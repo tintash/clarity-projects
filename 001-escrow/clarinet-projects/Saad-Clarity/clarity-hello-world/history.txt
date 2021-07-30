@@ -1,0 +1,4 @@
+#V2
+contract-call? .hello-world do-add 1 2
+(contract-call? .hello-world do-add 1 2)
+(contract-call? .hello-world do-add 10 2)
