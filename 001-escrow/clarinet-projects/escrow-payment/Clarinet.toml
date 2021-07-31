@@ -1,0 +1,6 @@
+[project]
+name = "escrow-payment"
+requirements = []
+[contracts.escrow-payment]
+path = "contracts/escrow-payment.clar"
+depends_on = []
