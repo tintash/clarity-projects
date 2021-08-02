@@ -1,5 +1,0 @@
-#V2
-(contract-call? get-message)
-(contract-call? . get-message)
-(contract-call? .* get-message)
-(contract-call? .billboard get-message)

@@ -1,3 +1,0 @@
-#V2
-(contract-call? .timelocked-wallet lock 'ST1J4G6RR643BCG8G8SR6M2D9Z9KXT2NJDRK3FBTK u10 u20)
-::get_assets_maps

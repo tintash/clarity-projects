@@ -1,5 +1,0 @@
-#V2
-(try! (some "string"))
-(try! (ok false))
-(try! (err false))
-(try! (ok true))
