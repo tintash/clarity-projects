@@ -25,17 +25,11 @@
   )
 )
 
-(define-private (payoutBalance)
-  (begin
-    (unwrap-panic (as-contract (stx-transfer? (+ (var-get item-amount) (var-get seller-amount)) tx-sender (unwrap-panic (var-get seller)))))
-    (unwrap-panic (as-contract (stx-transfer? (var-get item-amount) tx-sender (unwrap-panic (var-get buyer)))))
-  )
-)
-
 (define-public (itemRecieved)
   (begin
     (asserts! (is-eq (some tx-sender) (var-get buyer)) err-buyer-only)
-    (payoutBalance)
+    (try! (as-contract (stx-transfer? (+ (var-get item-amount) (var-get seller-amount)) tx-sender (unwrap-panic (var-get seller)))))
+    (try! (as-contract (stx-transfer? (var-get item-amount) tx-sender (unwrap-panic (var-get buyer)))))
     (ok true)
   )
 )
