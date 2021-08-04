@@ -16,7 +16,7 @@
 
 ;; data maps and vars
 ;;
-(define-map orders {buyer: principal, seller: principal, item: (string-ascii 40)} {item-received: bool, price: uint})
+(define-map orders {buyer: principal, seller: principal, item: (string-ascii 40)} {price: uint})
 
 ;; private functions
 ;;
@@ -33,11 +33,8 @@
    (and (> price u0)  (is-none (map-get? orders {buyer: buyer-address, seller: tx-sender, item:  item-name})))
    (let ((doubled-price (* u2 price)))
       (unwrap! (stx-transfer? doubled-price tx-sender (as-contract  tx-sender)) (err payment-error))
-      (if 
-         (map-set orders {buyer: buyer-address, seller: tx-sender, item: item-name} {item-received: false, price: price})
-         (ok success)
-         (err record-update-error)
-     )
+      (map-set orders {buyer: buyer-address, seller: tx-sender, item: item-name} {price: price})
+      (ok success)
    )  
    (err duplicate-record-error) 
   )
