@@ -1,0 +1,19 @@
+[project]
+name = "app-data"
+requirements = []
+
+[contracts.app]
+path = "contracts/app.clar"
+depends_on = ["data"]
+
+[contracts.data]
+path = "contracts/data.clar"
+depends_on = ["trait"]
+
+[contracts.trait]
+path = "contracts/trait.clar"
+depends_on = []
+
+[contracts.upgraded-app]
+path = "contracts/upgraded-app.clar"
+depends_on = ["app"]
