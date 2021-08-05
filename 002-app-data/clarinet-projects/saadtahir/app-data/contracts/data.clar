@@ -7,9 +7,7 @@
 
 (define-map user-info {id: uint} {name: (string-ascii 20), age: uint})
 
-(define-read-only (get-contract-owner)
-    (ok contract-owner)
-)
+(define-read-only (get-contract-owner) contract-owner)
 
 (define-public (test)
     (begin
