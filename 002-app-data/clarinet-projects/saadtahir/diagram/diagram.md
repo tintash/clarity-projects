@@ -2,11 +2,13 @@ sequenceDiagram
   participant User
   participant App
   participant Data
-  participant Trait  
-  Data -->> Trait: Implements
+  User ->> App: Calls smart contract function
   App ->> Data: Calls data functions
-  Data -->> App: Checks if its a valid caller
-  Data ->> App: Returns data
-  User ->> Data: Calls data functions
-  Data -->> User: Checks if its a valid caller
-  Data ->> User: Returns Error
+  Data -->> Data: Checks if it's a valid caller
+  alt is valid
+    Data ->> App: Returns data
+    App ->> User: Returns data
+  else is invalid
+    Data ->> App: Returns error
+    App ->> User: Returns error
+  end
