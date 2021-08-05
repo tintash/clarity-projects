@@ -4,7 +4,7 @@
     (let
         (
             (user-info (try! (as-contract (contract-call? data-contract get-user-info user-id))))
-            (user-age (unwrap-panic (get age user-info)))
+            (user-age (unwrap! (get age user-info) (err u100)))
         )
         (if (>= user-age u18)
             (ok user-info)

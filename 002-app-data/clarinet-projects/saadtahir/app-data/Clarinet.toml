@@ -16,4 +16,4 @@ depends_on = []
 
 [contracts.upgraded-app]
 path = "contracts/upgraded-app.clar"
-depends_on = ["app"]
+depends_on = []
