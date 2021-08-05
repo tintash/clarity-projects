@@ -12,4 +12,4 @@ It interacts with the data contract methods to get and set the data variables. I
 
 # upgraded-app.clar
 
-This is an updated version of app contract since we cannot upgrade the already deployed app contract. It calls the app contract public function using its own function. The test for this class is implemented as well.
+The upgraded app contract is written because the specifications to work with the user info got changed and since we cannot edit the already deploy app contract, we write this contract and check the age if its greater or equal to 18.
