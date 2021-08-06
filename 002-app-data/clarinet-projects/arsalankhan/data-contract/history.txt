@@ -1,0 +1,5 @@
+#V2
+(contract-call? .app-contract myadd .data-trait)
+(contract-call? .app-contract .data-trait my-add)
+(contract-call? .app-contract my-add b.data-trait)
+(contract-call? .app-contract my-add .data-trait)
