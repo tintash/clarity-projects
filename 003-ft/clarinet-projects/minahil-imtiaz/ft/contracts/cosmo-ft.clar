@@ -11,10 +11,7 @@
 (define-map valid-contract-callers { contract-identifier: principal} {valid-caller: bool})
 
 (define-private (is-valid-contract-caller (caller principal))
-  (begin 
-     (unwrap! (map-get? valid-contract-callers { contract-identifier: caller }) false)
-     true
-  )
+  (is-some (map-get? valid-contract-callers { contract-identifier: caller }))
 )
 
 
@@ -43,20 +40,20 @@
 )
 
 (define-public (transfer ( amount uint) (sender principal) (recipient principal))
-  (ok (try! (ft-transfer? cosmo-ft amount sender recipient)))
+  (ft-transfer? cosmo-ft amount sender recipient)
 )
 
 (define-public (issue-token ( amount uint) (recipient principal))
    (begin 
       (asserts! (or (is-eq tx-sender contract-owner) (is-valid-contract-caller contract-caller)) (err ERR_UNAUTHORIZED_CALLER)) 
-      (ok (try! (ft-mint? cosmo-ft amount recipient)))
+      (ft-mint? cosmo-ft amount recipient)
    )
 )
 
 (define-public (destroy-token (amount uint) (owner principal))
    (begin 
       (asserts! (or (is-eq tx-sender contract-owner) (is-eq tx-sender owner)) (err ERR_UNAUTHORIZED_CALLER)) 
-      (ok (try! (ft-burn? cosmo-ft amount owner)))
+      (ft-burn? cosmo-ft amount owner)
    )
 )
 

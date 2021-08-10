@@ -2,6 +2,7 @@
 ;; product-store
 
 (define-constant contract-owner tx-sender)
+(define-constant CONVERSION_UNIT u1000)
 (define-constant ERR_NO_RECORD_FOUND u404)
 (define-constant ERR_DUPLICATE_RECORD u504)
 (define-constant ERR_UNAUTHORIZED_CALLER u400)
@@ -45,12 +46,11 @@
 (define-public (buy-product (name (string-ascii 50)) (price uint))
    (let 
       ((product-price (try! (get-product-price name))) 
-       (caller tx-sender)
-       (tokens (* u1000 price))
+       (tokens (* CONVERSION_UNIT price))
       )
       (asserts! (is-eq product-price price) (err ERR_INVALID_PRICE))
       (try! (decrement-quantity name))
-      (try! (stx-transfer? price caller (as-contract tx-sender)))
+      (try! (stx-transfer? price tx-sender (as-contract tx-sender)))
       (try! (contract-call? .cosmo-ft issue-token tokens tx-sender))
       (ok SUCCESS)
    )
@@ -67,7 +67,7 @@
 (define-public (redeem-reward-tokens (amount uint))
    (let 
       ((caller tx-sender)
-       (transfer-amount (/ amount u1000)))
+       (transfer-amount (/ amount CONVERSION_UNIT)))
       (asserts! (> amount u0) (err ERR_INVALID_PRICE))
       (try! (contract-call? .cosmo-ft destroy-token amount tx-sender))
       (try! (as-contract (stx-transfer? transfer-amount tx-sender caller)))
