@@ -5,6 +5,7 @@
 (define-constant ERR_PAYMENT (err u1))
 (define-constant ERR_NOT_BUYER (err u2))
 (define-constant ERR_PAID_AMOUNT (err u3)) ;;price high or less than paid amount
+(define-constant ERR_WRONG_BUYER (err u4)) ;;buyer can not be same as seller
 ;; data variable
 (define-data-var item-buyer (optional principal) none)
 (define-data-var item-seller (optional principal) none)
@@ -16,7 +17,7 @@
 
 (define-public (amountBySeller (amountPaid uint))
     (begin 
-        (var-set item-price amountPaid u2)
+        (var-set item-price amountPaid)
         (unwrap! (stx-transfer? amountPaid tx-sender (as-contract tx-sender)) (err ERR_PAYMENT))
         (var-set item-seller (some tx-sender))
         (ok true)
@@ -25,6 +26,7 @@
 
 ;; customer will call this method to transfer money to contract
 ;; check if the amount is 2x the price of item (saved in item-price variable)
+;; check that the seller is not making the purchase
 ;; if amount is equal to item-price then save the sender id and transfer amount to contract
 ;; if the amount is not equal to item-price, then throw error
 ;; sender id will be saved in the item-buyer variable
@@ -33,8 +35,11 @@
 (define-public (purchaseItem (amountPaid uint))
     (begin
         (asserts! (is-eq amountPaid (var-get item-price)) ERR_PAID_AMOUNT)
+        (asserts! (not (is-eq (some tx-sender) (var-get item-seller))) ERR_WRONG_BUYER)
         (try! (stx-transfer? amountPaid tx-sender (as-contract tx-sender)))
         (var-set item-buyer (some tx-sender))
+        (print (var-get item-buyer))
+        (print tx-sender)
         (ok true)
     )
 )
@@ -46,19 +51,11 @@
 (define-public (itemReceived)
     (begin 
         (asserts! (is-eq (some tx-sender) (var-get item-buyer)) ERR_NOT_BUYER)
-        (try! (stx-transfer? (/ (var-get item-price) u2) (as-contract tx-sender) (unwrap-panic (var-get item-buyer))))
-        (try! (stx-transfer? (+  (var-get item-price)  (/ (var-get item-price) u2)) (as-contract tx-sender) (unwrap-panic (var-get item-seller))))
-        (var-set item-price u0)
+        (try! (as-contract (stx-transfer? (/ (var-get item-price) u2) tx-sender (unwrap-panic (var-get item-buyer)))))
+        (try! (as-contract (stx-transfer? (+ (var-get item-price) (/ (var-get item-price) u2) ) tx-sender (unwrap-panic (var-get item-buyer)))))
         (var-set item-buyer none)
         (var-set item-seller none)
+        (var-set item-price u0)
         (ok true)
     )
 )
-
-(define-read-only (itemNotReceived)
-    (begin
-        ;; confirmation from seller required
-        (ok true)
-    )
-)
-
