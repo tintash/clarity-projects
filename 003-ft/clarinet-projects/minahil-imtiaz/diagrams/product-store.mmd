@@ -1,0 +1,14 @@
+sequenceDiagram
+  participant User 
+  participant Product Store 
+  participant Cosmo FT
+  participant Trait Contract
+  Cosmo FT  -->> Trait Contract: Implements the traits defined
+  User ->> Product Store: Calls a function in Product Store 
+  activate  Product Store
+  Product Store ->> Cosmo FT: Calls relevant function in Cosmo FT
+  activate Cosmo FT
+  Cosmo FT ->> Product Store: Returns the result
+  deactivate Cosmo FT
+  Product Store ->> User: Returns the result obtained from Cosmo FT
+  deactivate Product Store
