@@ -75,6 +75,10 @@
    )
 )
 
+(define-read-only (get-bonus-points-count)
+   (contract-call? .cosmo-ft get-balance-of tx-sender)
+)
+
 (define-read-only (get-product-price (name (string-ascii 50)))
     (let
        ((required-product (unwrap! (map-get? products { name: name }) (err ERR_NO_RECORD_FOUND))))
