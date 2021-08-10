@@ -58,4 +58,4 @@
     )
 )
 
-(ft-mint? omegacoins u100 TOKEN_OWNER)
+(ft-mint? omegacoins u1000 TOKEN_OWNER)

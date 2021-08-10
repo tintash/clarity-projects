@@ -1,9 +1,7 @@
 sequenceDiagram
-  User->>+Omega-Contract: sell-omega(amount) [only contract deployer]
-  Omega-Contract->>+FT-omegacoins: transfer (amount, User, Omega-Contract, none)
+  Contract-Deployer->>Omega-Contract: deposit-omega(amount)
+  Omega-Contract->>+FT-omegacoins: transfer (amount, Contract-Deployer, Omega-Contract, none)
   FT-omegacoins-->>+SIP-010-Trait: implements
   User->>Omega-Contract: buy-omega(amount) [any principal]
   Omega-Contract->>FT-omegacoins: transfer (amount, Omega-Contract, User, none)
-  User->>Omega-Contract: withdraw-omega(amount) [only contract deployer]
-  Omega-Contract->FT-omegacoins: trasnfer(amount, Omega-Contract, user, none)
-  User->>Omega-Contract: change-price(newPrice)
+  Contract-Deployer->>Omega-Contract: change-price(newPrice)

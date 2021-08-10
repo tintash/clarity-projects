@@ -12,8 +12,8 @@ Clarinet.test({
         
 
         let block = chain.mineBlock([
-            Tx.contractCall('omega-contract', 'sell-omega', [types.uint(omegaCoins)], deployer.address),
-            Tx.contractCall('omega-contract', 'sell-omega', [types.uint(omegaCoins)], wallet_1.address)
+            Tx.contractCall('omega-contract', 'deposit-omega', [types.uint(omegaCoins)], deployer.address),
+            Tx.contractCall('omega-contract', 'deposit-omega', [types.uint(omegaCoins)], wallet_1.address)
         ]);
 
         block.receipts[0].result.expectOk().expectBool(true)
@@ -33,7 +33,7 @@ Clarinet.test({
         
 
         let block = chain.mineBlock([
-            Tx.contractCall('omega-contract', 'sell-omega', [types.uint(amount)], deployer.address),
+            Tx.contractCall('omega-contract', 'deposit-omega', [types.uint(amount)], deployer.address),
             Tx.contractCall('omega-contract', 'buy-omega', [types.uint(amount)], wallet_1.address)
         ]);
 
@@ -43,27 +43,7 @@ Clarinet.test({
     },
 });
 
-Clarinet.test({
-    name: "Ensure that withdrawing omega tokens can only be done by contract deployer",
-    async fn(chain: Chain, accounts: Map<string, Account>) {
-        const deployer = accounts.get('deployer')!;
-        const wallet_1 = accounts.get('wallet_1')!;
-        const omegaCoins = 10;
-        
 
-        let block = chain.mineBlock([
-            Tx.contractCall('omega-contract', 'sell-omega', [types.uint(omegaCoins)], deployer.address),
-            Tx.contractCall('omega-contract', 'withdraw-omega', [types.uint(omegaCoins)], deployer.address),
-            Tx.contractCall('omega-contract', 'withdraw-omega', [types.uint(omegaCoins)], wallet_1.address)
-
-        ]);
-
-        block.receipts[0].result.expectOk().expectBool(true)
-        block.receipts[1].result.expectOk().expectBool(true)
-        block.receipts[2].result.expectErr().expectUint(101)
-        
-    },
-});
 
 Clarinet.test({
     name: "Ensure that changing price of omega tokens can only be done by contract deployer",
