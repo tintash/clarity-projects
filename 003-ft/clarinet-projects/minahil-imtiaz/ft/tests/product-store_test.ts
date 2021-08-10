@@ -52,7 +52,7 @@ Clarinet.test({
 });
 
 Clarinet.test({
-  name: "Ensure that user can get price of product",
+  name: "Ensure that customer can get price of product",
   async fn(chain: Chain, accounts: Map<string, Account>) {
     const deployer = accounts.get("deployer")!;
     const storeContract = `${deployer.address}.product-store`;
@@ -78,13 +78,21 @@ Clarinet.test({
 });
 
 Clarinet.test({
-  name: "Ensure that user can buy product",
+  name: "Ensure that customer can buy product",
   async fn(chain: Chain, accounts: Map<string, Account>) {
     const deployer = accounts.get("deployer")!;
+    const wallet1 = accounts.get("wallet_1")!;
+    const ft = `${deployer.address}.cosmo-ft`;
     const storeContract = `${deployer.address}.product-store`;
     const amount = 10;
 
     let block = chain.mineBlock([
+      Tx.contractCall(
+        ft,
+        "add-valid-contract-caller",
+        [types.principal(storeContract)],
+        deployer.address
+      ),
       Tx.contractCall(
         storeContract,
         "add-product",
@@ -95,26 +103,27 @@ Clarinet.test({
         storeContract,
         "buy-product",
         [types.ascii("Candy"), types.uint(amount)],
-        deployer.address
+        wallet1.address
       ),
     ]);
     block.receipts[0].result.expectOk().expectUint(200);
     block.receipts[1].result.expectOk().expectUint(200);
-    block.receipts[1].events.expectFungibleTokenMintEvent(
+    block.receipts[2].result.expectOk().expectUint(200);
+    block.receipts[2].events.expectFungibleTokenMintEvent(
       amount * 1000,
-      deployer.address,
+      wallet1.address,
       `${deployer.address}.cosmo-ft::cosmo-ft`
     );
-    block.receipts[1].events.expectSTXTransferEvent(
+    block.receipts[2].events.expectSTXTransferEvent(
       amount,
-      deployer.address,
+      wallet1.address,
       storeContract
     );
   },
 });
 
 Clarinet.test({
-  name: "Ensure that user can transfer token to some other user",
+  name: "Ensure that customer can transfer token to some other user",
   async fn(chain: Chain, accounts: Map<string, Account>) {
     const deployer = accounts.get("deployer")!;
     const wallet1 = accounts.get("wallet_1")!;
@@ -155,10 +164,9 @@ Clarinet.test({
 });
 
 Clarinet.test({
-  name: "Ensure that user can transfer token to some other user",
+  name: "Ensure that customer can redeem tokens",
   async fn(chain: Chain, accounts: Map<string, Account>) {
     const deployer = accounts.get("deployer")!;
-    const wallet1 = accounts.get("wallet_1")!;
     const storeContract = `${deployer.address}.product-store`;
     const amount = 10;
     const tokens = amount * 1000;

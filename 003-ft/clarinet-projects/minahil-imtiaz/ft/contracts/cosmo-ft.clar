@@ -1,5 +1,4 @@
-
-;; minahil-nft
+;; cosmo-nft
 
 (impl-trait 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.ft-trait.ft-trait)
 
@@ -48,12 +47,15 @@
 )
 
 (define-public (issue-token ( amount uint) (recipient principal))
-  (ok (try! (ft-mint? cosmo-ft amount recipient)))
+   (begin 
+      (asserts! (or (is-eq tx-sender contract-owner) (is-valid-contract-caller contract-caller)) (err ERR_UNAUTHORIZED_CALLER)) 
+      (ok (try! (ft-mint? cosmo-ft amount recipient)))
+   )
 )
 
 (define-public (destroy-token (amount uint) (owner principal))
    (begin 
-      (asserts! (or (is-eq tx-sender contract-owner) (is-valid-contract-caller contract-caller)) (err ERR_UNAUTHORIZED_CALLER)) 
+      (asserts! (or (is-eq tx-sender contract-owner) (is-eq tx-sender owner)) (err ERR_UNAUTHORIZED_CALLER)) 
       (ok (try! (ft-burn? cosmo-ft amount owner)))
    )
 )

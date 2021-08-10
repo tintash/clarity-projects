@@ -50,7 +50,7 @@ Clarinet.test({
 });
 
 Clarinet.test({
-  name: "Ensure that issue-token mints new tokens",
+  name: "Ensure that contract owner can mint new tokens",
   async fn(chain: Chain, accounts: Map<string, Account>) {
     const deployer = accounts.get("deployer")!;
     const amount = 5000;
@@ -149,7 +149,7 @@ Clarinet.test({
 });
 
 Clarinet.test({
-  name: "Ensure that transfer returns correct supply",
+  name: "Ensure that user can transfer the tokens from one user to another",
   async fn(chain: Chain, accounts: Map<string, Account>) {
     const deployer = accounts.get("deployer")!;
     const wallet1 = accounts.get("wallet_1")!;
@@ -218,7 +218,7 @@ Clarinet.test({
 });
 
 Clarinet.test({
-  name: "Ensure that valid deployer can destroy tokens",
+  name: "Ensure that contract deployer can destroy tokens",
   async fn(chain: Chain, accounts: Map<string, Account>) {
     const deployer = accounts.get("deployer")!;
     const wallet1 = accounts.get("wallet_1")!;
@@ -236,6 +236,43 @@ Clarinet.test({
         "destroy-token",
         [types.uint(amount), types.principal(wallet1.address)],
         deployer.address
+      ),
+    ]);
+
+    block.receipts[0].result.expectOk().expectBool(true);
+    block.receipts[0].events.expectFungibleTokenMintEvent(
+      amount,
+      wallet1.address,
+      `${deployer.address}.cosmo-ft::cosmo-ft`
+    );
+    block.receipts[1].result.expectOk().expectBool(true);
+    block.receipts[1].events.expectFungibleTokenBurnEvent(
+      amount,
+      wallet1.address,
+      `${deployer.address}.cosmo-ft::cosmo-ft`
+    );
+  },
+});
+
+Clarinet.test({
+  name: "Ensure that token owner can destroy his tokens",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    const deployer = accounts.get("deployer")!;
+    const wallet1 = accounts.get("wallet_1")!;
+    const amount = 5000;
+
+    let block: Block = chain.mineBlock([
+      Tx.contractCall(
+        `${deployer.address}.cosmo-ft`,
+        "issue-token",
+        [types.uint(amount), types.principal(wallet1.address)],
+        deployer.address
+      ),
+      Tx.contractCall(
+        `${deployer.address}.cosmo-ft`,
+        "destroy-token",
+        [types.uint(amount), types.principal(wallet1.address)],
+        wallet1.address
       ),
     ]);
 
