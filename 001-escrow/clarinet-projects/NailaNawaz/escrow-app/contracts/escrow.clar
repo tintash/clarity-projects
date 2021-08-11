@@ -52,7 +52,7 @@
     (begin 
         (asserts! (is-eq (some tx-sender) (var-get item-buyer)) ERR_NOT_BUYER)
         (try! (as-contract (stx-transfer? (/ (var-get item-price) u2) tx-sender (unwrap-panic (var-get item-buyer)))))
-        (try! (as-contract (stx-transfer? (+ (var-get item-price) (/ (var-get item-price) u2) ) tx-sender (unwrap-panic (var-get item-buyer)))))
+        (try! (as-contract (stx-transfer? (+ (var-get item-price) (/ (var-get item-price) u2) ) tx-sender (unwrap-panic (var-get item-seller)))))
         (var-set item-buyer none)
         (var-set item-seller none)
         (var-set item-price u0)
