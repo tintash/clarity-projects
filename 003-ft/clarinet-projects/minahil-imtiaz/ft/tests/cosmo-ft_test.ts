@@ -45,7 +45,7 @@ Clarinet.test({
       [],
       deployer.address
     );
-    receipt.result.expectErr().expectUint(404);
+    receipt.result.expectOk().expectSome().expectUtf8("\\u{f09f8c8c}");
   },
 });
 
@@ -288,5 +288,94 @@ Clarinet.test({
       wallet1.address,
       `${deployer.address}.cosmo-ft::cosmo-ft`
     );
+  },
+});
+
+Clarinet.test({
+  name: "Ensure that user can't transfer 0 token from one user to another",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    const deployer = accounts.get("deployer")!;
+    const wallet1 = accounts.get("wallet_1")!;
+    const amount = 5000;
+    const token = 0;
+
+    let block = chain.mineBlock([
+      Tx.contractCall(
+        `${deployer.address}.cosmo-ft`,
+        "issue-token",
+        [types.uint(amount), types.principal(deployer.address)],
+        deployer.address
+      ),
+      Tx.contractCall(
+        `${deployer.address}.cosmo-ft`,
+        "transfer",
+        [
+          types.uint(token),
+          types.principal(deployer.address),
+          types.principal(wallet1.address),
+        ],
+        deployer.address
+      ),
+    ]);
+    block.receipts[0].result.expectOk().expectBool(true);
+    block.receipts[0].events.expectFungibleTokenMintEvent(
+      amount,
+      deployer.address,
+      `${deployer.address}.cosmo-ft::cosmo-ft`
+    );
+
+    block.receipts[1].result.expectErr().expectUint(3);
+  },
+});
+
+Clarinet.test({
+  name: "Ensure that token can't be tansferred between same principals",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    const deployer = accounts.get("deployer")!;
+    const amount = 5000;
+
+    let block = chain.mineBlock([
+      Tx.contractCall(
+        `${deployer.address}.cosmo-ft`,
+        "issue-token",
+        [types.uint(amount), types.principal(deployer.address)],
+        deployer.address
+      ),
+      Tx.contractCall(
+        `${deployer.address}.cosmo-ft`,
+        "transfer",
+        [
+          types.uint(amount),
+          types.principal(deployer.address),
+          types.principal(deployer.address),
+        ],
+        deployer.address
+      ),
+    ]);
+    block.receipts[0].result.expectOk().expectBool(true);
+    block.receipts[0].events.expectFungibleTokenMintEvent(
+      amount,
+      deployer.address,
+      `${deployer.address}.cosmo-ft::cosmo-ft`
+    );
+
+    block.receipts[1].result.expectErr().expectUint(2);
+  },
+});
+
+Clarinet.test({
+  name: "Ensure that contract owner can't mint 0 tokens",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    const deployer = accounts.get("deployer")!;
+    const amount = 0;
+    let block: Block = chain.mineBlock([
+      Tx.contractCall(
+        `${deployer.address}.cosmo-ft`,
+        "issue-token",
+        [types.uint(amount), types.principal(deployer.address)],
+        deployer.address
+      ),
+    ]);
+    block.receipts[0].result.expectErr().expectUint(1);
   },
 });

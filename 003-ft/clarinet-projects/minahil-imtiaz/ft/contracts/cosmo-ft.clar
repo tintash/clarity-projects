@@ -32,7 +32,7 @@
 )
 
 (define-read-only (get-token-uri)
-  (err u404)
+  (ok  (some u"\u{1F30C}"))  
 )
 
 (define-read-only (get-balance-of (owner-identifier principal))

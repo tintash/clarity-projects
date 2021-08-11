@@ -47,7 +47,7 @@ Clarinet.test({
       ),
     ]);
     block.receipts[0].result.expectOk().expectUint(200);
-    block.receipts[1].result.expectOk().expectUint(200);
+    block.receipts[1].result.expectOk().expectBool(true);
   },
 });
 
@@ -102,7 +102,7 @@ Clarinet.test({
       Tx.contractCall(
         storeContract,
         "buy-product",
-        [types.ascii("Candy"), types.uint(amount)],
+        [types.ascii("Candy")],
         wallet1.address
       ),
     ]);
@@ -141,7 +141,7 @@ Clarinet.test({
       Tx.contractCall(
         storeContract,
         "buy-product",
-        [types.ascii("Candy"), types.uint(amount)],
+        [types.ascii("Candy")],
         deployer.address
       ),
       Tx.contractCall(
@@ -181,7 +181,7 @@ Clarinet.test({
       Tx.contractCall(
         storeContract,
         "buy-product",
-        [types.ascii("Candy"), types.uint(amount)],
+        [types.ascii("Candy")],
         deployer.address
       ),
       Tx.contractCall(
@@ -233,7 +233,7 @@ Clarinet.test({
       Tx.contractCall(
         storeContract,
         "buy-product",
-        [types.ascii("Candy"), types.uint(amount)],
+        [types.ascii("Candy")],
         wallet1.address
       ),
       Tx.contractCall(
@@ -257,5 +257,43 @@ Clarinet.test({
       storeContract
     );
     block.receipts[3].result.expectOk().expectUint(tokens);
+  },
+});
+
+Clarinet.test({
+  name: "Ensure that contract-owner can't add product with quantity set as 0",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    const deployer = accounts.get("deployer")!;
+    const storeContract = `${deployer.address}.product-store`;
+    const amount = 10;
+
+    let block = chain.mineBlock([
+      Tx.contractCall(
+        storeContract,
+        "add-product",
+        [types.ascii("Candy"), types.uint(amount), types.uint(0)],
+        deployer.address
+      ),
+    ]);
+    block.receipts[0].result.expectErr().expectUint(406);
+  },
+});
+
+Clarinet.test({
+  name: "Ensure that contract-owner can't add product with price set as 0",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    const deployer = accounts.get("deployer")!;
+    const storeContract = `${deployer.address}.product-store`;
+    const amount = 0;
+
+    let block = chain.mineBlock([
+      Tx.contractCall(
+        storeContract,
+        "add-product",
+        [types.ascii("Candy"), types.uint(amount), types.uint(5)],
+        deployer.address
+      ),
+    ]);
+    block.receipts[0].result.expectErr().expectUint(401);
   },
 });
