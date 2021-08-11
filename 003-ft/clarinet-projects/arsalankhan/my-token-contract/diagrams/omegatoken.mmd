@@ -2,6 +2,15 @@ sequenceDiagram
   Contract-Deployer->>Omega-Contract: deposit-omega(amount)
   Omega-Contract->>+FT-omegacoins: transfer (amount, Contract-Deployer, Omega-Contract, none)
   FT-omegacoins-->>+SIP-010-Trait: implements
-  User->>Omega-Contract: buy-omega(amount) [any principal]
-  Omega-Contract->>FT-omegacoins: transfer (amount, Omega-Contract, User, none)
   Contract-Deployer->>Omega-Contract: change-price(newPrice)
+
+sequenceDiagram
+  Principal->>+FT-omegacoins: transfer (amount, to, from, memo) 
+  Principal->>+FT-omegacoins: get-name ()
+  Principal->>+FT-omegacoins: get-symbol ()
+  Principal->>+FT-omegacoins: get-decimals ()
+  Principal->>+FT-omegacoins: get-balance (principal)
+  Principal->>+FT-omegacoins: get-total-supply ()
+  Principal->>+FT-omegacoins: get-token-uri ()
+  Principal->>+FT-omegacoins: mint (amount, principal)
+  Principal->>+FT-omegacoins: burn (amount, principal)
