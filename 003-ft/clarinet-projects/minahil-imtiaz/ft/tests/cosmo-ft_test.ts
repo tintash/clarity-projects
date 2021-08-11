@@ -213,7 +213,7 @@ Clarinet.test({
         deployer.address
       ),
     ]);
-    block1.receipts[0].result.expectOk().expectUint(200);
+    block1.receipts[0].result.expectOk().expectBool(true);
   },
 });
 
@@ -377,5 +377,58 @@ Clarinet.test({
       ),
     ]);
     block.receipts[0].result.expectErr().expectUint(1);
+  },
+});
+
+Clarinet.test({
+  name: "Ensure that only contract owner can mint new tokens",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    const deployer = accounts.get("deployer")!;
+    const wallet1 = accounts.get("wallet_1")!;
+    const amount = 5000;
+    let block: Block = chain.mineBlock([
+      Tx.contractCall(
+        `${deployer.address}.cosmo-ft`,
+        "issue-token",
+        [types.uint(amount), types.principal(deployer.address)],
+        wallet1.address
+      ),
+    ]);
+    block.receipts[0].result.expectErr().expectUint(400);
+  },
+});
+
+Clarinet.test({
+  name: "Ensure that different principals of tx-sender and sender can't be used for transferring tokens",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    const deployer = accounts.get("deployer")!;
+    const wallet1 = accounts.get("wallet_1")!;
+    const amount = 5000;
+
+    let block: Block = chain.mineBlock([
+      Tx.contractCall(
+        `${deployer.address}.cosmo-ft`,
+        "issue-token",
+        [types.uint(amount), types.principal(deployer.address)],
+        deployer.address
+      ),
+      Tx.contractCall(
+        `${deployer.address}.cosmo-ft`,
+        "transfer",
+        [
+          types.uint(amount),
+          types.principal(deployer.address),
+          types.principal(wallet1.address),
+        ],
+        wallet1.address
+      ),
+    ]);
+    block.receipts[0].result.expectOk().expectBool(true);
+    block.receipts[0].events.expectFungibleTokenMintEvent(
+      amount,
+      deployer.address,
+      `${deployer.address}.cosmo-ft::cosmo-ft`
+    );
+    block.receipts[1].result.expectErr().expectUint(400);
   },
 });

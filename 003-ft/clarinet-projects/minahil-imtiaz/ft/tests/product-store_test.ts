@@ -106,7 +106,7 @@ Clarinet.test({
         wallet1.address
       ),
     ]);
-    block.receipts[0].result.expectOk().expectUint(200);
+    block.receipts[0].result.expectOk().expectBool(true);
     block.receipts[1].result.expectOk().expectUint(200);
     block.receipts[2].result.expectOk().expectUint(200);
     block.receipts[2].events.expectFungibleTokenMintEvent(
@@ -243,7 +243,7 @@ Clarinet.test({
         wallet1.address
       ),
     ]);
-    block.receipts[0].result.expectOk().expectUint(200);
+    block.receipts[0].result.expectOk().expectBool(true);
     block.receipts[1].result.expectOk().expectUint(200);
     block.receipts[2].result.expectOk().expectUint(200);
     block.receipts[2].events.expectFungibleTokenMintEvent(
