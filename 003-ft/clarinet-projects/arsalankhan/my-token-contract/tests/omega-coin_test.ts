@@ -72,20 +72,18 @@ Clarinet.test({
 });
 
 Clarinet.test({
-    name: "Ensure that selling omega tokens can only be done by contract deployer",
+    name: "Ensure that selling omega tokens can only be done by any principal",
     async fn(chain: Chain, accounts: Map<string, Account>) {
-        const deployer = accounts.get('deployer')!;
         const wallet_1 = accounts.get('wallet_1')!;
         const omegaCoins = 10;
         
 
         let block = chain.mineBlock([
-            Tx.contractCall('omega-coin', 'deposit-omega', [types.uint(omegaCoins)], deployer.address),
-            Tx.contractCall('omega-coin', 'deposit-omega', [types.uint(omegaCoins)], wallet_1.address)
+            Tx.contractCall('omega-coin', 'buy-omega', [types.uint(omegaCoins)], wallet_1.address),
+            Tx.contractCall('omega-coin', 'sell-omega', [types.uint(omegaCoins)], wallet_1.address)
         ]);
 
-        block.receipts[0].result.expectOk().expectBool(true)
-        block.receipts[1].result.expectErr().expectUint(2000)
+        block.receipts[1].result.expectOk().expectBool(true)
     },
 });
 
@@ -101,13 +99,11 @@ Clarinet.test({
         
 
         let block = chain.mineBlock([
-            Tx.contractCall('omega-coin', 'deposit-omega', [types.uint(amount)], deployer.address),
             Tx.contractCall('omega-coin', 'buy-omega', [types.uint(amount)], wallet_1.address)
         ]);
-
-        block.receipts[1].result.expectOk().expectBool(true)
-        block.receipts[1].events.expectSTXTransferEvent(amount * 1000, wallet_1.address, deployer.address);
-        block.receipts[1].events.expectFungibleTokenTransferEvent(amount, contract, wallet_1.address, asset)
+        block.receipts[0].result.expectOk().expectBool(true)
+        block.receipts[0].events.expectSTXTransferEvent(amount * 1000, wallet_1.address, contract);
+        block.receipts[0].events.expectFungibleTokenTransferEvent(amount, contract, wallet_1.address, asset)
     },
 });
 

@@ -11,14 +11,17 @@
 
 
 ;; only contract-ownder will call this to deposit amount of "OMC tokens" to this contract.
-(define-public (deposit-omega (amount uint))
-    (begin
-       (asserts! (is-eq contract-caller TOKEN_OWNER) ERR_UNAUTHORIZED)
-        
-        ;; send OMEGA to contract
-        (try! (transfer amount contract-caller (as-contract tx-sender) none))
-        (ok true)
+(define-public (sell-omega (amount uint))
+  (let
+    (
+      (seller tx-sender)
     )
+    (asserts! (not (is-eq contract-caller TOKEN_OWNER)) ERR_UNAUTHORIZED)
+    ;; transfer stx to deployer
+    (try! (as-contract (stx-transfer? (* amount (var-get price)) tx-sender seller)))
+    (try! (transfer amount seller (as-contract tx-sender) none))
+    (ok true)
+  )
 )
 
 ;; any principal buy OMC tokens by transfering stx tokens.
@@ -28,8 +31,8 @@
         (buyer tx-sender)
     )
     (asserts! (not (is-eq contract-caller TOKEN_OWNER)) ERR_UNAUTHORIZED)
-    ;; transfer stx to deployer
-    (try! (stx-transfer? (* amount (var-get price)) tx-sender TOKEN_OWNER))
+    ;; transfer stx to contract
+    (try! (stx-transfer? (* amount (var-get price)) tx-sender (as-contract tx-sender)))
     (try! (as-contract (transfer amount tx-sender buyer none)))
     (ok true)
   )
@@ -69,6 +72,16 @@
     ;; we don't want random people destroying someone else's tokens
     (asserts! (is-eq tx-sender TOKEN_OWNER) ERR_UNAUTHORIZED)
     (ft-burn? omegacoins amount address)
+    )
+)
+
+(define-private (deposit-omega (amount uint))
+    (begin
+       (asserts! (is-eq contract-caller TOKEN_OWNER) ERR_UNAUTHORIZED)
+        ;; send OMEGA to contract
+
+        (try! (transfer amount contract-caller (as-contract tx-sender) none))
+        (ok true)
     )
 )
 
