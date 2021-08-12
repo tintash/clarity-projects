@@ -1,0 +1,7 @@
+sequenceDiagram
+  FT-Contract-deployer->>OmegaCoin: deposit-omega(amount)
+  FT-Contract-deployer->>OmegaCoin: change-price(newPrice)
+  OmegaCoin-->>+SIP-010-Trait: implements
+  FT-Contract-deployer->>OmegaCoin: mint(amount principal)
+  FT-Contract-deployer->>OmegaCoin: burn(amount principal)
+  FT-Contract-deployer->>OmegaCoin: calls all the SIP-010 implemented functions

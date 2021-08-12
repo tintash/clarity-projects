@@ -8,7 +8,3 @@ depends_on = ["sip-010-trait-ft-standard"]
 [contracts.sip-010-trait-ft-standard]
 path = "contracts/sip-010-trait-ft-standard.clar"
 depends_on = []
-
-[contracts.omega-contract]
-path = "contracts/omega-contract.clar"
-depends_on = ["omega-coin"]
