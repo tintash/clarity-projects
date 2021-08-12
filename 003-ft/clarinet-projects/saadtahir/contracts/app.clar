@@ -23,40 +23,22 @@
 (define-constant SCORE_TOKENS u1000000)
 (define-constant NO_SCORE_TOKENS u1000)
 
-(define-data-var player-score uint u0)
-
 ;; A random function to call goal-scored method
 ;; Need to ::advance_chain_tip 1 atleast to make it work
 (define-read-only (get-random-number)
     (index-of BUFF_TO_UINT8 (try! (element-at (try! (get-block-info? vrf-seed u0)) u31)))
 )
 
-(define-public (generate-player-score)
-    (begin 
-        (var-set player-score (unwrap-panic (get-random-number)))
-        (ok (var-get player-score))
-    )
-)
-
-;; Manager calls my-ft function to give tokens to player
-(define-public (check-goal-scored (player principal))
+(define-public (is-goal-scored (score uint) (player principal))
     (let
-        (
-            (score (var-get player-score))
+        (            
             (playerBalance (unwrap-panic (contract-call? .my-ft get-balance player)))
         )
-        (print {score: score, balance: playerBalance})
         (if (> score GOAL_SCORING_CRITERIA)
-            (begin
-                (try! (contract-call? .my-ft give SCORE_TOKENS player))
-                (ok true)
-            )
+            (ok (try! (contract-call? .my-ft give SCORE_TOKENS player)))
         (begin
-            (if (> playerBalance score)
-                (begin 
-                    (try! (contract-call? .my-ft destroy NO_SCORE_TOKENS player))
-                    (ok false)
-                )
+            (if (> playerBalance NO_SCORE_TOKENS)
+                (ok (try! (contract-call? .my-ft destroy NO_SCORE_TOKENS player)))
             (ok false)
             )
         )

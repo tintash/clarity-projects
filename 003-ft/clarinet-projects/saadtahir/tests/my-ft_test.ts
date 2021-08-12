@@ -57,7 +57,6 @@ Clarinet.test({
   async fn(chain: Chain, accounts: Map<string, Account>) {
     const deployer = accounts.get("deployer")!;
     const recipient = accounts.get("wallet_1")!;
-    const assetID = `${deployer}.my-ft::my-token`;
 
     let block = chain.mineBlock([
       Tx.contractCall(
