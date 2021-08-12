@@ -45,3 +45,12 @@
         )
     )
 )
+
+(define-public (goal-score (player principal))
+    (let
+        (
+            (score (unwrap-panic (get-random-number)))
+        )
+        (is-goal-scored score player)
+    )
+)
