@@ -1,4 +1,9 @@
-User ->> Product Store: transfer-reward-tokens(amount, recipient)
+sequenceDiagram
+  participant User 
+  participant Product Store 
+  participant Cosmo FT
+  
+  User ->> Product Store: transfer-reward-tokens(amount, recipient)
   activate  Product Store
   Product Store ->> Cosmo FT: transfer(amount, sender, recipient)
   activate Cosmo FT
