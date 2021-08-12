@@ -52,15 +52,13 @@
       )
       (try! (decrement-quantity name))
       (try! (stx-transfer? product-price tx-sender (as-contract tx-sender)))
-      (try! (contract-call? .cosmo-ft issue-token tokens tx-sender))
-      (ok SUCCESS)
+      (ok (try! (contract-call? .cosmo-ft issue-token tokens tx-sender)))
    )
 )
 
 (define-public (transfer-reward-tokens (amount uint) (recipient principal))
    (begin 
-      (try! (contract-call? .cosmo-ft transfer amount tx-sender recipient))
-      (ok SUCCESS)
+      (ok (try! (contract-call? .cosmo-ft transfer amount tx-sender recipient)))
    )
 )
 
