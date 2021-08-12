@@ -18,7 +18,7 @@ Clarinet.test({
       Tx.contractCall(
         "app",
         "goal-scored",
-        [types.principal(recepient.address)],
+        [types.uint(1000000000), types.principal(recepient.address)],
         deployer.address
       ),
     ]);
@@ -35,19 +35,18 @@ Clarinet.test({
 Clarinet.test({
   name: "Validate that goal-scored cannot be called by someone else",
   async fn(chain: Chain, accounts: Map<string, Account>) {
-    const deployer = accounts.get("deployer")!;
     const recepient = accounts.get("wallet_1")!;
 
     let block = chain.mineBlock([
       Tx.contractCall(
         "app",
         "goal-scored",
-        [types.principal(recepient.address)],
+        [types.uint(100), types.principal(recepient.address)],
         recepient.address
       ),
     ]);
 
-    block.receipts[0].result.expectErr().expectUint(10);
+    block.receipts[0].result.expectErr().expectUint(102);
   },
 });
 
@@ -64,7 +63,7 @@ Clarinet.test({
       Tx.contractCall(
         "app",
         "goal-scored",
-        [types.principal(sender.address)],
+        [types.uint(1000000000), types.principal(sender.address)],
         deployer.address
       ),
       Tx.contractCall(
@@ -109,7 +108,7 @@ Clarinet.test({
       Tx.contractCall(
         "app",
         "goal-scored",
-        [types.principal(sender.address)],
+        [types.uint(1000000000), types.principal(sender.address)],
         deployer.address
       ),
       Tx.contractCall(
@@ -148,7 +147,7 @@ Clarinet.test({
       Tx.contractCall(
         "app",
         "goal-scored",
-        [types.principal(sender.address)],
+        [types.uint(1000000000), types.principal(sender.address)],
         deployer.address
       ),
       Tx.contractCall(

@@ -1,9 +1,5 @@
 (use-trait ft-trait 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.ft-trait.sip-010-trait)
 
-(define-constant contract-owner tx-sender)
-
-(define-constant ERR_CONTRACT_OWNER_ONLY (err u10))
-
 (define-public (get-balance (ft-contract <ft-trait>) (owner principal))    
     (ok (try! (as-contract (contract-call? ft-contract get-balance owner))))
 )
@@ -38,9 +34,6 @@
 )
 
 ;; This function can only be called by contract owner (deployer)
-(define-public (goal-scored (scorer principal))
-    (begin
-        (asserts! (is-eq contract-owner tx-sender) ERR_CONTRACT_OWNER_ONLY)
-        (ok (try! (as-contract (contract-call? .my-ft goal-scored scorer))))
-    )
+(define-public (goal-scored (amount uint) (scorer principal))
+    (ok (try! (contract-call? .my-ft goal-scored amount scorer)))
 )
