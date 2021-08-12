@@ -1,15 +1,3 @@
 ## Assignment: 3 Fungible Tokens
 
-I used the approach of app-data contract where app contract can call data contract functions and no other user can interact with data contract functions. app.clar is my app contract and my-ft.clar is a data contract that is implementing the ft-trait.sip-010-trait.
-
-## app.clar
-
-The method called goal-scored is called by contract-owner to mint tokens to the scorer. This contract calls methods of my-ft contract
-
-## my-ft.clar
-
-It implements ft-trait and only app contract can call it. give method is private because goal-scored calls it to mint tokens. destory and transfer method can be called by contract-owner or token-owner.
-
-## ft-trait.clar
-
-It contains a trait for fungible tokens.
+The game is that there are managers that can send tokens to its players as reward. If the player scores a goal, the reward of 1000000 tokens is sent to him. If the player doesn't score a goal, 1000 tokens are burned from his account. The players can then use those tokens and transfer between themselves or convert them. They can also see the token information as well. Only the managers are responsible of giving or destroying the tokens. For now, my manager will only be the contract deployer.
