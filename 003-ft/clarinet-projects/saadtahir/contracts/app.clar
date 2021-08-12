@@ -1,5 +1,5 @@
 
-;; random number list
+;; random number list https://github.com/psq/stacks-open-oracle/blob/master/contracts/oracle.clar#L27
 (define-constant BUFF_TO_UINT8 (list
     0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b 0x0c 0x0d 0x0e 0x0f
     0x10 0x11 0x12 0x13 0x14 0x15 0x16 0x17 0x18 0x19 0x1a 0x1b 0x1c 0x1d 0x1e 0x1f
@@ -19,7 +19,7 @@
     0xf0 0xf1 0xf2 0xf3 0xf4 0xf5 0xf6 0xf7 0xf8 0xf9 0xfa 0xfb 0xfc 0xfd 0xfe 0xff
 ))
 ;; The goal-scored reward will be given to those who generate a random number greater than this criteria
-(define-constant goal-scoring-criteria u200)
+(define-constant GOAL_SCORING_CRITERIA u200)
 (define-constant SCORE_TOKENS u1000000)
 (define-constant NO_SCORE_TOKENS u1000)
 
@@ -36,7 +36,7 @@
             (random (unwrap-panic (get-random-number)))
         )
         (print random)
-        (if (> random goal-scoring-criteria)
+        (if (> random GOAL_SCORING_CRITERIA)
             (ok (try! (contract-call? .my-ft give SCORE_TOKENS player)))
         (ok (try! (contract-call? .my-ft destroy NO_SCORE_TOKENS player)))
         )

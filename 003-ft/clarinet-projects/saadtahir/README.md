@@ -8,7 +8,7 @@ Implements a random number generator. If the random number is greater than the c
 
 ## my-ft.clar
 
-Implements sip-010-trait. A token owner can transfer tokens by calling transfer function. It can also view token properties. A manager can give or burn tokens of players. A player can convert tokens to STX following specified conversion. The contract owner first adds managers in the data variable.
+Implements sip-010-trait. A token owner can transfer tokens by calling transfer function. It can also view token properties. A manager can give or burn tokens of players. A player can convert tokens to STX following the conversion e.g 1 STX = 1000 tokens. The contract owner first adds managers in the data variable.
 
 ## ft-trait.clar
 

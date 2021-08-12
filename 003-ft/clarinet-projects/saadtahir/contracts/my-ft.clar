@@ -1,7 +1,7 @@
 (impl-trait .ft-trait.sip-010-trait)
 
-(define-constant contract-owner tx-sender)
-(define-constant transfer-rate u1000)
+(define-constant CONTRACT_OWNER tx-sender)
+(define-constant TRANSFER_RATE u1000)
 
 (define-constant ERR_CONTRACT_OWNER_ONLY (err u100))
 (define-constant ERR_MANAGER_ONLY (err u101))
@@ -41,12 +41,11 @@
     (ok (some u"https://ohmytoken.com"))
 )
 
-;; Transfers tokens to a recipient
-(define-public (transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))    
+;; Only admin can add a manager
+(define-public (add-manager (user principal))
     (begin
-        (asserts! (is-eq tx-sender sender) ERR_TOKEN_OWNER_ONLY)
-        (try! (ft-transfer? my-token amount sender recipient))
-        (print memo)
+        (asserts! (is-eq CONTRACT_OWNER tx-sender) ERR_CONTRACT_OWNER_ONLY)
+        (var-set manager (some user))
         (ok true)
     )
 )
@@ -54,18 +53,18 @@
 ;; convert tokens to stx
 (define-public (convert-tokens (amount uint) (sender principal))
     (begin
-        (asserts! (is-eq contract-owner tx-sender) ERR_CONTRACT_OWNER_ONLY)
-        (try! (stx-transfer? (/ amount transfer-rate) tx-sender sender))
+        (asserts! (is-eq CONTRACT_OWNER tx-sender) ERR_CONTRACT_OWNER_ONLY)
+        (try! (stx-transfer? (/ amount TRANSFER_RATE) tx-sender sender))
         (try! (destroy amount sender))
         (ok true)
     )
 )
 
-;; Only admin can add a manager
-(define-public (add-manager (user principal))
+;; This method gives the tokens to the address
+(define-public (give (amount uint) (address principal))
     (begin
-        (asserts! (is-eq contract-owner tx-sender) ERR_CONTRACT_OWNER_ONLY)
-        (var-set manager (some user))
+        (asserts! (is-eq tx-sender (unwrap! (var-get manager) ERR_NO_MANAGER)) ERR_MANAGER_ONLY)
+        (try! (ft-mint? my-token amount address))
         (ok true)
     )
 )
@@ -79,11 +78,12 @@
     )
 )
 
-;; This method gives the tokens to the address
-(define-public (give (amount uint) (address principal))
+;; Transfers tokens to a recipient
+(define-public (transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))    
     (begin
-        (asserts! (is-eq tx-sender (unwrap! (var-get manager) ERR_NO_MANAGER)) ERR_MANAGER_ONLY)
-        (try! (ft-mint? my-token amount address))
+        (asserts! (is-eq tx-sender sender) ERR_TOKEN_OWNER_ONLY)
+        (try! (ft-transfer? my-token amount sender recipient))
+        (print memo)
         (ok true)
     )
 )
