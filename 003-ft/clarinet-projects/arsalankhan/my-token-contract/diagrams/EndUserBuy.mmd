@@ -1,4 +1,3 @@
 sequenceDiagram
-  Enduser->>+OmegaCoin: buy-omega(amount)
-  OmegaCoin->>+OmegaCoin: transfer of omega coins(amount, OmegaCoin, enduser, none)
-  OmegaCoin->>+OmegaCoin: transfer of STX tokens(1000*amount, enduser, OmegaCoin)
+  Enduser->>+OmegaCoin: calls buy-omega and send 1000 uSTX
+  OmegaCoin->>+OmegaCoin: transfer of 1 OMC token to user's account
