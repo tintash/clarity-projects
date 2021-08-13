@@ -55,10 +55,10 @@
 ;; convert tokens to stx
 (define-public (convert-tokens (amount uint) (sender principal))
     (begin
-        (asserts! (is-eq CONTRACT_OWNER tx-sender) ERR_CONTRACT_OWNER_ONLY)
+        (asserts! (is-eq sender tx-sender) ERR_TOKEN_OWNER_ONLY)
         (asserts! (> amount TRANSFER_RATE) ERR_AMOUNT_NON_POSITIVE)
-        (try! (stx-transfer? (/ amount TRANSFER_RATE) tx-sender sender))
-        (try! (destroy amount sender))
+        (try! (as-contract (stx-transfer? (/ amount TRANSFER_RATE) tx-sender sender)))
+        (try! (ft-burn? my-token amount sender))
         (ok true)
     )
 )
@@ -91,3 +91,5 @@
     )
 )
 
+;; Transfer STX to contract
+(stx-transfer? u1000000 tx-sender (as-contract tx-sender))

@@ -6,10 +6,16 @@ The game is that there are managers that can send tokens to its players as rewar
 
 Implements a random number generator. If the random number is greater than the criteria set, the token is transferred to the player's wallet. Else tokens are burnt.
 
+ST5HYHBZ6CH0DHENSVCRTGKJ0CGTDFN09DRT38YK.app
+
 ## my-ft.clar
 
-Implements sip-010-trait. A token owner can transfer tokens by calling transfer function. It can also view token properties. A manager can give or burn tokens of players. A player can convert tokens to STX following the conversion e.g 1 STX = 1000 tokens. The contract owner first adds managers in the data variable.
+Implements sip-010-trait. A token owner can transfer tokens by calling transfer function. It can also view token properties. A manager can give or burn tokens of players. A player can convert tokens to STX following the conversion e.g 1 STX = 1000 tokens. Initially, 1000000 STX is given to contract so that convert tokens can be acheived. The contract owner first adds managers in the data variable.
+
+ST5HYHBZ6CH0DHENSVCRTGKJ0CGTDFN09DRT38YK.my-ft
 
 ## ft-trait.clar
 
 sip-010-trait is defined in the contract.
+
+ST5HYHBZ6CH0DHENSVCRTGKJ0CGTDFN09DRT38YK.ft-trait
