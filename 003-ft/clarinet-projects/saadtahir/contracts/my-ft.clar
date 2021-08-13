@@ -7,6 +7,8 @@
 (define-constant ERR_MANAGER_ONLY (err u101))
 (define-constant ERR_TOKEN_OWNER_ONLY (err u102))
 (define-constant ERR_NO_MANAGER (err u103))
+(define-constant ERR_AMOUNT_NON_POSITIVE (err u104))
+
 
 (define-fungible-token my-token)
 
@@ -54,6 +56,7 @@
 (define-public (convert-tokens (amount uint) (sender principal))
     (begin
         (asserts! (is-eq CONTRACT_OWNER tx-sender) ERR_CONTRACT_OWNER_ONLY)
+        (asserts! (> amount TRANSFER_RATE) ERR_AMOUNT_NON_POSITIVE)
         (try! (stx-transfer? (/ amount TRANSFER_RATE) tx-sender sender))
         (try! (destroy amount sender))
         (ok true)
