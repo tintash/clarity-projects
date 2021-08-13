@@ -1,0 +1,18 @@
+# OmegaCoins
+OmegaCoins(OMC) is a fungible token which implements sip-010-trait standard, it implements all the functions provided by sip-011 trait to be fully compatible with the stacks blockchain. 1000 new OMC tokens will be minted to the Token Owner and deposited 100 to the contract itself.
+The Token Owner can mint and destroy these OmegaCoins and can deposit to the omega coin FT-contract and then anyone can get these Omegacoin tokens by transfering STX token to the Ft-contract and in return he/she will get OmegaCoin tokens. The exchange rate is (1 OMC = 1000 uSTX). e.g in order to get 1 OMC token, you have to transfer 1000 mSTX. A sequence diagram showing different actions that can be performed by the end-user and the FT-token deployer can be seen as follows:
+
+- sell-omega():  sell omega coins and take STX tokens in return from the contract
+
+[![](https://mermaid.ink/img/eyJjb2RlIjoic2VxdWVuY2VEaWFncmFtXG4gIEVuZHVzZXItPj4rT21lZ2FDb2luOiBjYWxscyBzZWxsLW9tZWdhIGFuZCBzZW5kIDEgT01DXG4gIE9tZWdhQ29pbi0-PitPbWVnYUNvaW46IHRyYW5zZmVyIG9mIFNUWCB0b2tlbnMgMTAwMCBVU1RYIHRvIHVzZXIncyBhY2NvdW50XG4iLCJtZXJtYWlkIjp7InRoZW1lIjoiZGVmYXVsdCJ9LCJ1cGRhdGVFZGl0b3IiOmZhbHNlLCJhdXRvU3luYyI6dHJ1ZSwidXBkYXRlRGlhZ3JhbSI6ZmFsc2V9)](https://mermaid-js.github.io/mermaid-live-editor/edit/##eyJjb2RlIjoic2VxdWVuY2VEaWFncmFtXG4gIEVuZHVzZXItPj4rT21lZ2FDb2luOiBjYWxscyBzZWxsLW9tZWdhIGFuZCBzZW5kIDEgT01DXG4gIE9tZWdhQ29pbi0-PitPbWVnYUNvaW46IHRyYW5zZmVyIG9mIFNUWCB0b2tlbnMgMTAwMCBVU1RYIHRvIHVzZXIncyBhY2NvdW5cbiIsIm1lcm1haWQiOiJ7XG4gIFwidGhlbWVcIjogXCJkZWZhdWx0XCJcbn0iLCJ1cGRhdGVFZGl0b3IiOmZhbHNlLCJhdXRvU3luYyI6dHJ1ZSwidXBkYXRlRGlhZ3JhbSI6ZmFsc2V9)
+
+- buy-omega(): buy omega coins by transfering STX tokens to the contract
+
+[![](https://mermaid.ink/img/eyJjb2RlIjoic2VxdWVuY2VEaWFncmFtXG4gIEVuZHVzZXItPj4rT21lZ2FDb2luOiBjYWxscyBidXktb21lZ2EgYW5kIHRyYW5zZmVyIDEwMDAgdVNUWFxuICBPbWVnYUNvaW4tPj4rT21lZ2FDb2luOiBtaW50cyAxIE9NQyB0b2tlbiB0byB0aGUgRW5kdXNlcidzIGFjY291bnQiLCJtZXJtYWlkIjp7InRoZW1lIjoiZGVmYXVsdCJ9LCJ1cGRhdGVFZGl0b3IiOmZhbHNlLCJhdXRvU3luYyI6dHJ1ZSwidXBkYXRlRGlhZ3JhbSI6ZmFsc2V9)](https://mermaid-js.github.io/mermaid-live-editor/edit/##eyJjb2RlIjoic2VxdWVuY2VEaWFncmFtXG4gIEVuZHVzZXItPj4rT21lZ2FDb2luOiBjYWxscyBidXktb21lZ2EgYW5kIHRyYW5zZmVyIDEwMDAgdVNUWFxuICBPbWVnYUNvaW4tPj4rT21lZ2FDb2luOiBtaW50cyAxIE9NQyB0b2tlbiB0byB0aGUgRW5kdXNlcidzIGFjY291bnQoIiwibWVybWFpZCI6IntcbiAgXCJ0aGVtZVwiOiBcImRlZmF1bHRcIlxufSIsInVwZGF0ZUVkaXRvciI6ZmFsc2UsImF1dG9TeW5jIjp0cnVlLCJ1cGRhdGVEaWFncmFtIjpmYWxzZX0)
+- change-price(): contract owner can change the price of the Omega-Tokens which is (1 OMC = 1000 uSTX) for now.
+
+[![](https://mermaid.ink/img/eyJjb2RlIjoic2VxdWVuY2VEaWFncmFtXG4gIEZULUNvbnRyYWN0LWRlcGxveWVyLT4-T21lZ2FDb2luOiBjYWxscyBjaGFuZ2UtcHJpY2UgdG8gY2hhbmdlIHRoZSBwcmljZSBvZiBPTUMgdG9rZW4iLCJtZXJtYWlkIjp7InRoZW1lIjoiZGVmYXVsdCJ9LCJ1cGRhdGVFZGl0b3IiOmZhbHNlLCJhdXRvU3luYyI6dHJ1ZSwidXBkYXRlRGlhZ3JhbSI6ZmFsc2V9)](https://mermaid-js.github.io/mermaid-live-editor/edit/##eyJjb2RlIjoic2VxdWVuY2VEaWFncmFtXG4gIEVuZHVzZXItPj4rT21lZ2FDb2luOiBjYWxscyBzZWxsLW9tZWdhIGFuZCBzZW5kIDEgT01DXG4gIE9tZWdhQ29pbi0-PitPbWVnYUNvaW46IHRyYW5zZmVyIG9mIFNUWCB0b2tlbnMgMTAwMCBVU1RYIHRvIHVzZXIncyBhY2NvdW50XG4iLCJtZXJtYWlkIjoie1xuICBcInRoZW1lXCI6IFwiZGVmYXVsdFwiXG59IiwidXBkYXRlRWRpdG9yIjpmYWxzZSwiYXV0b1N5bmMiOnRydWUsInVwZGF0ZURpYWdyYW0iOmZhbHNlfQ)
+
+## Testnet Addresses
+- omega-coin contract: ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.omega-coin
+- SIP-010-standard-contract: ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE.sip-010-trait-ft-standard1
