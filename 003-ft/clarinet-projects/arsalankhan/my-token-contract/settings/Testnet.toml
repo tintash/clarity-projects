@@ -1,0 +1,6 @@
+[network]
+name = "testnet"
+node_rpc_address = "https://stacks-node-api.testnet.stacks.co"
+
+[accounts.deployer]
+mnemonic = "fetch outside black test wash cover just actual execute nice door want airport betray quantum stamp fish act pen trust portion fatigue scissors vague"

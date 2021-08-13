@@ -1,4 +1,3 @@
 sequenceDiagram
-  Enduser->>+OmegaCoin: sell-omega(amount)
-  OmegaCoin->>+OmegaCoin: transfer of omega coins(amount, endUser, OmegaCoin, none)
-  OmegaCoin->>+OmegaCoin: transfer of STX tokens(1000*amount, OmegaCoin, enduser)
+  Enduser->>+OmegaCoin: calls sell-omega and send 1 OMC
+  OmegaCoin->>+OmegaCoin: transfer of STX tokens 1000 USTX to user's account

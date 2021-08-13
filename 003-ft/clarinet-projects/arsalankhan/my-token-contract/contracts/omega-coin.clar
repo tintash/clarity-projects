@@ -75,7 +75,7 @@
     )
 )
 
-(define-private (deposit-omega (amount uint))
+(define-public (deposit-omega (amount uint))
     (begin
        (asserts! (is-eq contract-caller TOKEN_OWNER) ERR_UNAUTHORIZED)
         ;; send OMEGA to contract
@@ -115,4 +115,3 @@
 )
 
 (ft-mint? omegacoins u1000 TOKEN_OWNER)
-(deposit-omega u100)
