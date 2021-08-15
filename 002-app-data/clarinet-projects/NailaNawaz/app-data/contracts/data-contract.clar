@@ -16,7 +16,7 @@
 
 ;;this method will be called by the other functions of data-contract to check if that
 ;;method is being called by a valid caller or not
-(define-public (check-valid-caller (caller principal))
+(define-private (check-valid-caller (caller principal))
   (ok (is-some (map-get? valid-callers {valid-caller-id: caller})))
 )
 
