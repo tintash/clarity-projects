@@ -16,32 +16,19 @@
 
 ;;this method will be called by the other functions of data-contract to check if that
 ;;method is being called by a valid caller or not
-(define-private (check-valid-caller (caller principal))
-  (begin
-    (unwrap! (map-get? valid-callers {valid-caller-id: caller}) false)
-    true
-  )
+(define-public (check-valid-caller (caller principal))
+  (ok (is-some (map-get? valid-callers {valid-caller-id: caller})))
 )
 
 ;;pubic functions
 
-;; this function takes two uint type params and displays their sum
+;; this function takes two uint type params and returns their sum
 ;; the contract can be called only by valid app contract
 (define-public (get-sum (num1 uint) (num2 uint) ) 
-    (begin
-        (asserts! (check-valid-caller contract-caller) (err ERR_INVALID_CALLER))
-        (print (+ num1 num2))
-        (ok true)
-    )
-)
-
-;; This is the update in this contract and new contracts implementing data-trait can use this method
-(define-public (get-sum-updated (num1 uint) (num2 uint) (num3 uint))
-    (begin
-        (asserts! (check-valid-caller contract-caller) (err ERR_INVALID_CALLER))
-        (print (+ (+ num1 num2) num3))
-        (ok true)
-    )
+  (begin
+    (asserts! (unwrap! (check-valid-caller contract-caller) (err ERR_INVALID_CALLER)) (err ERR_INVALID_CALLER))
+    (ok (+ num1 num2))
+  )
 )
 
 ;; CONTRACT_OWNER IS THE OWNER OF DATA-CONTRACT, and only this one can add the other valid callers
