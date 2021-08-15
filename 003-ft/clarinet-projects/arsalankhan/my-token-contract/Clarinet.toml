@@ -1,0 +1,10 @@
+[project]
+name = "my-token-contract"
+requirements = []
+[contracts.omega-coin]
+path = "contracts/omega-coin.clar"
+depends_on = ["sip-010-trait-ft-standard"]
+
+[contracts.sip-010-trait-ft-standard]
+path = "contracts/sip-010-trait-ft-standard.clar"
+depends_on = []
