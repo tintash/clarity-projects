@@ -27,5 +27,5 @@ It uses the Data-Trait by implementing Data-Contract. User uses this contract fo
 
 ## Updated-App-Contract
 
-Once the App-Contract is deployed, it can not be updated, and hence any change on data side (through Data Contract) can not be updated in
+Once the App-Contract is deployed, it can not be updated, and hence any change needed on data side (through Data Contract) can not be updated in
 App Contract. So this new contract is created to use those updated changes and is then deployed.
