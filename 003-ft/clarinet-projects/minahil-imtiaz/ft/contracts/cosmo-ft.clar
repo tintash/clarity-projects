@@ -42,10 +42,7 @@
 )
 
 (define-read-only (check-is-contract-paused) 
-  (if (var-get is-paused) 
-    true
-    false
-  )
+  (var-get is-paused) 
 )
 
 (define-public (transfer ( amount uint) (sender principal) (recipient principal))
