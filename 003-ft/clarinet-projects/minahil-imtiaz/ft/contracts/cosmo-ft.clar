@@ -42,7 +42,7 @@
 )
 
 (define-read-only (check-is-contract-paused) 
-  (if (is-eq (var-get is-paused) true)  
+  (if (var-get is-paused) 
     true
     false
   )
