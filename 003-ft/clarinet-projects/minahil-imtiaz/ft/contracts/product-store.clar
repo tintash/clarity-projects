@@ -5,6 +5,7 @@
 (define-constant CONVERSION_UNIT u1000)
 (define-constant ERR_NO_RECORD_FOUND u404)
 (define-constant ERR_DUPLICATE_RECORD u504)
+(define-constant ERR_UPDATE_RECORD u505)
 (define-constant ERR_UNAUTHORIZED_CALLER u400)
 (define-constant ERR_INVALID_PRICE u401)
 (define-constant ERR_INVALID_TOKEN_AMOUNT u405)
@@ -12,8 +13,12 @@
 (define-constant SUCCESS u200)
 
 
-(define-map products { name: (string-ascii 50)} { price: uint, quantity: uint })
+(define-map products { name: (string-ascii 50)} { quantity: uint })
+(define-map prices  {name: (string-ascii  50)} { price: uint }) 
 
+(define-read-only (get-product-quantity (name (string-ascii 50)))
+   (default-to u0 (get quantity (map-get? products { name: name })))
+)
 
 (define-private (decrement-quantity (name (string-ascii 50)))
   (let
@@ -21,18 +26,20 @@
      (quantity (get quantity required-product))
     )
     (asserts! (> quantity u0) (err ERR_INVALID_QUANTITY))
-    (if (is-eq (- quantity u1) u0) (try! (delete-product name)) (map-set products {name: name} {quantity: (- quantity u1), price: (get price required-product)}))
+    (map-set products {name: name} {quantity: (- quantity u1)})
     (ok SUCCESS)
-  )
+  )   
 )
 
 
 (define-public (add-product (name (string-ascii 50)) (price uint) (quantity uint) ) 
-  (begin 
+  (let 
+    ((previous-quantity (get-product-quantity name)))
     (asserts! (is-eq tx-sender CONTRACT_OWNER) (err ERR_UNAUTHORIZED_CALLER)) 
     (asserts! (> price u0) (err ERR_INVALID_PRICE))
     (asserts! (> quantity u0) (err ERR_INVALID_QUANTITY))
-    (asserts! (map-insert products {name: name} {price: price, quantity: quantity}) (err ERR_DUPLICATE_RECORD))
+    (asserts! (map-set products {name: name} {quantity: (+ quantity previous-quantity)}) (err ERR_UPDATE_RECORD))
+    (asserts! (map-set prices {name: name} {price: price}) (err ERR_UPDATE_RECORD))
     (ok SUCCESS)
   )
 )
@@ -79,7 +86,7 @@
 
 (define-read-only (get-product-price (name (string-ascii 50)))
     (let
-       ((required-product (unwrap! (map-get? products { name: name }) (err ERR_NO_RECORD_FOUND))))
+       ((required-product (unwrap! (map-get? prices { name: name }) (err ERR_NO_RECORD_FOUND))))
        (ok (get price required-product))
     ) 
 )

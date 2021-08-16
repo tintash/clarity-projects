@@ -6,8 +6,10 @@
 (define-constant CONTRACT_OWNER tx-sender)
 (define-constant ERR_UNAUTHORIZED_CALLER u400)
 (define-constant ERR_DUPLICATE_RECORD u504)
+(define-constant ERR_CONTRACT_PAUSED u505)
 (define-constant SUCCESS u200)
 
+(define-data-var is-paused bool false)
 (define-map valid-contract-callers { contract-identifier: principal} {valid-caller: bool})
 
 (define-private (is-valid-contract-caller (caller principal))
@@ -39,8 +41,16 @@
   (ok (ft-get-balance cosmo-ft owner-identifier))
 )
 
+(define-read-only (check-is-contract-paused) 
+  (if  (is-eq (var-get  is-paused) true)  
+     (err ERR_CONTRACT_PAUSED)
+     (ok SUCCESS)
+  )
+)
+
 (define-public (transfer ( amount uint) (sender principal) (recipient principal))
   (begin 
+    (try! (check-is-contract-paused)) 
     (asserts! (is-eq tx-sender sender) (err ERR_UNAUTHORIZED_CALLER))
     (ft-transfer? cosmo-ft amount sender recipient)
   )
@@ -48,6 +58,7 @@
 
 (define-public (issue-token ( amount uint) (recipient principal))
    (begin 
+      (try! (check-is-contract-paused)) 
       (asserts! (or (is-eq tx-sender CONTRACT_OWNER) (is-valid-contract-caller contract-caller)) (err ERR_UNAUTHORIZED_CALLER)) 
       (ft-mint? cosmo-ft amount recipient)
    )
@@ -55,6 +66,7 @@
 
 (define-public (destroy-token (amount uint) (owner principal))
    (begin 
+      (try! (check-is-contract-paused)) 
       (asserts! (or (is-eq tx-sender CONTRACT_OWNER) (is-eq tx-sender owner)) (err ERR_UNAUTHORIZED_CALLER)) 
       (ft-burn? cosmo-ft amount owner)
    )
@@ -62,7 +74,22 @@
 
 (define-public (add-valid-contract-caller (app-contract-identifier principal))
   (begin 
+    (try! (check-is-contract-paused)) 
     (asserts! (is-eq tx-sender CONTRACT_OWNER) (err ERR_UNAUTHORIZED_CALLER)) 
     (ok (map-set valid-contract-callers { contract-identifier: app-contract-identifier } {valid-caller: true }))    
+  )
+)
+
+(define-public (pause-contract)
+  (begin 
+    (asserts! (is-eq tx-sender CONTRACT_OWNER) (err ERR_UNAUTHORIZED_CALLER)) 
+    (ok (var-set is-paused true))    
+  )
+)
+
+(define-public (resume-contract)
+  (begin 
+    (asserts! (is-eq tx-sender CONTRACT_OWNER) (err ERR_UNAUTHORIZED_CALLER)) 
+    (ok (var-set is-paused false))    
   )
 )
