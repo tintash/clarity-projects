@@ -432,3 +432,174 @@ Clarinet.test({
     block.receipts[1].result.expectErr().expectUint(400);
   },
 });
+
+Clarinet.test({
+  name: "Ensure that contract-owner can pause contracts",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    const deployer = accounts.get("deployer")!;
+    let block: Block = chain.mineBlock([
+      Tx.contractCall(
+        `${deployer.address}.cosmo-ft`,
+        "pause-contract",
+        [],
+        deployer.address
+      ),
+    ]);
+    block.receipts[0].result.expectOk().expectBool(true);
+  },
+});
+
+Clarinet.test({
+  name: "Ensure that any user except contract-owner gets error on trying to pause contracts",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    const deployer = accounts.get("deployer")!;
+    const wallet1 = accounts.get("wallet_1")!;
+    let block: Block = chain.mineBlock([
+      Tx.contractCall(
+        `${deployer.address}.cosmo-ft`,
+        "pause-contract",
+        [],
+        wallet1.address
+      ),
+    ]);
+    block.receipts[0].result.expectErr().expectUint(400);
+  },
+});
+
+Clarinet.test({
+  name: "Ensure that issue-token returns error when contact is paused",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    const deployer = accounts.get("deployer")!;
+
+    let block: Block = chain.mineBlock([
+      Tx.contractCall(
+        `${deployer.address}.cosmo-ft`,
+        "pause-contract",
+        [],
+        deployer.address
+      ),
+      Tx.contractCall(
+        `${deployer.address}.cosmo-ft`,
+        "issue-token",
+        [types.uint(10), types.principal(deployer.address)],
+        deployer.address
+      ),
+    ]);
+    block.receipts[0].result.expectOk().expectBool(true);
+    block.receipts[1].result.expectErr().expectUint(505);
+  },
+});
+
+Clarinet.test({
+  name: "Ensure that transfer returns error when contact is paused",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    const deployer = accounts.get("deployer")!;
+    const wallet1 = accounts.get("wallet_1")!;
+
+    let block: Block = chain.mineBlock([
+      Tx.contractCall(
+        `${deployer.address}.cosmo-ft`,
+        "pause-contract",
+        [],
+        deployer.address
+      ),
+      Tx.contractCall(
+        `${deployer.address}.cosmo-ft`,
+        "transfer",
+        [
+          types.uint(10),
+          types.principal(deployer.address),
+          types.principal(wallet1.address),
+        ],
+        deployer.address
+      ),
+    ]);
+    block.receipts[0].result.expectOk().expectBool(true);
+    block.receipts[1].result.expectErr().expectUint(505);
+  },
+});
+
+Clarinet.test({
+  name: "Ensure that destroy-token returns error when contact is paused",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    const deployer = accounts.get("deployer")!;
+    const wallet1 = accounts.get("wallet_1")!;
+
+    let block: Block = chain.mineBlock([
+      Tx.contractCall(
+        `${deployer.address}.cosmo-ft`,
+        "pause-contract",
+        [],
+        deployer.address
+      ),
+      Tx.contractCall(
+        `${deployer.address}.cosmo-ft`,
+        "destroy-token",
+        [types.uint(10), types.principal(wallet1.address)],
+        deployer.address
+      ),
+    ]);
+    block.receipts[0].result.expectOk().expectBool(true);
+    block.receipts[1].result.expectErr().expectUint(505);
+  },
+});
+
+Clarinet.test({
+  name: "Ensure that contract owner can't add valid contract when contract is paused",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    const deployer = accounts.get("deployer")!;
+
+    let block = chain.mineBlock([
+      Tx.contractCall(
+        `${deployer.address}.cosmo-ft`,
+        "pause-contract",
+        [],
+        deployer.address
+      ),
+      Tx.contractCall(
+        `${deployer.address}.cosmo-ft`,
+        "add-valid-contract-caller",
+        [types.principal(`${deployer.address}.product-store`)],
+        deployer.address
+      ),
+    ]);
+    block.receipts[0].result.expectOk().expectBool(true);
+    block.receipts[1].result.expectErr().expectUint(505);
+  },
+});
+
+Clarinet.test({
+  name: "Ensure that after resuming contract issue-token works fine",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    const deployer = accounts.get("deployer")!;
+
+    let block: Block = chain.mineBlock([
+      Tx.contractCall(
+        `${deployer.address}.cosmo-ft`,
+        "pause-contract",
+        [],
+        deployer.address
+      ),
+      Tx.contractCall(
+        `${deployer.address}.cosmo-ft`,
+        "resume-contract",
+        [],
+        deployer.address
+      ),
+      Tx.contractCall(
+        `${deployer.address}.cosmo-ft`,
+        "issue-token",
+        [types.uint(10), types.principal(deployer.address)],
+        deployer.address
+      ),
+    ]);
+    block.receipts[0].result.expectOk().expectBool(true);
+    block.receipts[1].result.expectOk().expectBool(true);
+    block.receipts[2].result.expectOk().expectBool(true);
+    block.receipts[2].events.expectFungibleTokenMintEvent(
+      10,
+      deployer.address,
+      `${deployer.address}.cosmo-ft::cosmo-ft`
+    );
+  },
+});
