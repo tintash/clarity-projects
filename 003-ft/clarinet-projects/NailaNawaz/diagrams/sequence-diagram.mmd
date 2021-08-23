@@ -1,17 +1,25 @@
 sequenceDiagram
+
     alt if player registers the game
+
     Player->>Game: registerNewPlayer()
+
     Game->>+Player: sendCoins(500)
+
     end
+
     alt if player wins the game
+
     Game->>Player:sendCoins(100)
+
     else if player loose the game
+
     Game->>Player:destroyCoins(50)
+
     end
+
     alt if player transfer the coins to another player
+
     Player->>AnotherPlayer: sendCoins()
-    Game->>Player: destroyCoins()
-    end
-    alt if player purchase the gifts
-    Game->>Player:destroyCoins()
+
     end
