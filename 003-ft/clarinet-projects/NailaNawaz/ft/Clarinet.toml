@@ -1,0 +1,6 @@
+[project]
+name = "ft"
+requirements = []
+[contracts.game-contract]
+path = "contracts/game-contract.clar"
+depends_on = []
