@@ -2,7 +2,6 @@
 ;; game-contract
 
 ;; constants
-(define-constant TOKEN_OWNER 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 (define-constant ERR_NOT_OWNER (err u100))
 (define-constant ERR_NO_COINS (err u200))
 (define-constant ERR_DUPLICATE_RECORD (err u300))
@@ -24,11 +23,11 @@
     0xe0 0xe1 0xe2 0xe3 0xe4 0xe5 0xe6 0xe7 0xe8 0xe9 0xea 0xeb 0xec 0xed 0xee 0xef
     0xf0 0xf1 0xf2 0xf3 0xf4 0xf5 0xf6 0xf7 0xf8 0xf9 0xfa 0xfb 0xfc 0xfd 0xfe 0xff
 ))
-(define-constant coins-on-reg u1000) ;; number of coins player is given on registeration
-(define-constant win-coins u100) ;; number of coins player is awarded on winning game
-(define-constant loose-coins u10) ;; number of coins that player looses on losing game
-(define-constant min-needed-coins u10) ;; minimum needed coins to play game
-(define-constant min-winning-score u100) ;;minimum score needed to win game
+(define-constant COINS_ON_REG u1000) ;; number of coins player is given on registeration
+(define-constant WIN_COINS u100) ;; number of coins player is awarded on winning game
+(define-constant LOSE_COINS u10) ;; number of coins that player loses on losing game
+(define-constant MIN_NEEDED_COINS u10) ;; minimum needed coins to play game
+(define-constant MIN_WINNING_SCORE u100) ;;minimum score needed to win game
 ;; data maps and vars
 (define-fungible-token game-coins u2000000) ;; maximum number of coins in game
 (define-map registered-players { registered-player-id: principal} {is-registered: bool})
@@ -39,7 +38,7 @@
         ;; we don't want to register the already registered users
         (asserts! (map-insert registered-players { registered-player-id: address } {is-registered: true }) ERR_DUPLICATE_RECORD)
         ;; give u1000 coins to new players to start the game
-        (give coins-on-reg address)
+        (give COINS_ON_REG address)
     )
 )
 
@@ -50,20 +49,20 @@
             (player-balance (unwrap-panic (get-balance-of tx-sender)))
         )
         ;; check that player balance should be greater than u10 i.e number of coins he can loose
-        (if (> player-balance min-needed-coins)
+        (if (> player-balance MIN_NEEDED_COINS)
             ;; if player has enough coins, let him play the game
             (begin 
                 ;; score should be greater than u100 to win the game
-                (if (> score min-winning-score)
+                (if (> score MIN_WINNING_SCORE)
                     (begin
                         (print "win")
                         ;; transfer u100 coins if he wins
-                        (give win-coins tx-sender)
+                        (give WIN_COINS tx-sender)
                     )
                     (begin 
                         (print "loose")
                         ;; destroy u10 coins if he loose
-                        (destroy loose-coins tx-sender)
+                        (destroy LOSE_COINS tx-sender)
                     )
                   )
             )
@@ -80,29 +79,19 @@
 (define-public (transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))
     (begin
     ;; we don't want random people transfering away someone else's tokens
-    (asserts! (or (is-eq tx-sender sender)
-                  (is-eq tx-sender TOKEN_OWNER))
+    (asserts! (is-eq tx-sender sender)
               (err u100))
     (ft-transfer? game-coins amount sender recipient)
-    ;; (ok true)
     )
 )
 
 ;; private functions
 (define-private (give (amount uint) (address principal))
-  (begin
-    ;; we don't want random people giving themselves tokens
-    (asserts! (is-eq tx-sender TOKEN_OWNER) (err u100))
-    (ft-mint? game-coins amount address))
+    (ft-mint? game-coins amount address)
 )
 
 (define-private (destroy (amount uint) (address principal))
-  (begin
-    ;; we don't want random people destroying someone else's tokens
-    (asserts! (or (is-eq tx-sender address)
-                  (is-eq tx-sender TOKEN_OWNER))
-              (err u100))
-    (ft-burn? game-coins amount address))
+    (ft-burn? game-coins amount address)
 )
 
 ;; read only functions
