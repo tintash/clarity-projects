@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript" src="app.js"></script>
+    </head>
+<body>
+
+<h1>Express Server</h1>
+<form method="GET" action="http://localhost:3000">
+    <input type="submit" value="Say Hello" />
+</form>
+<br>
+<form method="GET" action="http://localhost:3000/user">
+    <input type="submit" value="Reveal Author Name" />
+</form>
+<br>
+<form method="GET" action="http://localhost:3000/privateKey">
+    <input type="submit" value="Reveal Private Key" />
+</form>
+<br>
+<form method="GET" action="http://localhost:3000/publicKey">
+    <input type="submit" value="Reveal Public Key" />
+</form>
+<br>
+<form method="POST" action="http://localhost:3000/stx/send">
+    <input type="text" name="user[address]">
+    <input type="submit" value="Send Stx" />
+</form>
+<br>
+<form method="GET" action="http://localhost:3000/readonly/get-random-number">
+    <input type="submit" value="Get Random Number" />
+</form>
+<br>
+<form method="GET" action="http://localhost:3000/public/goal-score">
+    <input type="submit" value="Goal Score" />
+</form>
+<br>
+
+</body>
+</html>
