@@ -2,7 +2,6 @@
 ;; game-contract
 
 ;; constants
-(define-constant ERR_NOT_OWNER (err u100))
 (define-constant ERR_NO_COINS (err u200))
 (define-constant ERR_DUPLICATE_RECORD (err u300))
 (define-constant BUFF_TO_UINT8 (list
