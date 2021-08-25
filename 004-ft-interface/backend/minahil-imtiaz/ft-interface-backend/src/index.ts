@@ -1,4 +1,4 @@
-import express, { response } from 'express';
+import express from 'express';
 import {
   AnchorMode,
   broadcastTransaction,
@@ -76,48 +76,17 @@ function createSignedContractCallOptions(
 }
 
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static(__dirname));
 
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
-});
-
-app.get('/get-name', async function (req, res) {
-  try {
-    const options = createReadOnlyFunctionOption('get-name', tokenContractName);
-    const result: ClarityValue = await callReadOnlyFunction(options);
-    const jsonResponse = cvToJSON(result);
-    res.end(jsonResponse.value.value);
-  } catch (error) {
-    res.end(JSON.stringify(error));
-  }
-});
-
-app.get('/get-symbol', async function (req, res) {
-  try {
-    const options = createReadOnlyFunctionOption(
-      'get-symbol',
-      tokenContractName
-    );
-    const result: ClarityValue = await callReadOnlyFunction(options);
-    const jsonResponse = cvToJSON(result);
-    res.end(jsonResponse.value.value);
-  } catch (error) {
-    res.end(JSON.stringify(error));
-  }
-});
-
-app.get('/get-total-supply', async function (req, res) {
-  try {
-    const options = createReadOnlyFunctionOption(
-      'get-total-supply',
-      tokenContractName
-    );
-    const result: ClarityValue = await callReadOnlyFunction(options);
-    const jsonResponse = cvToJSON(result);
-    res.end(jsonResponse.value.value);
-  } catch (error) {
-    res.end(JSON.stringify(error));
-  }
+app.post('/', async (req, res) => {
+  const tokenName = await getTokenName();
+  const tokenSymbol = await getTokenSymbol();
+  const tokenSupply = await getTokenSupply();
+  res.send({
+    tokenName: tokenName,
+    tokenSymbol: tokenSymbol,
+    tokenSupply: tokenSupply
+  });
 });
 
 app.get('/get-token-uri', async function (req, res) {
@@ -478,3 +447,42 @@ app.post('/redeem-reward-tokens', async function (req, res) {
 app.listen(port, function () {
   return console.log(`server is listening on ${port}`);
 });
+
+async function getTokenName(): Promise<String> {
+  try {
+    const options = createReadOnlyFunctionOption('get-name', tokenContractName);
+    const result = await callReadOnlyFunction(options);
+    const jsonResponse = cvToJSON(result);
+    return jsonResponse.value.value;
+  } catch (error) {
+    return '';
+  }
+}
+
+async function getTokenSymbol(): Promise<String> {
+  try {
+    const options = createReadOnlyFunctionOption(
+      'get-symbol',
+      tokenContractName
+    );
+    const result: ClarityValue = await callReadOnlyFunction(options);
+    const jsonResponse = cvToJSON(result);
+    return jsonResponse.value.value;
+  } catch (error) {
+    return '';
+  }
+}
+
+async function getTokenSupply(): Promise<String> {
+  try {
+    const options = createReadOnlyFunctionOption(
+      'get-total-supply',
+      tokenContractName
+    );
+    const result: ClarityValue = await callReadOnlyFunction(options);
+    const jsonResponse = cvToJSON(result);
+    return jsonResponse.value.value;
+  } catch (error) {
+    return '';
+  }
+}

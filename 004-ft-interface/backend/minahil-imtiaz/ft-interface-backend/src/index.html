@@ -1,8 +1,10 @@
 <html>
 
   <head>
+    <meta charset="UTF-8" />
     <title>COSMO FT</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="functions.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css" />
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
@@ -10,6 +12,11 @@
       div {
         text-align: left;
         margin: 20px;
+      }
+
+      p,
+      h3 {
+        text-align: center;
       }
 
       h1 {
@@ -25,70 +32,59 @@
 
   <body>
     <h1>COSMO TOKEN</h1>
+    <br />
     <div>
-      <form action="http://127.0.0.1:3000/get-name" method="GET">
-        Get token name <input type="submit" value="GET" />
-      </form>
+      <h3>Token Details</h3>
+      <p id="token-name">Token Name:</p>
+      <p id="token-symbol">Token Symbol:</p>
+      <p id="total-supply">Token Supply:</p>
     </div>
     <br />
     <div>
-      <form action="http://127.0.0.1:3000/get-symbol" method="GET">
-        Get token symbol<input type="submit" value="GET" />
-      </form>
-    </div>
-    <br />
-    <div>
-      <form action="http://127.0.0.1:3000/get-total-supply" method="GET">
-        Get total supply <input type="submit" value="GET" />
-      </form>
-    </div>
-    <br />
-    <div>
-      <form action="http://127.0.0.1:3000/get-token-uri" method="GET">
-        Get token uri <input type="submit" value="GET" />
-      </form>
-    </div>
-    <br />
-    <div>
-      <form action="http://127.0.0.1:3000/check-balance" method="POST">
+      <form action="/check-balance" method="POST">
         <h4>Check balance</h4>
-        Enter your address <input name="address" type="text" id="stx-address" />
+        Enter your address
+        <input name="address" type="text" id="token-inquiry-address" />
         <input type="submit" value="Check" />
       </form>
     </div>
     <br />
     <div>
-      <form action="http://127.0.0.1:3000/get-tokens" method="POST">
+      <form action="/get-tokens" method="POST">
         <h4>Request Tokens</h4>
-        STX Address <input name="address" type="text" id="stx-address" />
+        STX Address
+        <input name="address" type="text" id="requester-stx-address" />
         <input type="submit" value="Submit" />
       </form>
     </div>
     <br />
     <div>
-      <form action="http://127.0.0.1:3000/transfer-tokens" method="POST">
+      <form action="/transfer-tokens" method="POST">
         <h4>Transfer Tokens</h4>
         Sender Address
-        <input name="senderAddress" type="text" id="sender-address" />
-        Sender Key <input name="senderKey" type="text" id="sender-key" />
+        <input name="senderAddress" type="text" id="token-sender-address" />
+        Sender Key
+        <input name="senderKey" type="text" id="token-sender-key" />
         Recipient Address
-        <input name="recipientAddress" type="text" id="recipient-address" />
-        Amount <input name="amount" type="number" id="amount" />
+        <input name="recipientAddress" type="text" id="token-recipient-address" />
+        Amount
+        <input name="amount" type="number" id="transfer-amount" />
         <input type="submit" value="Submit" />
       </form>
     </div>
     <br />
     <div>
-      <form action="http://127.0.0.1:3000/destroy-tokens" method="POST">
+      <form action="/destroy-tokens" method="POST">
         <h4>Destroy Tokens</h4>
-        STX Address <input name="address" type="text" id="stx-address" /> Amount
-        <input name="amount" type="number" id="amount" />
+        STX Address
+        <input name="address" type="text" id="owner-stx-address" /> Amount
+        <input name="amount" type="number" id="burn-amount" />
         <input type="submit" value="Submit" />
       </form>
     </div>
     <br />
     <div>
-      <form action="http://127.0.0.1:3000/add-valid-contract-caller" method="POST">
+      <form action="/add-valid-contract-caller" method="POST">
         <h4>Add Calling Contract</h4>
         Deployer Address
         <input name="deployerAddress" type="text" id="deployer-address" />
@@ -100,7 +96,7 @@
 
     <h1>Product Store</h1>
     <div>
-      <form action="http://127.0.0.1:3000/get-product-price" method="POST">
+      <form action="/get-product-price" method="POST">
         <h4>Check product price</h4>
         Product Name <input name="productName" type="text" id="product-name" />
         <input type="submit" value="Submit" />
@@ -109,16 +105,16 @@
     <br />
     <br />
     <div>
-      <form action="http://127.0.0.1:3000/get-bonus-points-count" method="POST">
+      <form action="/get-bonus-points-count" method="POST">
         <h4>Check bonus point</h4>
-        Address <input name="address" type="text" id="address" />
+        Address <input name="address" type="text" id="reward-inquiry-address" />
         <input type="submit" value="Submit" />
       </form>
     </div>
     <br />
     <br />
     <div>
-      <form action="http://127.0.0.1:3000/delete-product" method="POST">
+      <form action="/delete-product" method="POST">
         <h4>Delete Product</h4>
         Product Name <input name="productName" type="text" id="product-name" />
         <input type="submit" value="Submit" />
@@ -127,10 +123,10 @@
     <br />
     <br />
     <div>
-      <form action="http://127.0.0.1:3000/add-product" method="POST">
+      <form action="/add-product" method="POST">
         <h4>Add Product</h4>
         Product Name
-        <input name="productName" type="text" id="product-name" /> Price
+        <input name="productName" type="text" id="new-product-name" /> Price
         <input name="price" type="text" id="price" /> Quantity
         <input name="quantity" type="text" id="quantity" />
         <input type="submit" value="Submit" />
@@ -139,35 +135,38 @@
     <br />
     <br />
     <div>
-      <form action="http://127.0.0.1:3000/buy-product" method="POST">
+      <form action="/buy-product" method="POST">
         <h4>Buy Product</h4>
         Product Name
-        <input name="productName" type="text" id="product-name" /> Sender Key
-        <input name="senderKey" type="text" id="sender-key" />
+        <input name="productName" type="text" id="requested-product-name" />
+        Sender Key
+        <input name="senderKey" type="text" id="buyer-sender-key" />
         <input type="submit" value="Submit" />
       </form>
     </div>
     <br />
     <br />
     <div>
-      <form action="http://127.0.0.1:3000/transfer-reward-tokens" method="POST">
+      <form action="/transfer-reward-tokens" method="POST">
         <h4>Transfer Reward</h4>
-        Amount <input name="amount" type="text" id="amount" /> Friend's Address
-        <input name="recipientAddress" type="text" id="recipient-address" />
+        Amount <input name="amount" type="text" id="reward-transfer-amount" />
+        Friend's Address
+        <input name="recipientAddress" type="text" id="reward-recipient-address" />
         Your Address
-        <input name="senderAddress" type="text" id="sender-address" /> Sender
-        Key <input name="senderKey" type="text" id="sender-key" />
+        <input name="senderAddress" type="text" id="reward-sender-address" />
+        Sender Key <input name="senderKey" type="text" id="reward-sender-key" />
         <input type="submit" value="Submit" />
       </form>
     </div>
     <br />
     <br />
     <div>
-      <form action="http://127.0.0.1:3000/redeem-reward-tokens" method="POST">
+      <form action="/redeem-reward-tokens" method="POST">
         <h4>Redeem Reward</h4>
-        Amount <input name="amount" type="text" id="amount" /> Your Address
-        <input name="senderAddress" type="text" id="sender-address" /> Sender
-        Key <input name="senderKey" type="text" id="sender-key" />
+        Amount <input name="amount" type="text" id="redeem-amount" /> Your
+        Address
+        <input name="senderAddress" type="text" id="reward-owner-address" />
+        Sender Key <input name="senderKey" type="text" id="reward-owner-key" />
         <input type="submit" value="Submit" />
       </form>
     </div>
