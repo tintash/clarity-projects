@@ -40,6 +40,9 @@ function StoreData(data) {
     .then(() => {
       // Handle any execution after data has been saved
       console.log("Data Saved");
+    })
+    .catch((err) => {
+      console.log("Data not saved: " + err);
     });
   console.log(fileUrl);
 }
