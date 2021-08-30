@@ -1,0 +1,29 @@
+{
+  "name": "ft-caller-static-page",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "serve": "serve",
+    "build": "webpack",
+    "start": "npm run build && npm run serve",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "prettier": "2.3.2",
+    "ts-loader": "^9.2.5",
+    "webpack": "^5.51.1",
+    "webpack-cli": "^4.8.0"
+  },
+  "dependencies": {
+    "@stacks/connect": "^6.0.1",
+    "@stacks/transactions": "^1.4.1",
+    "crypto-browserify": "^3.12.0",
+    "regenerator-runtime": "^0.13.9",
+    "serve": "^12.0.0",
+    "stream-browserify": "^3.0.0"
+  }
+}

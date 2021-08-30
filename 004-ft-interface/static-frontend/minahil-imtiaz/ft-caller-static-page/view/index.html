@@ -1,0 +1,185 @@
+<html>
+
+    <head>
+        <meta charset="UTF-8" />
+        <title>PRODUCT STORE</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script src="../dist/bundle.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css" />
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+        <style>
+            div {
+                text-align: left;
+                margin: 20px;
+            }
+
+            p,
+            h3 {
+                text-align: center;
+            }
+
+            h1 {
+                text-align: center;
+                margin-top: 30px;
+            }
+
+            input {
+                margin-inline-end: 20px;
+            }
+
+            output {
+                border-radius: 2;
+                border-width: 1;
+                border-style: solid;
+                padding: 20px;
+                width: 1000px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <h1>COSMO TOKEN</h1> <br />
+        <div>
+            <h3>Token Details</h3>
+            <p id="token-name">Token Name: </p>
+            <p id="token-symbol">Token Symbol: </p>
+            <p id="total-supply">Token Supply: </p>
+        </div>
+        <br />
+        <div>
+            <form id="balance-inquiry-form">
+                <h4>Balance Inquiry</h4>
+                Check your balance <input type="submit" value="Check" />
+                <br>
+                Your balance:
+                <output id="balance-output"></output>
+            </form>
+        </div>
+        <br />
+        <div>
+            <form id="issue-tokens">
+                <h4>Issue Tokens</h4>
+                Want to issue tokens to someone?
+                <br>
+                Recipient Address
+                <input name="recipientAddress" type="text" id="token-receiver-address" />
+                Amount <input name="amount" type="number" id="token-issue-amount" />
+                <input type="submit" value="Yes" />
+                <br>
+                Output: <output id="issue-token-output"></output>
+            </form>
+        </div>
+        <br />
+        <div>
+            <form id="transfer-tokens">
+                <h4>Transfer Tokens</h4>
+                Recipient Address <input name="recipientAddress" type="text" id="token-recipient-address" />
+                Amount <input name="amount" type="number" id="transfer-amount" />
+                <input type="submit" value="Transfer" />
+                <br>
+                Output: <output id="transfer-token-output"></output>
+            </form>
+        </div> <br />
+        <div>
+            <form id="destroy-tokens">
+                <h4>Destroy Tokens</h4>
+                STX Address
+                <input name="address" type="text" id="owner-stx-address" />
+                Amount
+                <input name="amount" type="number" id="burn-amount" />
+                <input type="submit" value="Submit" />
+                <br>
+                Output:
+                <output id="destroy-token-output"></output>
+            </form>
+        </div> <br />
+        <div>
+            <form id="add-valid-contract-caller">
+                <h4>Add Calling Contract</h4>
+                Deployer Address <input name="deployerAddress" type="text" id="deployer-address" />
+                Contract Name <input name="contractName" type="text" id="contract-name" />
+                <input type="submit" value="Add" />
+                <br>
+                Output <output id="contract-caller-output">
+            </form>
+        </div>
+        <h1>Product Store</h1>
+        <div>
+            <form id="get-product-price">
+                <h4>Check product price</h4>
+                Product Name <input name="productName" type="text" id="product-name" />
+                <input type="submit" value="Submit" />
+                <br>
+                Output: <output id="price-output"></output>
+            </form>
+        </div>
+        <br />
+        <br />
+        <div>
+            <form id="get-bonus-points-count">
+                <h4>Check bonus point</h4>
+                Want to check your reward points? <input type="submit" value="Yes" />
+                <br>
+                Output: <output id="bonus-point-output"></output>
+            </form>
+        </div>
+        <br />
+        <br />
+        <div>
+            <form id="delete-product">
+                <h4>Delete Product</h4>
+                Product Name <input name="productName" type="text" id="delete-product-name" />
+                <input type="submit" value="Submit" />
+                <br>
+                Output: <output id="delete-product-output"></output>
+            </form>
+        </div>
+        <br />
+        <br />
+        <div>
+            <form id="add-product">
+                <h4>Add Product</h4>
+                Product Name <input name="productName" type="text" id="new-product-name" />
+                Price <input name="price" type="text" id="price" />
+                Quantity <input name="quantity" type="text" id="quantity" />
+                <input type="submit" value="Submit" />
+                <br>
+                Output: <output id="add-product-output"></output>
+            </form>
+        </div> <br /> <br />
+        <div>
+            <form id="buy-product">
+                <h4>Buy Product</h4>
+                Product Name <input name="productName" type="text" id="requested-product-name" />
+                <input type="submit" value="Submit" />
+                <br>
+                Output: <output id="purchase-output"></output>
+            </form>
+        </div>
+        <br />
+        <br />
+        <div>
+            <form id="transfer-reward-tokens">
+                <h4>Transfer Reward</h4>
+                Amount <input name="amount" type="text" id="reward-transfer-amount" />
+                Friend's Address <input name="recipientAddress" type="text" id="reward-recipient-address" />
+                <input type="submit" value="Submit" />
+                <br>
+                Output: <output id="transfer-reward-output"></output>
+            </form>
+        </div>
+        <br />
+        <br />
+        <div>
+            <form id="redeem-reward-tokens">
+                <h4>Redeem Reward</h4>
+                Amount <input name="amount" type="text" id="redeem-amount" />
+                <input type="submit" value="Redeem" />
+                <br>
+                Output: <output id="redeem-reward-output"></output>
+            </form>
+        </div>
+    </body>
+
+</html>
