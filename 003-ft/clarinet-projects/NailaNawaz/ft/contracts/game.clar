@@ -4,6 +4,7 @@
 ;; constants
 (define-constant ERR_NO_COINS (err u200))
 (define-constant ERR_DUPLICATE_RECORD (err u300))
+(define-constant ERR_WRONG_SENDER (err u100))
 (define-constant BUFF_TO_UINT8 (list
     0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b 0x0c 0x0d 0x0e 0x0f
     0x10 0x11 0x12 0x13 0x14 0x15 0x16 0x17 0x18 0x19 0x1a 0x1b 0x1c 0x1d 0x1e 0x1f
@@ -47,7 +48,7 @@
             (score (unwrap-panic (get-random-number)))
             (player-balance (unwrap-panic (get-balance-of tx-sender)))
         )
-        ;; check that player balance should be greater than u10 i.e number of coins he can loose
+        ;; check that player balance should be greater than u10 i.e number of coins he can lose
         (if (> player-balance MIN_NEEDED_COINS)
             ;; if player has enough coins, let him play the game
             (begin 
@@ -59,8 +60,8 @@
                         (give WIN_COINS tx-sender)
                     )
                     (begin 
-                        (print "loose")
-                        ;; destroy u10 coins if he loose
+                        (print "lose")
+                        ;; destroy u10 coins if he lose
                         (destroy LOSE_COINS tx-sender)
                     )
                   )
@@ -79,7 +80,7 @@
     (begin
     ;; we don't want random people transfering away someone else's tokens
     (asserts! (is-eq tx-sender sender)
-              (err u100))
+                    ERR_WRONG_SENDER)
     (ft-transfer? game-coins amount sender recipient)
     )
 )
