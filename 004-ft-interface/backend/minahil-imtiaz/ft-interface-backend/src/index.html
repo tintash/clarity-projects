@@ -61,10 +61,6 @@
     <div>
       <form action="/transfer-tokens" method="POST">
         <h4>Transfer Tokens</h4>
-        Sender Address
-        <input name="senderAddress" type="text" id="token-sender-address" />
-        Sender Key
-        <input name="senderKey" type="text" id="token-sender-key" />
         Recipient Address
         <input name="recipientAddress" type="text" id="token-recipient-address" />
         Amount
@@ -76,8 +72,7 @@
     <div>
       <form action="/destroy-tokens" method="POST">
         <h4>Destroy Tokens</h4>
-        STX Address
-        <input name="address" type="text" id="owner-stx-address" /> Amount
+        Amount
         <input name="amount" type="number" id="burn-amount" />
         <input type="submit" value="Submit" />
       </form>
@@ -139,8 +134,6 @@
         <h4>Buy Product</h4>
         Product Name
         <input name="productName" type="text" id="requested-product-name" />
-        Sender Key
-        <input name="senderKey" type="text" id="buyer-sender-key" />
         <input type="submit" value="Submit" />
       </form>
     </div>
@@ -152,9 +145,6 @@
         Amount <input name="amount" type="text" id="reward-transfer-amount" />
         Friend's Address
         <input name="recipientAddress" type="text" id="reward-recipient-address" />
-        Your Address
-        <input name="senderAddress" type="text" id="reward-sender-address" />
-        Sender Key <input name="senderKey" type="text" id="reward-sender-key" />
         <input type="submit" value="Submit" />
       </form>
     </div>
@@ -163,10 +153,7 @@
     <div>
       <form action="/redeem-reward-tokens" method="POST">
         <h4>Redeem Reward</h4>
-        Amount <input name="amount" type="text" id="redeem-amount" /> Your
-        Address
-        <input name="senderAddress" type="text" id="reward-owner-address" />
-        Sender Key <input name="senderKey" type="text" id="reward-owner-key" />
+        Amount <input name="amount" type="text" id="redeem-amount" />
         <input type="submit" value="Submit" />
       </form>
     </div>

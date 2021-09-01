@@ -1,4 +1,4 @@
-import express from 'express';
+import express from "express";
 import {
   AnchorMode,
   broadcastTransaction,
@@ -20,30 +20,33 @@ import {
   standardPrincipalCV,
   stringAsciiCV,
   TxBroadcastResult,
-  uintCV
-} from '@stacks/transactions';
-import { StacksTestnet } from '@stacks/network';
+  uintCV,
+} from "@stacks/transactions";
+import { StacksTestnet } from "@stacks/network";
+import { FungiblePostCondition } from "@stacks/transactions/dist/postcondition";
 
-require('dotenv').config();
+require("dotenv").config();
 
-const deployerAddress = process.env.DEPLOYER_ADDRESS || '';
-const deployerPrivateKey = process.env.DEPLOYER_PRIVATE_KEY || '';
-const tokenContractName = 'cosmo-ft';
-const storeContractName = 'product-store';
-const assetName = 'cosmo-ft';
-const port = process.env.PORT;
+const deployerAddress = process.env.DEPLOYER_ADDRESS || "";
+const deployerPrivateKey = process.env.DEPLOYER_PRIVATE_KEY || "";
+const senderAddress = process.env.SENDER_ADDRESS || "";
+const senderPrivateKey = process.env.SENDER_PRIVATE_KEY || "";
+const tokenContractName = "cosmo-ft";
+const storeContractName = "product-store";
+const assetName = "cosmo-ft";
+const port = process.env.PORT || 3000;
 const network = new StacksTestnet();
-const explorerBaseUrl = 'https://explorer.stacks.co/txid/0x';
+const explorerBaseUrl = "https://explorer.stacks.co/txid/0x";
 const conversionRate = 1000;
 
 const app = express();
-var bodyParser = require('body-parser');
+var bodyParser = require("body-parser");
 
 function createReadOnlyFunctionOption(
   functionName: string,
   contractName: string,
   functionArgs: ClarityValue[] = [],
-  senderAddress: string = deployerAddress
+  callerAddress: string = deployerAddress
 ): ReadOnlyFunctionOptions {
   const options: ReadOnlyFunctionOptions = {
     contractAddress: deployerAddress,
@@ -51,7 +54,7 @@ function createReadOnlyFunctionOption(
     functionName: functionName,
     functionArgs: functionArgs,
     network,
-    senderAddress: senderAddress
+    senderAddress: callerAddress,
   };
   return options;
 }
@@ -70,29 +73,53 @@ function createSignedContractCallOptions(
     senderKey: senderKey,
     validateWithAbi: true,
     network,
-    anchorMode: AnchorMode.Any
+    anchorMode: AnchorMode.Any,
   };
   return txOptions;
+}
+
+function createFungibleAssetPostCondition(
+  amount: string,
+  conditionCode: FungibleConditionCode
+): FungiblePostCondition {
+  const postConditionAddress = senderAddress;
+  const postConditionCode = conditionCode;
+  const postConditionAmount: number = Number(amount);
+  const fungibleAssetInfo = createAssetInfo(
+    deployerAddress,
+    tokenContractName,
+    assetName
+  );
+
+  const fungiblePostCondition: FungiblePostCondition =
+    makeStandardFungiblePostCondition(
+      postConditionAddress,
+      postConditionCode,
+      postConditionAmount,
+      fungibleAssetInfo
+    );
+
+  return fungiblePostCondition;
 }
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(__dirname));
 
-app.post('/', async (req, res) => {
+app.post("/", async (req, res) => {
   const tokenName = await getTokenName();
   const tokenSymbol = await getTokenSymbol();
   const tokenSupply = await getTokenSupply();
   res.send({
     tokenName: tokenName,
     tokenSymbol: tokenSymbol,
-    tokenSupply: tokenSupply
+    tokenSupply: tokenSupply,
   });
 });
 
-app.get('/get-token-uri', async function (req, res) {
+app.get("/get-token-uri", async function (req, res) {
   try {
     const options = createReadOnlyFunctionOption(
-      'get-token-uri',
+      "get-token-uri",
       tokenContractName
     );
     const result: ClarityValue = await callReadOnlyFunction(options);
@@ -103,10 +130,10 @@ app.get('/get-token-uri', async function (req, res) {
   }
 });
 
-app.post('/check-balance', async function (req, res) {
+app.post("/check-balance", async function (req, res) {
   try {
     const options = createReadOnlyFunctionOption(
-      'get-balance-of',
+      "get-balance-of",
       tokenContractName,
       [standardPrincipalCV(req.body.address.toString())]
     );
@@ -118,12 +145,12 @@ app.post('/check-balance', async function (req, res) {
   }
 });
 
-app.post('/get-tokens', async function (req, res) {
+app.post("/get-tokens", async function (req, res) {
   try {
     const txOptions: SignedContractCallOptions =
-      createSignedContractCallOptions('issue-token', tokenContractName, [
+      createSignedContractCallOptions("issue-token", tokenContractName, [
         uintCV(10),
-        standardPrincipalCV(req.body.address.toString())
+        standardPrincipalCV(req.body.address.toString()),
       ]);
     const transaction: StacksTransaction = await makeContractCall(txOptions);
     const result: TxBroadcastResult = await broadcastTransaction(
@@ -137,30 +164,23 @@ app.post('/get-tokens', async function (req, res) {
   }
 });
 
-app.post('/destroy-tokens', async function (req, res) {
+app.post("/destroy-tokens", async function (req, res) {
   try {
-    const postConditionAddress = req.body.address.toString();
-    const postConditionCode = FungibleConditionCode.Equal;
-    const postConditionAmount: number = Number(req.body.amount.toString());
-    const fungibleAssetInfo = createAssetInfo(
-      deployerAddress,
-      tokenContractName,
-      assetName
+    var fungibleAssetPostCondition = createFungibleAssetPostCondition(
+      req.body.amount.toString(),
+      FungibleConditionCode.Equal
     );
-
-    const contractFungiblePostCondition = makeStandardFungiblePostCondition(
-      postConditionAddress,
-      postConditionCode,
-      postConditionAmount,
-      fungibleAssetInfo
-    );
-
     const txOptions: SignedContractCallOptions =
-      createSignedContractCallOptions('destroy-token', tokenContractName, [
-        uintCV(req.body.amount.toString()),
-        standardPrincipalCV(req.body.address.toString())
-      ]);
-    txOptions.postConditions = [contractFungiblePostCondition];
+      createSignedContractCallOptions(
+        "destroy-token",
+        tokenContractName,
+        [
+          uintCV(req.body.amount.toString()),
+          standardPrincipalCV(senderAddress),
+        ],
+        senderPrivateKey
+      );
+    txOptions.postConditions = [fungibleAssetPostCondition];
     const transaction: StacksTransaction = await makeContractCall(txOptions);
     const result: TxBroadcastResult = await broadcastTransaction(
       transaction,
@@ -175,36 +195,23 @@ app.post('/destroy-tokens', async function (req, res) {
   }
 });
 
-app.post('/transfer-tokens', async function (req, res) {
+app.post("/transfer-tokens", async function (req, res) {
   try {
-    const postConditionAddress = req.body.senderAddress.toString();
-    const assetName = 'cosmo-ft';
-    const postConditionCode = FungibleConditionCode.Equal;
-    const postConditionAmount: number = Number(req.body.amount.toString());
-    const fungibleAssetInfo = createAssetInfo(
-      deployerAddress,
-      tokenContractName,
-      assetName
+    var fungibleAssetPostCondition = createFungibleAssetPostCondition(
+      req.body.amount.toString(),
+      FungibleConditionCode.Equal
     );
-
-    const contractFungiblePostCondition = makeStandardFungiblePostCondition(
-      postConditionAddress,
-      postConditionCode,
-      postConditionAmount,
-      fungibleAssetInfo
-    );
-
     var txOptions: SignedContractCallOptions = createSignedContractCallOptions(
-      'transfer',
+      "transfer",
       tokenContractName,
       [
         uintCV(req.body.amount.toString()),
-        standardPrincipalCV(req.body.senderAddress.toString()),
-        standardPrincipalCV(req.body.recipientAddress.toString())
+        standardPrincipalCV(senderAddress),
+        standardPrincipalCV(req.body.recipientAddress.toString()),
       ],
-      req.body.senderKey.toString()
+      senderPrivateKey
     );
-    txOptions.postConditions = [contractFungiblePostCondition];
+    txOptions.postConditions = [fungibleAssetPostCondition];
     const transaction: StacksTransaction = await makeContractCall(txOptions);
     const result: TxBroadcastResult = await broadcastTransaction(
       transaction,
@@ -219,18 +226,19 @@ app.post('/transfer-tokens', async function (req, res) {
   }
 });
 
-app.post('/add-valid-contract-caller', async function (req, res) {
+app.post("/add-valid-contract-caller", async function (req, res) {
   try {
     const txOptions: SignedContractCallOptions =
       createSignedContractCallOptions(
-        'add-valid-contract-caller',
+        "add-valid-contract-caller",
         tokenContractName,
         [
           contractPrincipalCV(
             req.body.deployerAddress.toString(),
-            req.body.tokentokenContractName.toString()
-          )
-        ]
+            req.body.contractName.toString()
+          ),
+        ],
+        deployerPrivateKey
       );
     const transaction: StacksTransaction = await makeContractCall(txOptions);
     const result: TxBroadcastResult = await broadcastTransaction(
@@ -246,10 +254,10 @@ app.post('/add-valid-contract-caller', async function (req, res) {
   }
 });
 
-app.post('/get-product-price', async function (req, res) {
+app.post("/get-product-price", async function (req, res) {
   try {
     const options: ReadOnlyFunctionOptions = createReadOnlyFunctionOption(
-      'get-product-price',
+      "get-product-price",
       storeContractName,
       [stringAsciiCV(req.body.productName.toString())]
     );
@@ -261,10 +269,10 @@ app.post('/get-product-price', async function (req, res) {
   }
 });
 
-app.post('/get-bonus-points-count', async function (req, res) {
+app.post("/get-bonus-points-count", async function (req, res) {
   try {
     const options: ReadOnlyFunctionOptions = createReadOnlyFunctionOption(
-      'get-bonus-points-count',
+      "get-bonus-points-count",
       storeContractName,
       [],
       req.body.address.toString()
@@ -277,11 +285,11 @@ app.post('/get-bonus-points-count', async function (req, res) {
   }
 });
 
-app.post('/delete-product', async function (req, res) {
+app.post("/delete-product", async function (req, res) {
   try {
     const txOptions: SignedContractCallOptions =
-      createSignedContractCallOptions('delete-product', storeContractName, [
-        stringAsciiCV(req.body.productName.toString())
+      createSignedContractCallOptions("delete-product", storeContractName, [
+        stringAsciiCV(req.body.productName.toString()),
       ]);
     const transaction: StacksTransaction = await makeContractCall(txOptions);
     const result: TxBroadcastResult = await broadcastTransaction(
@@ -297,13 +305,13 @@ app.post('/delete-product', async function (req, res) {
   }
 });
 
-app.post('/add-product', async function (req, res) {
+app.post("/add-product", async function (req, res) {
   try {
     const txOptions: SignedContractCallOptions =
-      createSignedContractCallOptions('add-product', storeContractName, [
+      createSignedContractCallOptions("add-product", storeContractName, [
         stringAsciiCV(req.body.productName.toString()),
         uintCV(req.body.price),
-        uintCV(req.body.quantity)
+        uintCV(req.body.quantity),
       ]);
     const transaction: StacksTransaction = await makeContractCall(txOptions);
     const result: TxBroadcastResult = await broadcastTransaction(
@@ -321,14 +329,14 @@ app.post('/add-product', async function (req, res) {
   }
 });
 
-app.post('/buy-product', async function (req, res) {
+app.post("/buy-product", async function (req, res) {
   try {
     const txOptions: SignedContractCallOptions =
       createSignedContractCallOptions(
-        'buy-product',
+        "buy-product",
         storeContractName,
         [stringAsciiCV(req.body.productName.toString())],
-        req.body.senderKey.toString()
+        senderPrivateKey
       );
     txOptions.postConditionMode = PostConditionMode.Allow;
     const transaction: StacksTransaction = await makeContractCall(txOptions);
@@ -346,35 +354,23 @@ app.post('/buy-product', async function (req, res) {
   }
 });
 
-app.post('/transfer-reward-tokens', async function (req, res) {
+app.post("/transfer-reward-tokens", async function (req, res) {
   try {
-    const postConditionAddress = req.body.senderAddress.toString();
-    const assetName = 'cosmo-ft';
-    const postConditionCode = FungibleConditionCode.Equal;
-    const postConditionAmount: number = Number(req.body.amount.toString());
-    const fungibleAssetInfo = createAssetInfo(
-      deployerAddress,
-      tokenContractName,
-      assetName
-    );
-
-    const contractFungiblePostCondition = makeStandardFungiblePostCondition(
-      postConditionAddress,
-      postConditionCode,
-      postConditionAmount,
-      fungibleAssetInfo
+    var fungibleAssetPostCondition = createFungibleAssetPostCondition(
+      req.body.amount.toString(),
+      FungibleConditionCode.Equal
     );
     const txOptions: SignedContractCallOptions =
       createSignedContractCallOptions(
-        'transfer-reward-tokens',
+        "transfer-reward-tokens",
         storeContractName,
         [
           uintCV(req.body.amount.toString()),
-          standardPrincipalCV(req.body.recipientAddress.toString())
+          standardPrincipalCV(req.body.recipientAddress.toString()),
         ],
-        req.body.senderKey.toString()
+        senderPrivateKey
       );
-    txOptions.postConditions = [contractFungiblePostCondition];
+    txOptions.postConditions = [fungibleAssetPostCondition];
     const transaction: StacksTransaction = await makeContractCall(txOptions);
     const result: TxBroadcastResult = await broadcastTransaction(
       transaction,
@@ -389,23 +385,11 @@ app.post('/transfer-reward-tokens', async function (req, res) {
   }
 });
 
-app.post('/redeem-reward-tokens', async function (req, res) {
+app.post("/redeem-reward-tokens", async function (req, res) {
   try {
-    const postConditionAddress = req.body.senderAddress.toString();
-
-    const postConditionCode = FungibleConditionCode.Equal;
-    const postConditionAmount: number = Number(req.body.amount.toString());
-    const fungibleAssetInfo = createAssetInfo(
-      deployerAddress,
-      tokenContractName,
-      assetName
-    );
-
-    const contractFungiblePostCondition = makeStandardFungiblePostCondition(
-      postConditionAddress,
-      postConditionCode,
-      postConditionAmount,
-      fungibleAssetInfo
+    var fungibleAssetPostCondition = createFungibleAssetPostCondition(
+      req.body.amount.toString(),
+      FungibleConditionCode.Equal
     );
 
     const STXPostConditionCode = FungibleConditionCode.Equal;
@@ -420,14 +404,14 @@ app.post('/redeem-reward-tokens', async function (req, res) {
 
     const txOptions: SignedContractCallOptions =
       createSignedContractCallOptions(
-        'redeem-reward-tokens',
+        "redeem-reward-tokens",
         storeContractName,
         [uintCV(req.body.amount.toString())],
-        req.body.senderKey.toString()
+        senderPrivateKey
       );
     txOptions.postConditions = [
-      contractFungiblePostCondition,
-      contractSTXPostCondition
+      fungibleAssetPostCondition,
+      contractSTXPostCondition,
     ];
     const transaction: StacksTransaction = await makeContractCall(txOptions);
     const result: TxBroadcastResult = await broadcastTransaction(
@@ -437,52 +421,51 @@ app.post('/redeem-reward-tokens', async function (req, res) {
     if (result.error) {
       throw result;
     }
-    console.log(result);
     res.redirect(explorerBaseUrl + result.txid);
   } catch (error) {
     res.end(JSON.stringify(error));
   }
 });
 
-app.listen(port, function () {
-  return console.log(`server is listening on ${port}`);
+app.listen(port, () => {
+  console.log(`server is listening at http://localhost:${port}`);
 });
 
 async function getTokenName(): Promise<String> {
   try {
-    const options = createReadOnlyFunctionOption('get-name', tokenContractName);
+    const options = createReadOnlyFunctionOption("get-name", tokenContractName);
     const result = await callReadOnlyFunction(options);
     const jsonResponse = cvToJSON(result);
     return jsonResponse.value.value;
   } catch (error) {
-    return '';
+    return "";
   }
 }
 
 async function getTokenSymbol(): Promise<String> {
   try {
     const options = createReadOnlyFunctionOption(
-      'get-symbol',
+      "get-symbol",
       tokenContractName
     );
     const result: ClarityValue = await callReadOnlyFunction(options);
     const jsonResponse = cvToJSON(result);
     return jsonResponse.value.value;
   } catch (error) {
-    return '';
+    return "";
   }
 }
 
 async function getTokenSupply(): Promise<String> {
   try {
     const options = createReadOnlyFunctionOption(
-      'get-total-supply',
+      "get-total-supply",
       tokenContractName
     );
     const result: ClarityValue = await callReadOnlyFunction(options);
     const jsonResponse = cvToJSON(result);
     return jsonResponse.value.value;
   } catch (error) {
-    return '';
+    return "";
   }
 }

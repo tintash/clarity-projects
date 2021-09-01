@@ -1,12 +1,15 @@
+function displayTokenInformation(data) {
+  $("#token-name").append(data.tokenName);
+  $("#token-symbol").append(data.tokenSymbol);
+  $("#total-supply").append(data.tokenSupply);
+}
+
+function onTokenInformationFailure() {
+  console.log("Couldn't get token information");
+}
+
 $(document).ready(function () {
-  $.post('/', function (getTokenDetails) {})
-    .done(function (data) {
-      console.log(data);
-      document.getElementById('token-name').innerHTML += data.tokenName;
-      document.getElementById('token-symbol').innerHTML += data.tokenSymbol;
-      document.getElementById('total-supply').innerHTML += data.tokenSupply;
-    })
-    .fail(function () {
-      console.log("Couldn't get token information");
-    });
+  $.post('/', function () {})
+    .done(displayTokenInformation)
+    .fail(onTokenInformationFailure);
 });

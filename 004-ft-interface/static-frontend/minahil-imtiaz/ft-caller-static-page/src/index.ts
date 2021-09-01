@@ -23,6 +23,7 @@ import {
 } from "@stacks/transactions";
 import { StacksTestnet } from "@stacks/network";
 import BN from "bn.js";
+import { FungiblePostCondition } from "@stacks/transactions/dist/transactions/src/postcondition";
 
 const appConfig = new AppConfig(["store_write", "publish_data"]);
 const userSession = new UserSession({ appConfig });
@@ -32,6 +33,7 @@ const network = new StacksTestnet();
 const deployerAddress = "ST3F9BYX07T0Q51JT2YVXT532BNZGY78KT7ZMH6KC";
 const tokenContractName = "cosmo-ft";
 const storeContractName = "product-store";
+const assetName = "cosmo-ft";
 const explorerBaseUrl = "https://explorer.stacks.co/txid/0x";
 const conversionRate = 1000;
 const appDetails = {
@@ -77,6 +79,31 @@ function createContractCallOptions(
       alert("You cancelled the request");
     },
   };
+}
+
+function createFungibleAssetPostCondition(
+  senderAddress: string,
+  amount: string,
+  conditionCode: FungibleConditionCode
+): FungiblePostCondition {
+  const postConditionAddress = senderAddress;
+  const postConditionCode = conditionCode;
+  const postConditionAmount: BN = new BN(amount);
+  const fungibleAssetInfo = createAssetInfo(
+    deployerAddress,
+    tokenContractName,
+    assetName
+  );
+
+  const fungiblePostCondition: FungiblePostCondition =
+    makeStandardFungiblePostCondition(
+      postConditionAddress,
+      postConditionCode,
+      postConditionAmount,
+      fungibleAssetInfo
+    );
+
+  return fungiblePostCondition;
 }
 
 async function getTokenName() {
@@ -161,22 +188,13 @@ async function transferTokens(e: Event) {
   const recipientAddress = (<HTMLInputElement>(
     document.getElementById("token-recipient-address")
   )).value;
-  const postConditionAddress = userAddress;
-  const assetName = "cosmo-ft";
-  const postConditionCode = FungibleConditionCode.Equal;
-  const postConditionAmount: BN = new BN(amount);
-  const fungibleAssetInfo = createAssetInfo(
-    deployerAddress,
-    tokenContractName,
-    assetName
+
+  const fungibleAssetPostCondition = createFungibleAssetPostCondition(
+    userAddress,
+    amount,
+    FungibleConditionCode.Equal
   );
 
-  const contractFungiblePostCondition = makeStandardFungiblePostCondition(
-    postConditionAddress,
-    postConditionCode,
-    postConditionAmount,
-    fungibleAssetInfo
-  );
   const callArguments: ClarityValue[] = [
     uintCV(amount),
     standardPrincipalCV(userAddress),
@@ -189,7 +207,7 @@ async function transferTokens(e: Event) {
     "transfer-token-output",
     callArguments
   );
-  opts.postConditions = [contractFungiblePostCondition];
+  opts.postConditions = [fungibleAssetPostCondition];
   await openContractCall(opts);
 }
 
@@ -201,31 +219,19 @@ async function burnTokens(e: Event) {
     document.getElementById("owner-stx-address")
   )).value;
 
-  const postConditionAddress = ownerAddress;
-  const postConditionCode = FungibleConditionCode.Equal;
-  const postConditionAmount: BN = new BN(amount);
-  const fungibleAssetInfo = createAssetInfo(
-    deployerAddress,
-    tokenContractName,
-    "cosmo-ft"
+  const fungibleAssetPostCondition = createFungibleAssetPostCondition(
+    ownerAddress,
+    amount,
+    FungibleConditionCode.Equal
   );
 
-  const contractFungiblePostCondition = makeStandardFungiblePostCondition(
-    postConditionAddress,
-    postConditionCode,
-    postConditionAmount,
-    fungibleAssetInfo
-  );
-
-  console.log(amount);
-  console.log(ownerAddress);
   const opts: ContractCallOptions = createContractCallOptions(
     tokenContractName,
     "destroy-token",
     "destroy-token-output",
     [uintCV(amount), standardPrincipalCV(ownerAddress)]
   );
-  opts.postConditions = [contractFungiblePostCondition];
+  opts.postConditions = [fungibleAssetPostCondition];
   await openContractCall(opts);
 }
 
@@ -347,29 +353,20 @@ async function transferReward(e: Event) {
   const transferAmount = (<HTMLInputElement>(
     document.getElementById("reward-transfer-amount")
   )).value;
-  const postConditionAddress = userAddress;
-  const assetName = "cosmo-ft";
-  const postConditionCode = FungibleConditionCode.Equal;
-  const postConditionAmount = new BN(transferAmount);
-  const fungibleAssetInfo = createAssetInfo(
-    deployerAddress,
-    tokenContractName,
-    assetName
+
+  const fungibleAssetPostCondition = createFungibleAssetPostCondition(
+    userAddress,
+    transferAmount,
+    FungibleConditionCode.Equal
   );
 
-  const contractFungiblePostCondition = makeStandardFungiblePostCondition(
-    postConditionAddress,
-    postConditionCode,
-    postConditionAmount,
-    fungibleAssetInfo
-  );
   const opts: ContractCallOptions = createContractCallOptions(
     storeContractName,
     "transfer-reward-tokens",
     "transfer-reward-output",
     [uintCV(transferAmount), standardPrincipalCV(deployerAddress)]
   );
-  opts.postConditions = [contractFungiblePostCondition];
+  opts.postConditions = [fungibleAssetPostCondition];
   await openContractCall(opts);
 }
 
@@ -378,22 +375,6 @@ async function redeemReward(e: Event) {
   const rewardAmount = (<HTMLInputElement>(
     document.getElementById("redeem-amount")
   )).value;
-  const postConditionAddress = userAddress;
-  const postConditionCode = FungibleConditionCode.Equal;
-  const postConditionAmount: BN = new BN(rewardAmount);
-  const assetName = "cosmo-ft";
-  const fungibleAssetInfo = createAssetInfo(
-    deployerAddress,
-    tokenContractName,
-    assetName
-  );
-
-  const contractFungiblePostCondition = makeStandardFungiblePostCondition(
-    postConditionAddress,
-    postConditionCode,
-    postConditionAmount,
-    fungibleAssetInfo
-  );
 
   const STXPostConditionCode = FungibleConditionCode.Equal;
   const STXPostConditionAmount = new BN(Number(rewardAmount) / conversionRate);
@@ -404,6 +385,11 @@ async function redeemReward(e: Event) {
     STXPostConditionAmount
   );
 
+  const fungibleAssetPostCondition = createFungibleAssetPostCondition(
+    userAddress,
+    rewardAmount,
+    FungibleConditionCode.Equal
+  );
   const txOptions: ContractCallOptions = createContractCallOptions(
     storeContractName,
     "redeem-reward-tokens",
@@ -411,7 +397,7 @@ async function redeemReward(e: Event) {
     [uintCV(rewardAmount)]
   );
   txOptions.postConditions = [
-    contractFungiblePostCondition,
+    fungibleAssetPostCondition,
     contractSTXPostCondition,
   ];
   await openContractCall(txOptions);
