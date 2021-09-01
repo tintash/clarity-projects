@@ -1,6 +1,10 @@
 import "./App.css";
 import { DoAuthenticate, RetrieveData } from "./Authentication";
-import { PublicContractCall, ReadOnlyContractCall } from "./Contract";
+import {
+  PublicContractCall,
+  ReadOnlyContractCall,
+  TransferToken,
+} from "./Contract";
 import TransferSTX from "./TransferSTX";
 
 function App() {
@@ -22,6 +26,10 @@ function App() {
       <br />
       <button className="button" onClick={ReadOnlyContractCall}>
         Call Read Only function
+      </button>
+      <br />
+      <button className="button" onClick={TransferToken}>
+        Transfer 100 Tokens
       </button>
       <br />
       <button className="button" onClick={RetrieveData}>
