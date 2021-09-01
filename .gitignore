@@ -1,3 +1,4 @@
 *~
 *.swp
 Testnet.toml
+.DS_Store
