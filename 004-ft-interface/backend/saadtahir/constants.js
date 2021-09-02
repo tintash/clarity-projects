@@ -1,4 +1,4 @@
-import { standardPrincipalCV } from "@stacks/transactions/dist/clarity/types/principalCV.js";
+import { standardPrincipalCV } from "@stacks/transactions";
 
 const constants = {
   port: 3000,
