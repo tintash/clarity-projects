@@ -17,7 +17,7 @@ https://docs.stacks.co/build-apps/guides/authentication
 ## Using [@stacks/connect]('https://github.com/blockstack/connect') for calling functions 
 https://docs.stacks.co/build-apps/guides/transaction-signing#prompt-to-execute-contract
 
-##Starting the project 
+## Starting the project 
 - Navigate to ft-caller-static-page 
 - Run ```npm start```
 - Move to ```http://localhost:5000/view/``` for interacting with interface 
