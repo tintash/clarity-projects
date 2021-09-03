@@ -16,145 +16,33 @@ import {
   standardPrincipalCV,
   PostConditionMode,
   stringAsciiCV,
-  createAssetInfo,
-  makeStandardFungiblePostCondition,
   makeContractSTXPostCondition,
-  contractPrincipalCV,
 } from "@stacks/transactions";
-import { StacksTestnet } from "@stacks/network";
 import BN from "bn.js";
-import { FungiblePostCondition } from "@stacks/transactions/dist/transactions/src/postcondition";
+import {
+  appDetails,
+  createContractCallOptions,
+  createFungibleAssetPostCondition,
+  createReadOnlyFunctionOption,
+  deployerAddress,
+  getTokenName,
+  getTokenSupply,
+  getTokenSymbol,
+  getUserBalance,
+  storeContractName,
+  tokenContractName,
+} from "./commonFunctions";
 
 const appConfig = new AppConfig(["store_write", "publish_data"]);
 const userSession = new UserSession({ appConfig });
+const conversionRate = 1000;
 let userData: UserData;
 let userAddress = "";
-const network = new StacksTestnet();
-const deployerAddress = "ST3F9BYX07T0Q51JT2YVXT532BNZGY78KT7ZMH6KC";
-const tokenContractName = "cosmo-ft";
-const storeContractName = "product-store";
-const assetName = "cosmo-ft";
-const explorerBaseUrl = "https://explorer.stacks.co/txid/0x";
-const conversionRate = 1000;
-const appDetails = {
-  name: "Product Store",
-  icon: window.location.origin + "/src/icon.jpg",
-};
-
-function createReadOnlyFunctionOption(
-  functionName: string,
-  contractName: string,
-  functionArgs: ClarityValue[] = [],
-  senderAddress: string = deployerAddress
-): ReadOnlyFunctionOptions {
-  const options: ReadOnlyFunctionOptions = {
-    contractAddress: deployerAddress,
-    contractName: contractName,
-    functionName: functionName,
-    functionArgs: functionArgs,
-    network,
-    senderAddress: senderAddress,
-  };
-  return options;
-}
-
-function createContractCallOptions(
-  contractName: string,
-  functionName: string,
-  outputElementId: string,
-  functionArguments: ClarityValue[] = []
-): ContractCallOptions {
-  return {
-    contractAddress: deployerAddress,
-    contractName: contractName,
-    functionName: functionName,
-    functionArgs: functionArguments,
-    appDetails,
-    userSession: userSession,
-    onFinish: (data) => {
-      document.getElementById(outputElementId)!.innerHTML =
-        explorerBaseUrl + data.txId.toString();
-    },
-    onCancel: () => {
-      alert("You cancelled the request");
-    },
-  };
-}
-
-function createFungibleAssetPostCondition(
-  senderAddress: string,
-  amount: string,
-  conditionCode: FungibleConditionCode
-): FungiblePostCondition {
-  const postConditionAddress = senderAddress;
-  const postConditionCode = conditionCode;
-  const postConditionAmount: BN = new BN(amount);
-  const fungibleAssetInfo = createAssetInfo(
-    deployerAddress,
-    tokenContractName,
-    assetName
-  );
-
-  const fungiblePostCondition: FungiblePostCondition =
-    makeStandardFungiblePostCondition(
-      postConditionAddress,
-      postConditionCode,
-      postConditionAmount,
-      fungibleAssetInfo
-    );
-
-  return fungiblePostCondition;
-}
-
-async function getTokenName() {
-  try {
-    const options = createReadOnlyFunctionOption("get-name", tokenContractName);
-    const result = await callReadOnlyFunction(options);
-    const jsonResponse = cvToJSON(result);
-    return jsonResponse.value.value;
-  } catch (error) {
-    console.log(error);
-    return "";
-  }
-}
-
-async function getTokenSymbol() {
-  try {
-    const options = createReadOnlyFunctionOption(
-      "get-symbol",
-      tokenContractName
-    );
-    const result = await callReadOnlyFunction(options);
-    const jsonResponse = cvToJSON(result);
-    return jsonResponse.value.value;
-  } catch (error) {
-    return "";
-  }
-}
-
-async function getTokenSupply() {
-  try {
-    const options = createReadOnlyFunctionOption(
-      "get-total-supply",
-      tokenContractName
-    );
-    const result = await callReadOnlyFunction(options);
-    const jsonResponse = cvToJSON(result);
-    return jsonResponse.value.value;
-  } catch (error) {
-    return "";
-  }
-}
 
 async function getBalance(e: Event) {
   e.preventDefault();
   try {
-    const options = createReadOnlyFunctionOption(
-      "get-balance-of",
-      tokenContractName,
-      [standardPrincipalCV(userAddress.toString())]
-    );
-    const result = await callReadOnlyFunction(options);
+    const result = await getUserBalance(userAddress.toString());
     const jsonResponse = cvToJSON(result);
     document.getElementById("balance-output")!.innerHTML =
       jsonResponse.value.value;
@@ -162,23 +50,6 @@ async function getBalance(e: Event) {
     document.getElementById("balance-output")!.innerHTML =
       JSON.stringify(error);
   }
-}
-
-async function getTokens(e: Event) {
-  e.preventDefault();
-  const amount = (<HTMLInputElement>(
-    document.getElementById("token-issue-amount")
-  )).value;
-  const recipientAddress = (<HTMLInputElement>(
-    document.getElementById("token-receiver-address")
-  )).value;
-  const opts: ContractCallOptions = createContractCallOptions(
-    tokenContractName,
-    "issue-token",
-    "issue-token-output",
-    [uintCV(amount), standardPrincipalCV(recipientAddress)]
-  );
-  await openContractCall(opts);
 }
 
 async function transferTokens(e: Event) {
@@ -205,6 +76,7 @@ async function transferTokens(e: Event) {
     tokenContractName,
     "transfer",
     "transfer-token-output",
+    userSession,
     callArguments
   );
   opts.postConditions = [fungibleAssetPostCondition];
@@ -215,12 +87,9 @@ async function burnTokens(e: Event) {
   e.preventDefault();
   const amount = (<HTMLInputElement>document.getElementById("burn-amount"))
     .value;
-  const ownerAddress = (<HTMLInputElement>(
-    document.getElementById("owner-stx-address")
-  )).value;
 
   const fungibleAssetPostCondition = createFungibleAssetPostCondition(
-    ownerAddress,
+    userAddress,
     amount,
     FungibleConditionCode.Equal
   );
@@ -229,27 +98,10 @@ async function burnTokens(e: Event) {
     tokenContractName,
     "destroy-token",
     "destroy-token-output",
-    [uintCV(amount), standardPrincipalCV(ownerAddress)]
+    userSession,
+    [uintCV(amount), standardPrincipalCV(userAddress)]
   );
   opts.postConditions = [fungibleAssetPostCondition];
-  await openContractCall(opts);
-}
-
-async function addValidContractCaller(e: Event) {
-  e.preventDefault();
-  const callerDeployerAddress = (<HTMLInputElement>(
-    document.getElementById("deployer-address")
-  )).value;
-  const callerContractName = (<HTMLInputElement>(
-    document.getElementById("contract-name")
-  )).value;
-
-  const opts: ContractCallOptions = createContractCallOptions(
-    tokenContractName,
-    "add-valid-contract-caller",
-    "contract-caller-output",
-    [contractPrincipalCV(callerDeployerAddress, callerContractName)]
-  );
   await openContractCall(opts);
 }
 
@@ -285,52 +137,12 @@ async function getBonusPointsCount(e: Event) {
     );
     const result: ClarityValue = await callReadOnlyFunction(options);
     const jsonResponse = cvToJSON(result);
-    document.getElementById("bonus-point-output")!.innerHTML +=
+    document.getElementById("bonus-point-output")!.innerHTML =
       jsonResponse.value.value;
   } catch (error) {
-    document.getElementById("bonus-point-output")!.innerHTML +=
+    document.getElementById("bonus-point-output")!.innerHTML =
       JSON.stringify(error);
   }
-}
-
-async function addProduct(e: Event) {
-  e.preventDefault();
-
-  const price = (<HTMLInputElement>document.getElementById("price")).value;
-  const productName = (<HTMLInputElement>(
-    document.getElementById("new-product-name")
-  )).value;
-  const quantity = (<HTMLInputElement>document.getElementById("quantity"))
-    .value;
-  const callArguments: ClarityValue[] = [
-    stringAsciiCV(productName),
-    uintCV(price),
-    uintCV(quantity),
-  ];
-
-  const opts: ContractCallOptions = createContractCallOptions(
-    storeContractName,
-    "add-product",
-    "add-product-output",
-    callArguments
-  );
-  await openContractCall(opts);
-}
-
-async function deleteProduct(e: Event) {
-  e.preventDefault();
-  const productName = (<HTMLInputElement>(
-    document.getElementById("delete-product-name")
-  )).value;
-  const callArguments: ClarityValue[] = [stringAsciiCV(productName)];
-
-  const opts: ContractCallOptions = createContractCallOptions(
-    storeContractName,
-    "delete-product",
-    "delete-product-output",
-    callArguments
-  );
-  await openContractCall(opts);
 }
 
 async function buyProduct(e: Event) {
@@ -342,6 +154,7 @@ async function buyProduct(e: Event) {
     storeContractName,
     "buy-product",
     "purchase-output",
+    userSession,
     [stringAsciiCV(productName)]
   );
   opts.postConditionMode = PostConditionMode.Allow;
@@ -364,6 +177,7 @@ async function transferReward(e: Event) {
     storeContractName,
     "transfer-reward-tokens",
     "transfer-reward-output",
+    userSession,
     [uintCV(transferAmount), standardPrincipalCV(deployerAddress)]
   );
   opts.postConditions = [fungibleAssetPostCondition];
@@ -394,6 +208,7 @@ async function redeemReward(e: Event) {
     storeContractName,
     "redeem-reward-tokens",
     "redeem-reward-output",
+    userSession,
     [uintCV(rewardAmount)]
   );
   txOptions.postConditions = [
@@ -405,7 +220,7 @@ async function redeemReward(e: Event) {
 
 async function showPopup() {
   showConnect({
-    appDetails,
+    appDetails: appDetails,
     redirectTo: "/",
     onFinish: () => {
       userData = userSession.loadUserData();
@@ -432,20 +247,12 @@ function setEventListeners() {
     .addEventListener("submit", getBalance);
 
   document
-    .getElementById("issue-tokens")!
-    .addEventListener("submit", getTokens);
-
-  document
     .getElementById("destroy-tokens")!
     .addEventListener("submit", burnTokens);
 
   document
     .getElementById("transfer-tokens")!
     .addEventListener("submit", transferTokens);
-
-  document
-    .getElementById("add-valid-contract-caller")!
-    .addEventListener("submit", addValidContractCaller);
 
   document
     .getElementById("get-product-price")!
@@ -466,14 +273,6 @@ function setEventListeners() {
   document
     .getElementById("redeem-reward-tokens")!
     .addEventListener("submit", redeemReward);
-
-  document
-    .getElementById("add-product")!
-    .addEventListener("submit", addProduct);
-
-  document
-    .getElementById("delete-product")!
-    .addEventListener("submit", deleteProduct);
 }
 
 async function load() {

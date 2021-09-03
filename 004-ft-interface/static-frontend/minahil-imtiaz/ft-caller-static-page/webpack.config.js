@@ -1,14 +1,19 @@
 const path = require("path");
 const webpack = require("webpack");
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-module.exports = {
-  entry: "./src/index.ts",
+module.exports = { 
+   entry: {
+    admin: './src/admin.ts',
+    customer: './src/customer.ts',
+  },
   mode: "development",
   resolve: {
     fallback: {
       crypto: require.resolve("crypto-browserify"),
       stream: require.resolve("stream-browserify"),
     },
+    extensions: ['.ts', '.js', '.json']
   },
   module: {
     rules: [
@@ -20,7 +25,7 @@ module.exports = {
   },
   output: {
     clean: true,
-    filename: "bundle.js",
+    filename: '[name].bundle.js',
     path: path.resolve(__dirname, "dist"),
   },
   plugins: [
