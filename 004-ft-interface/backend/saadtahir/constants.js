@@ -17,6 +17,7 @@ const constants = {
 
   wallet_addresses: {
     faried: "ST3T6RJ8DKMJ4XB7DFTER1B9SX91GYBKXT27QC6FM",
+    saad_2: "STCZ2WWPY8NX8XNH169S9MSGWHFZJAHWCHEBAVRH",
   },
 
   functions: {

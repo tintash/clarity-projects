@@ -11,8 +11,12 @@ import {
   AnchorMode,
   callReadOnlyFunction,
   makeContractCall,
+  standardPrincipalCV,
+  uintCV,
+  PostConditionMode,
 } from "@stacks/transactions";
 import { StacksTestnet } from "@stacks/network";
+import { BN } from "bn.js";
 
 const app = express();
 const port = constants.port;
@@ -51,29 +55,32 @@ app.get(routes.publicKey, (req, res) => {
 app.post(routes.stx_send, async (req, res) => {
   console.log(req.body);
 
+  const recipient = req.body.recipient;
+  const amount = req.body.amount;
+  const memo = req.body.memo;
+
   const txOptions = {
-    recipient: req.body.user.address,
-    amount: 12345n,
+    recipient,
+    amount: new BN(amount),
     senderKey: privateKeyToString(privateKey),
     network,
-    memo: "test memo",
+    memo: memo,
+    postConditionMode: PostConditionMode.Allow,
     anchorMode: AnchorMode.Any,
   };
 
   try {
     const transaction = await makeSTXTokenTransfer(txOptions);
-
-    // to see the raw serialized tx
     const serializedTx = transaction.serialize().toString("hex");
-    console.log("serializedTx: " + serializedTx);
+    const txId = transaction.txid();
+    broadcastTransaction(transaction, network);
 
-    // broadcasting transaction to the specified network
-    const broadcastResponse = await broadcastTransaction(transaction, network);
-    const txId = broadcastResponse.txid;
+    console.log("serializedTx: " + serializedTx);
     console.log("txId: " + txId);
-    res.send("STX Transfer Request Sent: " + txId);
-  } catch (err) {
-    res.send("Function Failed: " + err);
+    res.send("STX Token Transfer call sent: " + txId);
+  } catch (error) {
+    console.log("ERROR: " + error);
+    res.send("Function Failed with error: " + err); // TypeError: failed to fetch
   }
 });
 
@@ -89,7 +96,7 @@ app.get(routes.random, async (req, res) => {
 
   try {
     const result = await callReadOnlyFunction(options);
-    console.log(result);
+    console.log(result.value.value);
     res.send("Function Succeded: " + result.value.value);
   } catch (err) {
     console.log(err);
@@ -97,24 +104,35 @@ app.get(routes.random, async (req, res) => {
   }
 });
 
-app.get(routes.goal_score, async (req, res) => {
+app.post(routes.is_goal_scored, async (req, res) => {
+  console.log(req.body);
+
+  const player = standardPrincipalCV(req.body.player);
+  const score = uintCV(req.body.score);
+  console.log("Player: " + player.address);
+  console.log("Score: " + score);
+
   const txOptions = {
     contractAddress: constants.functions.contractAddress,
     contractName: constants.functions.contract.name,
-    functionName: constants.functions.contract.public.goal_score.name,
-    functionArgs: [constants.functions.contract.public.goal_score.principal],
+    functionName: constants.functions.contract.public.is_goal_scored.name,
+    functionArgs: [score, player],
     senderKey: privateKeyToString(privateKey),
     validateWithAbi: true,
     network,
     postConditions: [],
+    postConditionMode: PostConditionMode.Allow,
     anchorMode: AnchorMode.Any,
   };
 
   try {
     const transaction = await makeContractCall(txOptions);
-    const broadcastResponse = await broadcastTransaction(transaction, network);
-    const txId = broadcastResponse.txid;
-    console.log("txID: " + txId);
+    const serializedTx = transaction.serialize().toString("hex");
+    const txId = transaction.txid();
+    broadcastTransaction(transaction, network);
+
+    console.log("serializedTx: " + serializedTx);
+    console.log("txId: " + txId);
     res.send("Function Succeded: " + "txId: " + txId);
   } catch (err) {
     console.log(err);
