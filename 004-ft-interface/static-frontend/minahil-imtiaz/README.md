@@ -1,11 +1,15 @@
 # Cosmo FT Caller Static Page
 
 There are two interface provided by the project under the view folder. 
+
+
 * **admin.html** provides interface for the deployer / owner of the contract to manage token and product store. You need to deploy the contract on testnet for using this interface. 
+
+
 * **customer.html** provides interface for the customers to interact with the store and use their reward tokens. 
 
 ## Deploy contract on testnet
-* [Set up the stacks wallet]('https://bitbucket.org/tintash/clarity-projects/src/main/003-ft/Stacks-Wallet.md')
+* Set up the stacks wallet by following guide at https://bitbucket.org/tintash/clarity-projects/src/main/003-ft/Stacks-Wallet.md
 * Switch to testnet network in the wallet 
 * Replace the hardcoded stacks address in your contract with your testnet address
 * In your project directory create ```settings/Testnet.toml``` 
@@ -24,6 +28,8 @@ mnemonic = "[your mnemonic]"
 ## WebPack Configuration
 
 https://webpack.js.org/guides/getting-started/
+
+
 https://www.codeinwp.com/blog/webpack-tutorial-for-beginners/
 
 Configuration with Typescript 
