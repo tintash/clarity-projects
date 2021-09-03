@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { AppConfig, UserSession, showConnect } from "@stacks/connect";
 import { Storage } from "@stacks/storage";
 import logo from "./logo.svg";
@@ -12,26 +13,37 @@ const options = {
 };
 
 function DoAuthenticate() {
-  showConnect({
-    appDetails: {
-      name: "My App",
-      icon: window.location.origin + logo,
-    },
-    redirectTo: "/",
-    onFinish: onFinish,
-    userSession: userSession,
-  });
-}
+  const [testnet, setTestnet] = useState("");
+  const [mainnet, setMainnet] = useState("");
 
-function onFinish() {
-  const userData = userSession.loadUserData();
-  // Save or otherwise utilize userData post-authentication
-  const profile = userData.profile.stxAddress;
-  const testnet = profile.testnet;
-  const mainnet = profile.mainnet;
-  document.getElementById("testnet").innerHTML = "Testnet: " + testnet;
-  document.getElementById("mainnet").innerHTML = "Mainnet: " + mainnet;
-  StoreData(userData);
+  const handleSubmit = (e) => {
+    showConnect({
+      appDetails: {
+        name: "My App",
+        icon: window.location.origin + logo,
+      },
+      redirectTo: "/",
+      onFinish: onFinish,
+      userSession: userSession,
+    });
+  };
+
+  const onFinish = (e) => {
+    const userData = userSession.loadUserData();
+    const profile = userData.profile.stxAddress;
+    setTestnet(profile.testnet);
+    setMainnet(profile.mainnet);
+  };
+
+  return (
+    <div>
+      <h1 id="testnet">Testnet: {testnet}</h1>
+      <h1 id="mainnet">Mainnet: {mainnet}</h1>
+      <button className="button" onClick={handleSubmit}>
+        Authenicate
+      </button>
+    </div>
+  );
 }
 
 function StoreData(data) {
