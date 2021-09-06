@@ -10,69 +10,84 @@
 (define-constant err-invalid-call (err u120))
 
 ;; data maps and vars
-(define-data-var purchase 
-    {price: uint, deposit: uint, buyer: (optional principal), seller: (optional principal)} 
-    {price: u0, deposit: u0, buyer: none, seller: none}
+(define-map orders
+    {order-id: uint} 
+    {price: uint, deposit: uint, buyer: (optional principal), seller: (optional principal)}
 )
 
 ;; read-only functions
-(define-read-only (get-buyer)
-    (get buyer (var-get purchase))
+(define-read-only (get-buyer (id uint))
+    (get buyer (unwrap! (map-get? orders {order-id: id}) none))
 )
 
-(define-read-only (get-seller)
-    (get seller (var-get purchase))
+(define-read-only (get-seller (id uint))
+    (get seller (unwrap! (map-get? orders {order-id: id}) none))
+)
+
+(define-read-only (get-deposit (id uint))
+    (get deposit (unwrap! (map-get? orders {order-id: id}) u0))
+)
+
+(define-read-only (get-price (id uint))
+    (get price (unwrap! (map-get? orders {order-id: id}) u0))
+)
+
+(define-read-only (get-order (id uint))
+    (map-get? orders {order-id: id})
 )
 
 ;; public functions
-(define-public (seller-deposit (amount uint))
+(define-public (seller-deposit (id uint) (amount uint))
     (begin 
         ;; only contract owner can call this -- needed ??
         (asserts! (is-eq contract-owner tx-sender) err-invalid-caller)
-        ;; call only once -- to avoid changes in future 
-        (asserts! (is-eq (get-seller) none) err-invalid-call)
+        ;; call only once for this id -- to avoid changes in future 
+        (asserts! (is-eq (get-seller id) none) err-invalid-call)
         ;; deposit/price should not be 0
         (asserts! (> (/ amount u2) u0) err-invalid-amount) 
-        (var-set purchase 
-            (merge 
-                (var-get purchase) 
-                {price: (/ amount u2), deposit: amount, seller: (some tx-sender)}
-            )
-        )
+        
+        (map-set orders {order-id: id} 
+            {price: (/ amount u2), deposit: amount, buyer: none, seller: (some tx-sender)})
+        
         (stx-transfer? amount tx-sender contract)
     )
 )
 
-(define-public (buyer-deposit (amount uint))
+(define-public (buyer-deposit (id uint) (amount uint))
     (begin
         ;; no seller
-        (unwrap! (get-seller) err-invalid-call)
+        (unwrap! (get-seller id) err-invalid-call)
         ;; call only once -- to avoid changes in future
-        (asserts! (is-eq (get-buyer) none) err-invalid-call)
+        (asserts! (is-eq (get-buyer id) none) err-invalid-call)
         ;; deposit must be same as sellers deposit
-        (asserts! (is-eq (get deposit (var-get purchase)) amount) err-invalid-amount)
-        (var-set purchase 
-            (merge (var-get purchase) {buyer: (some tx-sender)})
-        )
+        (asserts! (is-eq (get-deposit id) amount) err-invalid-amount)
+        
+        (map-set orders {order-id: id} 
+            (merge (unwrap! (get-order id) err-invalid-call) {buyer: (some tx-sender)}))
+
         (stx-transfer? amount tx-sender contract)
     )
 )
 
-(define-public (item-received)
+(define-public (item-received (id uint))
     (begin 
         ;; verify buyer 
-        (asserts! (is-eq (get-buyer) (some tx-sender)) err-invalid-caller)
+        (asserts! (is-eq (get-buyer id) (some tx-sender)) err-invalid-caller)
         ;; verify deposit exists!
-        (asserts! (> (get deposit (var-get purchase)) u0) err-invalid-call)
+        (asserts! (> (get-deposit id) u0) err-invalid-call)
         ;; transfers
         (try! (as-contract (stx-transfer? 
-            (- (get deposit (var-get purchase)) (get price (var-get purchase))) 
-            tx-sender (unwrap! (get-buyer) (err u121))
+            (- (get-deposit id) (get-price id)) 
+            tx-sender (unwrap! (get-buyer id) err-invalid-call)
         )))
         (try! (as-contract (stx-transfer? 
-            (+ (get deposit (var-get purchase)) (get price (var-get purchase))) 
-            tx-sender (unwrap! (get-seller) (err u122))
+            (+ (get-deposit id) (get-price id)) 
+            tx-sender (unwrap! (get-seller id) err-invalid-call)
         )))
+        ;; read it from another PR that clean up and record keeping is possible
+        (print (get-order id))
+        (map-delete orders {order-id: id})
+
         (ok true)
     )
 )
