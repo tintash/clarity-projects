@@ -73,11 +73,11 @@ app.post(routes.stx_send, async (req, res) => {
     const transaction = await makeSTXTokenTransfer(txOptions);
     const serializedTx = transaction.serialize().toString("hex");
     const txId = transaction.txid();
-    broadcastTransaction(transaction, network);
-
+    const result = await broadcastTransaction(transaction, network);
+    console.log("Brodcast result: " + JSON.stringify(result));
     console.log("serializedTx: " + serializedTx);
     console.log("txId: " + txId);
-    res.send("STX Token Transfer call sent: " + txId);
+    res.send(JSON.stringify(result));
   } catch (error) {
     console.log("ERROR: " + error);
     res.send("Function Failed with error: " + err); // TypeError: failed to fetch
@@ -109,8 +109,6 @@ app.post(routes.is_goal_scored, async (req, res) => {
 
   const player = standardPrincipalCV(req.body.player);
   const score = uintCV(req.body.score);
-  console.log("Player: " + player.address);
-  console.log("Score: " + score);
 
   const txOptions = {
     contractAddress: constants.functions.contractAddress,
@@ -129,11 +127,11 @@ app.post(routes.is_goal_scored, async (req, res) => {
     const transaction = await makeContractCall(txOptions);
     const serializedTx = transaction.serialize().toString("hex");
     const txId = transaction.txid();
-    broadcastTransaction(transaction, network);
-
-    console.log("serializedTx: " + serializedTx);
+    const result = await broadcastTransaction(transaction, network);
+    console.log("Broadcast result: " + JSON.stringify(result));
+    console.log("Contr: " + serializedTx);
     console.log("txId: " + txId);
-    res.send("Function Succeded: " + "txId: " + txId);
+    res.send(JSON.stringify(result));
   } catch (err) {
     console.log(err);
     res.send("Function Failed with error: " + err); // TypeError: failed to fetch
