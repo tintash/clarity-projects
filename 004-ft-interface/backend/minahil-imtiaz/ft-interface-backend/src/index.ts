@@ -3,7 +3,6 @@ import {
   AnchorMode,
   broadcastTransaction,
   callReadOnlyFunction,
-  ClarityType,
   ClarityValue,
   contractPrincipalCV,
   createAssetInfo,
@@ -14,7 +13,6 @@ import {
   makeStandardFungiblePostCondition,
   PostConditionMode,
   ReadOnlyFunctionOptions,
-  ResponseCV,
   SignedContractCallOptions,
   StacksTransaction,
   standardPrincipalCV,
@@ -126,7 +124,7 @@ app.get("/get-token-uri", async function (req, res) {
     const jsonResponse = cvToJSON(result);
     res.end(jsonResponse.value.value.value);
   } catch (error) {
-    res.end(JSON.stringify(error));
+    res.json(error);
   }
 });
 
@@ -141,7 +139,7 @@ app.post("/check-balance", async function (req, res) {
     const jsonResponse = cvToJSON(result);
     res.end(jsonResponse.value.value);
   } catch (error) {
-    res.end(JSON.stringify(error));
+    res.json(error);
   }
 });
 
@@ -160,7 +158,7 @@ app.post("/get-tokens", async function (req, res) {
     res.redirect(explorerBaseUrl + result.txid);
   } catch (error) {
     console.log(error);
-    res.end(JSON.stringify(error));
+    res.json(error);
   }
 });
 
@@ -191,7 +189,7 @@ app.post("/destroy-tokens", async function (req, res) {
     }
     res.redirect(explorerBaseUrl + result.txid);
   } catch (error) {
-    res.end(JSON.stringify(error));
+    res.json(error);
   }
 });
 
@@ -222,7 +220,7 @@ app.post("/transfer-tokens", async function (req, res) {
     }
     res.redirect(explorerBaseUrl + result.txid);
   } catch (error) {
-    res.end(JSON.stringify(error));
+    res.json(error);
   }
 });
 
@@ -250,7 +248,7 @@ app.post("/add-valid-contract-caller", async function (req, res) {
     }
     res.redirect(explorerBaseUrl + result.txid);
   } catch (error) {
-    res.end(JSON.stringify(error));
+    res.json(error);
   }
 });
 
@@ -263,9 +261,9 @@ app.post("/get-product-price", async function (req, res) {
     );
     const result: ClarityValue = await callReadOnlyFunction(options);
     const jsonResponse = cvToJSON(result);
-    res.end(JSON.stringify(jsonResponse));
+    res.json(jsonResponse);
   } catch (error) {
-    res.end(JSON.stringify(error));
+    res.json(error);
   }
 });
 
@@ -281,7 +279,7 @@ app.post("/get-bonus-points-count", async function (req, res) {
     const jsonResponse = cvToJSON(result);
     res.end(jsonResponse.value.value);
   } catch (error) {
-    res.end(JSON.stringify(error));
+    res.json(error);
   }
 });
 
@@ -301,7 +299,7 @@ app.post("/delete-product", async function (req, res) {
     }
     res.redirect(explorerBaseUrl + result.txid);
   } catch (error) {
-    res.end(JSON.stringify(error));
+    res.json(error);
   }
 });
 
@@ -325,7 +323,7 @@ app.post("/add-product", async function (req, res) {
     res.redirect(explorerBaseUrl + result.txid);
   } catch (error) {
     console.log(error);
-    res.end(JSON.stringify(error));
+    res.json(error);
   }
 });
 
@@ -350,7 +348,7 @@ app.post("/buy-product", async function (req, res) {
     console.log(result);
     res.redirect(explorerBaseUrl + result.txid);
   } catch (error) {
-    res.end(JSON.stringify(error));
+    res.json(error);
   }
 });
 
@@ -381,7 +379,7 @@ app.post("/transfer-reward-tokens", async function (req, res) {
     }
     res.redirect(explorerBaseUrl + result.txid);
   } catch (error) {
-    res.end(JSON.stringify(error));
+    res.json(error);
   }
 });
 
@@ -423,7 +421,7 @@ app.post("/redeem-reward-tokens", async function (req, res) {
     }
     res.redirect(explorerBaseUrl + result.txid);
   } catch (error) {
-    res.end(JSON.stringify(error));
+    res.json(error);
   }
 });
 
