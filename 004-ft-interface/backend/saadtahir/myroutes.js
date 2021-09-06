@@ -1,5 +1,6 @@
 const myroutes = {
-  hello: "/",
+  index: "/",
+  hello: "/hello",
   user: "/user",
   privateKey: "/privateKey",
   publicKey: "/publicKey",

@@ -12,7 +12,7 @@ This project is a web application that interacts with the Fungible Token created
 
 ## How to run it
 
-run **node app.js** to start the server http://localhost:3000 and open **index.html** to run all the routes.
+run **node app.js** to start the server http://localhost:3000 and open it to run all the routes.
 
 ## index.html
 

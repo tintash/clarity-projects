@@ -1,4 +1,5 @@
 import express from "express";
+import path from "path";
 import constants from "./constants.js";
 import routes from "./myroutes.js";
 import {
@@ -17,7 +18,11 @@ import {
 } from "@stacks/transactions";
 import { StacksTestnet } from "@stacks/network";
 import { BN } from "bn.js";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const app = express();
 const port = constants.port;
 
@@ -33,6 +38,10 @@ app.use(express.urlencoded());
 
 // Parse JSON bodies (as sent by API clients)
 app.use(express.json());
+
+app.get(routes.index, (req, res) => {
+  res.sendFile(path.join(__dirname, "/index.html"));
+});
 
 app.get(routes.hello, (req, res) => {
   res.send("Hello World!");
