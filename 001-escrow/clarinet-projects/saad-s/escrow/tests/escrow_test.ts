@@ -1,23 +1,25 @@
 
+// @ts-ignore
 import { Clarinet, Tx, Chain, Account, types } from 'https://deno.land/x/clarinet@v0.14.0/index.ts';
+// @ts-ignore
 import { assertEquals } from 'https://deno.land/std@0.90.0/testing/asserts.ts';
 
-Clarinet.test({
-    // maybe i need to change contract so anyone can sell ?? 
-    name: "contract is deployed by seller",
-    async fn(chain: Chain, accounts: Map<string, Account>) {
-        let eSeller = accounts.get('wallet_1')!;
-        const orderId = 0;
-        const amount = 100;
-        let block = chain.mineBlock([
-            Tx.contractCall ("escrow", "seller-deposit", 
-                [types.uint(orderId), types.uint(amount)],
-                eSeller.address
-            ),
-        ]);
-        block.receipts[0].result.expectErr().expectUint(100);
-    },
-});
+// Clarinet.test({
+//     // maybe i need to change contract so anyone can sell ?? 
+//     name: "contract is deployed by seller",
+//     async fn(chain: Chain, accounts: Map<string, Account>) {
+//         let eSeller = accounts.get('wallet_1')!;
+//         const orderId = 0;
+//         const amount = 100;
+//         let block = chain.mineBlock([
+//             Tx.contractCall ("escrow", "seller-deposit", 
+//                 [types.uint(orderId), types.uint(amount)],
+//                 eSeller.address
+//             ),
+//         ]);
+//         block.receipts[0].result.expectErr().expectUint(100);
+//     },
+// });
 
 Clarinet.test({
     name: "seller can deposit to contract",

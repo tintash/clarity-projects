@@ -40,9 +40,9 @@
 (define-public (seller-deposit (id uint) (amount uint))
     (begin 
         ;; only contract owner can call this -- needed ??
-        (asserts! (is-eq contract-owner tx-sender) err-invalid-caller)
+        ;; (asserts! (is-eq contract-owner tx-sender) err-invalid-caller)
         ;; call only once for this id -- to avoid changes in future 
-        (asserts! (is-eq (get-seller id) none) err-invalid-call)
+        (asserts! (is-none (get-seller id)) err-invalid-call)
         ;; deposit/price should not be 0
         (asserts! (> (/ amount u2) u0) err-invalid-amount) 
         
@@ -58,7 +58,7 @@
         ;; no seller
         (unwrap! (get-seller id) err-invalid-call)
         ;; call only once -- to avoid changes in future
-        (asserts! (is-eq (get-buyer id) none) err-invalid-call)
+        (asserts! (is-none (get-buyer id)) err-invalid-call)
         ;; deposit must be same as sellers deposit
         (asserts! (is-eq (get-deposit id) amount) err-invalid-amount)
         
@@ -71,23 +71,30 @@
 
 (define-public (item-received (id uint))
     (begin 
-        ;; verify buyer 
-        (asserts! (is-eq (get-buyer id) (some tx-sender)) err-invalid-caller)
-        ;; verify deposit exists!
-        (asserts! (> (get-deposit id) u0) err-invalid-call)
-        ;; transfers
-        (try! (as-contract (stx-transfer? 
-            (- (get-deposit id) (get-price id)) 
-            tx-sender (unwrap! (get-buyer id) err-invalid-call)
-        )))
-        (try! (as-contract (stx-transfer? 
-            (+ (get-deposit id) (get-price id)) 
-            tx-sender (unwrap! (get-seller id) err-invalid-call)
-        )))
-        ;; read it from another PR that clean up and record keeping is possible
-        (print (get-order id))
-        (map-delete orders {order-id: id})
+        (let (
+                (buyer (get-buyer id))
+                (seller (get-seller id))
+                (deposit (get-deposit id))
+                (price (get-price id))
+            )
+            ;; verify buyer 
+            (asserts! (is-eq buyer (some tx-sender)) err-invalid-caller)
+            ;; verify deposit exists!
+            (asserts! (> deposit u0) err-invalid-call)
+            ;; transfers
+            (try! (as-contract (stx-transfer? 
+                (- deposit price) 
+                tx-sender (unwrap! buyer err-invalid-call)
+            )))
+            (try! (as-contract (stx-transfer? 
+                (+ deposit price) 
+                tx-sender (unwrap! seller err-invalid-call)
+            )))
+            ;; read it from another PR that clean up and record keeping is possible
+            (print (get-order id))
+            (map-delete orders {order-id: id})
 
-        (ok true)
+            (ok true)
+        )
     )
 )
