@@ -1,0 +1,6 @@
+
+settings/Mainnet.toml
+settings/Testnet.toml
+settings/Devnet.toml
+history.txt
+contracts/history.txt

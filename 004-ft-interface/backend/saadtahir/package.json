@@ -1,0 +1,16 @@
+{
+  "name": "express-server",
+  "version": "1.0.0",
+  "description": "This program interacts with smart contracts",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Saad Tahir",
+  "license": "ISC",
+  "dependencies": {
+    "@stacks/connect": "^5.5.0",
+    "express": "^4.17.1"
+  }
+}

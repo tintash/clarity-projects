@@ -1,0 +1,27 @@
+{
+  "name": "ft-interface-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "tsc && node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/express": "^4.16.1",
+    "@types/utf8": "^3.0.0",
+    "prettier": "2.3.2",
+    "tslint": "^5.12.1",
+    "typescript": "^3.9.10"
+  },
+  "dependencies": {
+    "@stacks/network": "^2.0.1",
+    "@stacks/transactions": "^2.0.1",
+    "buffer": "^6.0.3",
+    "dotenv": "^10.0.0",
+    "express": "^4.16.4"
+  }
+}
