@@ -39,11 +39,9 @@
 ;; public functions
 (define-public (seller-deposit (id uint) (amount uint))
     (begin 
-        ;; only contract owner can call this -- needed ??
-        ;; (asserts! (is-eq contract-owner tx-sender) err-invalid-caller)
-        ;; call only once for this id -- to avoid changes in future 
+        ;; call only once 
         (asserts! (is-none (get-seller id)) err-invalid-call)
-        ;; deposit/price should not be 0
+        ;; deposit & price > 0
         (asserts! (> (/ amount u2) u0) err-invalid-amount) 
         
         (map-set orders {order-id: id} 
@@ -56,10 +54,10 @@
 (define-public (buyer-deposit (id uint) (amount uint))
     (begin
         ;; no seller
-        (unwrap! (get-seller id) err-invalid-call)
-        ;; call only once -- to avoid changes in future
+        (asserts! (is-some (get-seller id)) err-invalid-call)
+        ;; call only once 
         (asserts! (is-none (get-buyer id)) err-invalid-call)
-        ;; deposit must be same as sellers deposit
+        ;; verify deposit
         (asserts! (is-eq (get-deposit id) amount) err-invalid-amount)
         
         (map-set orders {order-id: id} 
@@ -79,8 +77,6 @@
             )
             ;; verify buyer 
             (asserts! (is-eq buyer (some tx-sender)) err-invalid-caller)
-            ;; verify deposit exists!
-            (asserts! (> deposit u0) err-invalid-call)
             ;; transfers
             (try! (as-contract (stx-transfer? 
                 (- deposit price) 
@@ -90,7 +86,7 @@
                 (+ deposit price) 
                 tx-sender (unwrap! seller err-invalid-call)
             )))
-            ;; read it from another PR that clean up and record keeping is possible
+            
             (print (get-order id))
             (map-delete orders {order-id: id})
 
