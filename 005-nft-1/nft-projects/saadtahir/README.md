@@ -2,16 +2,6 @@
 
 Velocity-nft is a marketplace for people to buy cars containing special attributes. The common car name is velocity. People can buy, sell, trade velocity. The app uses React JS as front end and @stacks/connect to connect with the wallet for transaction handling and authentication. @stacks/storage will be used as database and each user data will be saved in their respective UUID.json. In order to get profit from each transaction, you need to collect commision on every transfer people make e.g 2.5%. Keep the limit of tokens to 1000 and give 1000 tokens for free to all the people who register.
 
-## StacksPunk statements on buying punks
-
-> When putting your StacksPunk for sale, it is stored on a 'Temporary Account' owned by the marketplace program until a buyer is found or until you unlist it.
-
-> When someone buys your NFT, the program transfers the STX amount from the buyer to the seller, and then unlocks the StacksPunk which is sent to the buyer. A 2.5% commission is taken on the selling price.
-
-> We are the first on-chain-only marketplace on Stacks for NFTs that provides a secure and decentralized experience.
-
-> You can unlist your StacksPunk at any time.
-
 ## velocity.clar
 
 Implements nft-trait **SIP009 NFT trait on mainnet**. There is a max token limit of 1000. No more tokens that this limit are minted/created by contract-owner. All these tokens are up to claim by any user for free.
