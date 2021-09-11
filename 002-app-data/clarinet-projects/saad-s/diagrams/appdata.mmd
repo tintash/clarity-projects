@@ -1,0 +1,22 @@
+sequenceDiagram
+  participant seller
+  participant escrow_app
+  participant escrow_app_v2
+  participant escrow_data
+  participant escrow_data_deployer
+  
+  escrow_data_deployer ->> escrow_data: add_caller(escrow_app)
+  escrow_data_deployer ->> escrow_data: add_caller(escrow_app_v2)
+  escrow_data_deployer ->> escrow_data: remove_caller(escrow_app)
+  
+  seller ->> escrow_app: seller_deposit(100)
+  escrow_app -->>+ escrow_data: seller_deposit(100)
+  escrow_data -->> escrow_data: verify_caller() -- fails
+  escrow_data -->>- escrow_app: err: invalid caller
+  escrow_app ->> seller: err: invalid caller
+  
+  seller ->> escrow_app_v2: seller_deposit(100)
+  escrow_app_v2 -->>+ escrow_data: seller_deposit(100)
+  escrow_data -->> escrow_data: verify_caller() -- passes
+  escrow_data -->>- escrow_app_v2: ok: transaction complete 
+  escrow_app_v2 ->> seller: ok: transaction complete  
