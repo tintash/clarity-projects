@@ -1,0 +1,2 @@
+#V2
+(contract-call? .vbucks-game buy-tokens u1)
