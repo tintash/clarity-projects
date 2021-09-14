@@ -1,4 +1,4 @@
 *~
 *.swp
-settings/
+Testnet.toml
 .DS_Store
