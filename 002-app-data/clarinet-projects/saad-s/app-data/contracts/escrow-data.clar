@@ -21,23 +21,23 @@
 )
 
 ;; contract owner can add /remove callers for traits 
-(define-map valid-callers { caller: principal } uint)
+(define-map valid-callers { caller: principal } bool)
 
 ;; read-only functions
 (define-read-only (get-buyer (id uint))
-    (get buyer (unwrap! (map-get? orders {order-id: id}) none))
+    (default-to none (get buyer (map-get? orders {order-id: id})))
 )
 
 (define-read-only (get-seller (id uint))
-    (get seller (unwrap! (map-get? orders {order-id: id}) none))
+    (default-to none (get seller (map-get? orders {order-id: id})))
 )
 
 (define-read-only (get-deposit (id uint))
-    (get deposit (unwrap! (map-get? orders {order-id: id}) u0))
+    (default-to u0 (get deposit (map-get? orders {order-id: id})))
 )
 
 (define-read-only (get-price (id uint))
-    (get price (unwrap! (map-get? orders {order-id: id}) u0))
+    (default-to u0 (get price (map-get? orders {order-id: id})))
 )
 
 (define-read-only (get-order (id uint))
@@ -48,7 +48,7 @@
     (begin
         ;; only contract owner 
         (asserts! (is-eq tx-sender contract-owner) err-invalid-caller) 
-        (ok (map-set valid-callers {caller: caller} u1))
+        (ok (map-set valid-callers {caller: caller} true))
     )
 )
 
@@ -100,7 +100,7 @@
     )
 )
 
-(define-public (item-received (id uint))
+(define-public (item-received (id uint) (caller principal))
     (begin 
         ;; only valid contract principal
         (asserts! (is-some (is-valid-caller contract-caller)) err-unauthorized-caller)
@@ -112,7 +112,7 @@
             )
             ;; verify buyer 
             ;; INTENTIONALLY COMMENTED -- to be fixed in app-v2 
-            ;;(asserts! (is-eq buyer (some tx-sender)) err-invalid-caller)
+            ;;(asserts! (is-eq buyer (some caller)) err-invalid-caller)
             ;; transfers
             (try! (as-contract (stx-transfer? 
                 (- deposit price) 

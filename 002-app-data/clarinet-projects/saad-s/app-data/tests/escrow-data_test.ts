@@ -29,7 +29,7 @@ Clarinet.test({
                 eBuyer.address
             ),
             Tx.contractCall ('escrow-data', 'item-received', 
-                [types.uint(orderId)],
+                [types.uint(orderId), types.principal(eSeller.address)],
                 eSeller.address
             ),
         ]);
@@ -93,13 +93,14 @@ Clarinet.test({
                 deployer.address
             ),
             // sellers deposits using app contract
+            // types.principal(`${deployer.address}.escrow-data`), 
             Tx.contractCall ('escrow-app', 'seller-deposit', 
-                [types.principal(`${deployer.address}.escrow-data`), types.uint(orderId), types.uint(amount)],
+                [types.uint(orderId), types.uint(amount)],
                 eSeller.address
             ),
             // buyer deposits using app contract 
             Tx.contractCall ('escrow-app', 'buyer-deposit', 
-                [types.principal(`${deployer.address}.escrow-data`), types.uint(orderId), types.uint(amount)],
+                [types.uint(orderId), types.uint(amount)],
                 eBuyer.address
             ),
         ]);
@@ -126,17 +127,17 @@ Clarinet.test({
             ),
             // sellers deposits using app contract
             Tx.contractCall ('escrow-app', 'seller-deposit', 
-                [types.principal(`${deployer.address}.escrow-data`), types.uint(orderId), types.uint(amount)],
+                [types.uint(orderId), types.uint(amount)],
                 eSeller.address
             ),
             // buyer deposits using app contract 
             Tx.contractCall ('escrow-app', 'buyer-deposit', 
-                [types.principal(`${deployer.address}.escrow-data`), types.uint(orderId), types.uint(amount)],
+                [types.uint(orderId), types.uint(amount)],
                 eBuyer.address
             ),
             // seller completes purchase without sending item
             Tx.contractCall ('escrow-app', 'item-received', 
-                [types.principal(`${deployer.address}.escrow-data`), types.uint(orderId)],
+                [types.principal(`${deployer.address}.escrow-data`), types.uint(orderId), types.principal(eSeller.address)],
                 eSeller.address
             ),
         ]);
@@ -169,12 +170,12 @@ Clarinet.test({
             ),
             // sellers deposits using app contract
             Tx.contractCall ('escrow-app-v2', 'seller-deposit', 
-                [types.principal(`${deployer.address}.escrow-data`), types.uint(orderId), types.uint(amount)],
+                [types.uint(orderId), types.uint(amount)],
                 eSeller.address
             ),
             // buyer deposits using app contract 
             Tx.contractCall ('escrow-app-v2', 'buyer-deposit', 
-                [types.principal(`${deployer.address}.escrow-data`), types.uint(orderId), types.uint(amount)],
+                [types.uint(orderId), types.uint(amount)],
                 eBuyer.address
             ),
         ]);
@@ -210,12 +211,12 @@ Clarinet.test({
             ),
             // sellers deposits using app contract - should fail
             Tx.contractCall ('escrow-app', 'seller-deposit', 
-                [types.principal(`${deployer.address}.escrow-data`), types.uint(orderId), types.uint(amount)],
+                [types.uint(orderId), types.uint(amount)],
                 eSeller.address
             ),
             // buyer deposits using app contract - should fail 
             Tx.contractCall ('escrow-app', 'buyer-deposit', 
-                [types.principal(`${deployer.address}.escrow-data`), types.uint(orderId), types.uint(amount)],
+                [types.uint(orderId), types.uint(amount)],
                 eBuyer.address
             ),
         ]);
@@ -244,17 +245,22 @@ Clarinet.test({
             ),
             // sellers deposits using app contract
             Tx.contractCall ('escrow-app-v2', 'seller-deposit', 
-                [types.principal(`${deployer.address}.escrow-data`), types.uint(orderId), types.uint(amount)],
+                [types.uint(orderId), types.uint(amount)],
                 eSeller.address
             ),
             // buyer deposits using app contract 
             Tx.contractCall ('escrow-app-v2', 'buyer-deposit', 
-                [types.principal(`${deployer.address}.escrow-data`), types.uint(orderId), types.uint(amount)],
+                [types.uint(orderId), types.uint(amount)],
                 eBuyer.address
             ),
-            // seller completes purchase without sending item
+            // seller completes purchase without sending item -- should fail
             Tx.contractCall ('escrow-app-v2', 'item-received', 
-                [types.principal(`${deployer.address}.escrow-data`), types.uint(orderId)],
+                [types.principal(`${deployer.address}.escrow-data`), types.uint(orderId), types.principal(eSeller.address)],
+                eSeller.address
+            ),
+            // seller completes purchase without sending item -- should fail
+            Tx.contractCall ('escrow-app-v2', 'item-received', 
+                [types.principal(`${deployer.address}.escrow-data`), types.uint(orderId), types.principal(eBuyer.address)],
                 eSeller.address
             ),
         ]);
@@ -262,6 +268,7 @@ Clarinet.test({
         block.receipts[1].result.expectOk().expectBool(true);
         block.receipts[2].result.expectOk().expectBool(true);
         block.receipts[3].result.expectErr().expectUint(100);
+        block.receipts[4].result.expectErr().expectUint(100);
     },
 });
 
