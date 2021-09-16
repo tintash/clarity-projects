@@ -1,0 +1,17 @@
+sequenceDiagram
+  participant Referrer
+  participant User
+  participant user_mgmt
+  participant refer_reward_ft
+  
+  Referrer ->> User: refers user to system
+  User ->> user_mgmt: signup with Referrer info
+  note left of user_mgmt: adds User and records Referrer
+  User ->> user_mgmt: complete a transaction
+  user_mgmt -->> user_mgmt: verify number of transactions
+  alt should send reward to Referrer
+  user_mgmt -->>+ refer_reward_ft: create and send tokens to Referrer 
+  refer_reward_ft -->>- Referrer: sends tokens 
+  user_mgmt -->> user_mgmt: remove Referrer from User info 
+  end
+  user_mgmt ->> User: ok, transaction recorded
