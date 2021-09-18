@@ -40,7 +40,7 @@
 )
 
 (define-read-only (is-valid-caller (caller principal)) 
-    (map-get? valid-callers {caller: caller})
+    (is-some (map-get? valid-callers {caller: caller}))
 )
 
 ;; public functions
@@ -64,7 +64,7 @@
 (define-public (transfer (amount uint) (sender principal) (recipient principal))
     (begin
         ;; only valid contract principal
-        (asserts! (is-some (is-valid-caller contract-caller)) err-unauthorized-caller)
+        (asserts! (is-valid-caller contract-caller) err-unauthorized-caller)
         (ft-transfer? refer-reward amount sender recipient)
     )
 )
@@ -72,7 +72,7 @@
 (define-public (create-ft (amount uint) (recipient principal)) 
     (begin
         ;; only valid contract principal
-        (asserts! (is-some (is-valid-caller contract-caller)) err-unauthorized-caller)
+        (asserts! (is-valid-caller contract-caller) err-unauthorized-caller)
         (ft-mint? refer-reward amount recipient) 
     )
 )
@@ -80,7 +80,7 @@
 (define-public (destroy-ft (amount uint) (owner principal)) 
     (begin 
         ;; only valid contract principal
-        (asserts! (is-some (is-valid-caller contract-caller)) err-unauthorized-caller)
+        (asserts! (is-valid-caller contract-caller) err-unauthorized-caller)
         (ft-burn? refer-reward amount owner)
     )
 )

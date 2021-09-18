@@ -11,8 +11,7 @@ Clarinet.test({
         let eUser = accounts.get('wallet_2')!;
         let block = chain.mineBlock([
             Tx.contractCall ('user-mgmt', 'signup', 
-                [types.principal(eUser.address), types.ascii('name'),
-                    types.principal(eReferrer.address)],
+                [types.ascii('name'), types.principal(eReferrer.address)],
                 eUser.address
             ),
         ]);
@@ -27,13 +26,11 @@ Clarinet.test({
         let eUser = accounts.get('wallet_2')!;
         let block = chain.mineBlock([
             Tx.contractCall ('user-mgmt', 'signup', 
-                [types.principal(eUser.address), types.ascii('name'),
-                    types.principal(eReferrer.address)],
+                [types.ascii('name'), types.principal(eReferrer.address)],
                 eUser.address
             ),
             Tx.contractCall ('user-mgmt', 'signup', 
-                [types.principal(eUser.address), types.ascii('name'),
-                    types.principal(eReferrer.address)],
+                [types.ascii('name'), types.principal(eReferrer.address)],
                 eUser.address
             ),
         ]);
@@ -48,8 +45,7 @@ Clarinet.test({
         let eUser = accounts.get('wallet_1')!;
         let block = chain.mineBlock([
             Tx.contractCall ('user-mgmt', 'signup', 
-                [types.principal(eUser.address), types.ascii('name'),
-                    types.principal(eUser.address)],
+                [types.ascii('name'), types.principal(eUser.address)],
                 eUser.address
             ),
         ]);
@@ -75,13 +71,11 @@ Clarinet.test({
                 deployer.address
             ),
             Tx.contractCall ('user-mgmt', 'signup', 
-                [types.principal(eUser.address), types.ascii('name'),
-                    types.principal(eReferrer.address)],
+                [types.ascii('name'), types.principal(eReferrer.address)],
                 eUser.address
             ),
             Tx.contractCall ('user-mgmt', 'complete-transaction', 
-                [types.principal(eUser.address)],
-                eUser.address
+                [], eUser.address
             ),
         ]);
         block.receipts[0].result.expectOk().expectBool(true);

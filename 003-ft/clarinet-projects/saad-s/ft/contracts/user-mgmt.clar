@@ -33,47 +33,42 @@
 )
 
 ;; public functions
-(define-public (signup (user principal) (name (string-ascii 50)) (referrer principal)) 
+;; new user signup and mentions referrer (if any)
+(define-public (signup (name (string-ascii 50)) (referrer principal)) 
     (begin 
         ;; own principal
         (asserts! (not (is-eq tx-sender referrer)) err-invalid-call)
-        (asserts! (map-insert users user {username: name, num-transactions: u0, referrer: (some referrer)}) err-invalid-call)
+        (asserts! (map-insert users tx-sender {username: name, num-transactions: u0, referrer: (some referrer)}) err-invalid-call)
         (ok true)
     )
 )
 
-(define-public (complete-transaction (user principal)) 
+;; new user completes transactions 
+(define-public (complete-transaction) 
     (let
         (
-            (transactions (+ (get-num-transactions user) u1))
-            (user-info (get-user user))
-            (referrer (get-referrer user))
+            (transactions (+ (get-num-transactions tx-sender) u1))
+            (referrer (get-referrer tx-sender))
         )
-        (asserts! (is-eq tx-sender user) err-invalid-caller)
-        ;; verify user
-        (asserts! (is-some user-info) err-invalid-call)
-        (map-set users user 
-            (merge (unwrap! user-info err-invalid-call) {num-transactions: transactions}))
+        (map-set users tx-sender 
+            (merge (unwrap! (get-user tx-sender) err-invalid-call)
+                    {num-transactions: transactions}))
         ;; reward to referer if required number of transactions  
-        (asserts! (is-eq transactions num-transactions-for-reward) (ok true))
-        
-        (asserts! (remove-referrer user) (ok true))
-        (contract-call? .refer-reward-ft create-ft token-reward (unwrap! referrer (ok true)))
+        (if (is-eq transactions num-transactions-for-reward) 
+            (begin 
+                (remove-referrer tx-sender)
+                (contract-call? .refer-reward-ft create-ft token-reward 
+                    (unwrap! referrer (ok true)))
+            ) 
+            (ok true)
+        )
     )
 )
 
-(define-public (destroy-ft (amount uint) (owner principal)) 
-    (begin 
-        ;; only contract or token owner 
-        (asserts! (or (is-eq tx-sender contract-owner) 
-                    (is-eq tx-sender owner)) err-invalid-caller)
-        (contract-call? .refer-reward-ft destroy-ft amount owner)
-    )
+(define-public (destroy-ft (amount uint)) 
+    (contract-call? .refer-reward-ft destroy-ft amount tx-sender)
 )
 
-(define-public (transfer (amount uint) (sender principal) (recipient principal))
-    (begin
-        (asserts! (is-eq tx-sender sender) err-invalid-caller)
-        (contract-call? .refer-reward-ft transfer amount sender recipient)
-    )
+(define-public (transfer (amount uint) (recipient principal))
+    (contract-call? .refer-reward-ft transfer amount tx-sender recipient)
 )
