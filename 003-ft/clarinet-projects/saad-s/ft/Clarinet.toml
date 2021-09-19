@@ -8,7 +8,3 @@ depends_on = []
 [contracts.refer-reward-ft]
 path = "contracts/refer-reward-ft.clar"
 depends_on = ["ft-trait"]
-
-[contracts.user-mgmt]
-path = "contracts/user-mgmt.clar"
-depends_on = []

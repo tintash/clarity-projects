@@ -4,28 +4,25 @@
 ;; constants
 (define-constant contract-owner tx-sender)
 
+(define-constant token-reward u10)
+(define-constant num-transactions-for-reward u1)
+
 (define-constant err-invalid-caller (err u100))
 (define-constant err-invalid-call (err u110))
 (define-constant err-unauthorized-caller (err u99))
 
 ;; data maps and vars
 (define-fungible-token refer-reward)
-
-;; contract owner can add /remove callers for traits 
-(define-map valid-callers { caller: principal } bool)
+;; registered user info map 
+(define-map users principal 
+    {username: (string-ascii 50), num-transactions: uint, referrer: (optional principal)})
 
 ;; read-only functions 
-(define-read-only (get-name) 
-    (ok "Refer rewards")
-)
+(define-read-only (get-name) (ok "Refer rewards"))
 
-(define-read-only (get-symbol) 
-    (ok "RR")
-)
+(define-read-only (get-symbol) (ok "RR"))
 
-(define-read-only (get-decimals)
-    (ok u2)
-)
+(define-read-only (get-decimals) (ok u2))
 
 (define-read-only (get-balance-of (account principal))
     (ok (ft-get-balance refer-reward account))
@@ -39,48 +36,70 @@
     (ok (some u"https://www.tintash.com/"))
 )
 
-(define-read-only (is-valid-caller (caller principal)) 
-    (is-some (map-get? valid-callers {caller: caller}))
+(define-read-only (get-user (user principal)) 
+    (map-get? users user) 
+)
+
+(define-read-only (get-referrer (user principal)) 
+    (default-to none (get referrer (get-user user)))
+)
+
+(define-read-only (get-num-transactions (user principal))
+    (default-to u0 (get num-transactions (get-user user)))
+)
+
+;; private functions
+(define-private (remove-referrer (user principal)) 
+    (map-set users user (merge (unwrap! (get-user user) false) {referrer: none}))
 )
 
 ;; public functions
-(define-public (add-caller (caller principal)) 
-    (begin
-        ;; only contract owner 
-        (asserts! (is-eq tx-sender contract-owner) err-invalid-caller) 
-        (ok (map-set valid-callers {caller: caller} true))
-    )
-)
-
-(define-public (remove-caller (caller principal)) 
-    (begin 
-        ;; only contract owner 
-        (asserts! (is-eq tx-sender contract-owner) err-invalid-caller)
-        (asserts! (map-delete valid-callers {caller: caller}) err-invalid-call)
-        (ok true)
-    )
-)
-
 (define-public (transfer (amount uint) (sender principal) (recipient principal))
     (begin
-        ;; only valid contract principal
-        (asserts! (is-valid-caller contract-caller) err-unauthorized-caller)
+        (asserts! (is-eq tx-sender sender) err-invalid-caller)
         (ft-transfer? refer-reward amount sender recipient)
     )
 )
 
-(define-public (create-ft (amount uint) (recipient principal)) 
-    (begin
-        ;; only valid contract principal
-        (asserts! (is-valid-caller contract-caller) err-unauthorized-caller)
-        (ft-mint? refer-reward amount recipient) 
+(define-public (create-ft-by-owner (amount uint) (recipient principal))
+    (begin 
+        (asserts! (is-eq tx-sender contract-owner) err-invalid-caller)
+        (ft-mint? refer-reward amount recipient)
     )
 )
 
-(define-public (destroy-ft (amount uint) (owner principal)) 
+(define-public (destroy-ft (amount uint)) 
+    (ft-burn? refer-reward amount tx-sender)
+)
+
+;; new user signup and mentions referrer (if any)
+(define-public (signup (name (string-ascii 50)) (referrer principal)) 
     (begin 
-        ;; only valid contract principal
-        (asserts! (is-valid-caller contract-caller) err-unauthorized-caller)
-        (ft-burn? refer-reward amount owner)
+        ;; own principal
+        (asserts! (not (is-eq tx-sender referrer)) err-invalid-call)
+        (asserts! (map-insert users tx-sender 
+            {username: name, num-transactions: u0, referrer: (some referrer)}) err-invalid-call)
+        (ok true)
+    )
+)
+
+;; new user completes transactions 
+(define-public (complete-transaction) 
+    (let
+        (
+            (transactions (+ (get-num-transactions tx-sender) u1))
+            (referrer (get-referrer tx-sender))
+        )
+        (map-set users tx-sender 
+            (merge (unwrap! (get-user tx-sender) err-invalid-call)
+                    {num-transactions: transactions}))
+        ;; reward to referer if required number of transactions  
+        (if (is-eq transactions num-transactions-for-reward) 
+            (begin 
+                (remove-referrer tx-sender)
+                (ft-mint? refer-reward token-reward (unwrap! referrer (ok true)))
+            ) 
+            (ok true)
+        )
     )
 )
