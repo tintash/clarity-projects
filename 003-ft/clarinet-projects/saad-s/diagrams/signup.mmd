@@ -1,0 +1,10 @@
+
+sequenceDiagram
+    participant Referrer
+    participant User
+    participant refer_reward_ft
+
+    Referrer ->> User: recommeds user to register
+    note over Referrer,User: Referrer also shares its address  
+    User ->> refer_reward_ft: signup and mentions referrer address
+    note left of refer_reward_ft: adds User and records Referrer
