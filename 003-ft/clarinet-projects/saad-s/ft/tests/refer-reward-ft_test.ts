@@ -63,13 +63,12 @@ Clarinet.test({
 });
 
 Clarinet.test({
-    name: "user-mgmt -- users can signup and mention referrer",
+    name: "user-mgmt -- users can signup",
     async fn(chain: Chain, accounts: Map<string, Account>) {
-        let eReferrer = accounts.get('wallet_1')!;
-        let eUser = accounts.get('wallet_2')!;
+        let eUser = accounts.get('wallet_1')!;
         let block = chain.mineBlock([
-            Tx.contractCall ('refer-reward-ft', 'signup', 
-                [types.ascii('name'), types.principal(eReferrer.address)],
+            Tx.contractCall ('refer-reward-ft', 'signup-self', 
+                [types.ascii('email@domain.com')],
                 eUser.address
             ),
         ]);
@@ -80,15 +79,14 @@ Clarinet.test({
 Clarinet.test({
     name: "user-mgmt -- users cannot signup multiple times",
     async fn(chain: Chain, accounts: Map<string, Account>) {
-        let eReferrer = accounts.get('wallet_1')!;
         let eUser = accounts.get('wallet_2')!;
         let block = chain.mineBlock([
-            Tx.contractCall ('refer-reward-ft', 'signup', 
-                [types.ascii('name'), types.principal(eReferrer.address)],
+            Tx.contractCall ('refer-reward-ft', 'signup-self', 
+                [types.ascii('email@domain.com')],
                 eUser.address
             ),
-            Tx.contractCall ('refer-reward-ft', 'signup', 
-                [types.ascii('name'), types.principal(eReferrer.address)],
+            Tx.contractCall ('refer-reward-ft', 'signup-self', 
+                [types.ascii('email@domain.com')],
                 eUser.address
             ),
         ]);
@@ -98,12 +96,27 @@ Clarinet.test({
 });
 
 Clarinet.test({
+    name: "user-mgmt -- users can refer new users",
+    async fn(chain: Chain, accounts: Map<string, Account>) {
+        let eReferrer = accounts.get('wallet_1')!;
+        let eUser = accounts.get('wallet_2')!;
+        let block = chain.mineBlock([
+            Tx.contractCall ('refer-reward-ft', 'signup-by-referrer', 
+                [types.ascii('email@domain.com'), types.principal(eUser.address)],
+                eReferrer.address
+            ),
+        ]);
+        block.receipts[0].result.expectOk().expectBool(true);
+    },
+});
+
+Clarinet.test({
     name: "user-mgmt -- users cannot refer themselves",
     async fn(chain: Chain, accounts: Map<string, Account>) {
-        let eUser = accounts.get('wallet_1')!;
+        let eUser = accounts.get('wallet_2')!;
         let block = chain.mineBlock([
-            Tx.contractCall ('refer-reward-ft', 'signup', 
-                [types.ascii('name'), types.principal(eUser.address)],
+            Tx.contractCall ('refer-reward-ft', 'signup-by-referrer', 
+                [types.ascii('email@domain.com'), types.principal(eUser.address)],
                 eUser.address
             ),
         ]);
@@ -124,9 +137,9 @@ Clarinet.test({
         balance.result.expectOk().expectUint(0);
         
         let block = chain.mineBlock([
-            Tx.contractCall ('refer-reward-ft', 'signup', 
-                [types.ascii('name'), types.principal(eReferrer.address)],
-                eUser.address
+            Tx.contractCall ('refer-reward-ft', 'signup-by-referrer', 
+                [types.ascii('email@domain.com'), types.principal(eUser.address)],
+                eReferrer.address
             ),
             Tx.contractCall ('refer-reward-ft', 'complete-transaction', 
                 [], eUser.address

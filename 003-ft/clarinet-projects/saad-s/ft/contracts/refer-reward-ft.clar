@@ -1,4 +1,6 @@
 ;; refer-reward-ft
+;; this contract will offer token rewards to referrer 
+;; tokens are defined using SIP-10 
 (impl-trait .ft-trait.ft-trait)
 
 ;; constants
@@ -14,8 +16,8 @@
 ;; data maps and vars
 (define-fungible-token refer-reward)
 ;; registered user info map 
-(define-map users principal 
-    {username: (string-ascii 50), num-transactions: uint, referrer: (optional principal)})
+(define-map users 
+    principal { email: (string-ascii 200), num-transactions: uint, referrer: (optional principal)})
 
 ;; read-only functions 
 (define-read-only (get-name) (ok "Refer rewards"))
@@ -72,13 +74,22 @@
     (ft-burn? refer-reward amount tx-sender)
 )
 
-;; new user signup and mentions referrer (if any)
-(define-public (signup (name (string-ascii 50)) (referrer principal)) 
+;; signup by referrer
+(define-public (signup-by-referrer (email (string-ascii 200)) (user principal))
+    (begin
+        ;; !self refer  
+        (asserts! (not (is-eq tx-sender user)) err-invalid-call)
+        (asserts! (map-insert users user 
+            {email: email, num-transactions: u0, referrer: (some tx-sender)}) err-invalid-call)
+        (ok true)
+    )
+)
+
+;; self signup w/o referrer
+(define-public (signup-self (email (string-ascii 200))) 
     (begin 
-        ;; own principal
-        (asserts! (not (is-eq tx-sender referrer)) err-invalid-call)
         (asserts! (map-insert users tx-sender 
-            {username: name, num-transactions: u0, referrer: (some referrer)}) err-invalid-call)
+            {email: email, num-transactions: u0, referrer: none}) err-invalid-call)
         (ok true)
     )
 )

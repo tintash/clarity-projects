@@ -1,16 +1,16 @@
 ## Fungible tokens example 
 
-This example implements SIP10 fungible token trait to create referral rewards. These reward tokens are transferred to referrers after new users signup and perform certain number of transactions.   
+This example implements SIP10 fungible token trait to create referral rewards system. These reward tokens are transferred to referrers after new users signup and perform certain number of transactions.   
 
 Example contains a contract and a SIP-10 FT trait.  
 
 ### Files  
 
 - **contracts/ft-traits.clar** 
-    * defines traits for fungible tokens   
+    * defines traits for fungible tokens 
 - **contracts/refer-reward-ft.clar**
     * implements ft-traits for refer-reward tokens
-    * offers functions like signup, complete-transactions  
+    * offers functions like refer, signup, complete-transactions 
 - **tests/*.ts**
     * contains test cases
 
@@ -19,14 +19,17 @@ Example contains a contract and a SIP-10 FT trait.
 |Contract | Address|
 |:---------|:--------|
 |ft-trait | `ST2V7C1FR46HSV42S5XCZNJ80XE513E9526DGSC6E.ft-trait`|
-|refer-reward-ft | `ST2V7C1FR46HSV42S5XCZNJ80XE513E9526DGSC6E.refer-reward-ft`|
+|refer-reward-ft | `ST2V7C1FR46HSV42S5XCZNJ80XE513E9526DGSC6E.refer-reward-ft-v3`|
 
 ### Flow 
 
-Existing users can invite new users to system. While inviting new user, referrer shares its address with new user. On registration, user inputs name, address and referrer's address . Reward is only offered to referrer, if new user makes certain number of transactions in ssytem. Details of transactions are out of scope of this example. Currently transaction number is set to 1, for simplicity. Once user performs certain number of transactions, contract automatically sends refer reward tokens to referrer and finally removes it from user's stored info.  
+Existing users invite new users to system by registering user's address and email. Contract will save referrer's address and app (*using this contract*) will send an invite email to new user. New users can also self register without mentioning referrer. After registration, users can perform transactions. Reward is only offered to referrer, if new user makes certain number of transactions. Details of transactions are out of scope of this example. Currently transaction number is set to 1, for simplicity. Contract automatically sends reward tokens to referrer and removes it from user's stored info.
 
-***User registration flow is described in following***
-![Sequence Diagram](diagrams/signup.png)
+***User registration by referrer***
+![Sequence Diagram](diagrams/signup-by-referrer.png)
+
+***Self registration without referrer***
+![Sequence Diagram](diagrams/signup-self.png)
 
 ***Transactions and rewards flow***
 ![Sequence Diagram](diagrams/transactions-reward.png)
