@@ -2,19 +2,16 @@ import React, { useEffect, useState } from "react";
 import { AppConfig, openContractCall, UserSession } from "@stacks/connect";
 import {
   callReadOnlyFunction,
-  createAssetInfo,
   cvToValue,
-  makeStandardNonFungiblePostCondition,
-  NonFungibleConditionCode,
   PostConditionMode,
-  stringAsciiCV,
+  standardPrincipalCV,
 } from "@stacks/transactions";
-import { StacksTestnet } from "@stacks/network";
+import { StacksMocknet } from "@stacks/network";
 import "./Velocity.css";
 import logo from "../velocity.svg";
 import * as constants from "../Constants";
 
-const network = new StacksTestnet();
+const network = new StacksMocknet();
 const appConfig = new AppConfig(["store_write", "publish_data"]);
 const userSession = new UserSession({ appConfig });
 
@@ -22,10 +19,8 @@ function GetUserProfile() {
   return userSession.loadUserData().profile.stxAddress;
 }
 
-function GetLastTokenId() {
+function GetLastTokenId({ handleFreeTokens }) {
   const [soldTokens, setSoldTokens] = useState(0);
-  const [freeTokens, setFreeTokens] = useState(0);
-  const [stxTokens, setStxTokens] = useState(0);
   const profile = GetUserProfile();
 
   useEffect(() => {
@@ -41,45 +36,28 @@ function GetLastTokenId() {
       try {
         const result = await callReadOnlyFunction(options);
         const tokens = cvToValue(result.value);
-        console.log("Function Succeded: " + tokens);
+        const freeTokens = constants.tokensForFree - tokens;
         setSoldTokens(tokens);
-        setFreeTokens(constants.tokensForFree - tokens);
-        setStxTokens(constants.totalTokens - constants.tokensForFree - tokens);
+        handleFreeTokens(freeTokens);
       } catch (err) {
         console.log(err);
-        console.log("Function failed with error: " + err); // TypeError: failed to fetch
       }
     }
     handleSubmit();
-  }, [soldTokens, freeTokens, stxTokens, profile]);
+  }, [soldTokens, profile, handleFreeTokens]);
 
   return (
     <div>
       <h2>Tokens sold: {soldTokens}</h2>
-      <h2>Tokens yet to be claimed for free: {freeTokens}</h2>
-      <h2>Tokens yet to be claimed for STX: {stxTokens}</h2>
+      <h2>
+        There are total of {constants.totalTokens} Velocity NFTs to be claimed
+      </h2>
     </div>
   );
 }
 
-function ClaimForFree() {
-  const handleClaim = async () => {
-    const profile = GetUserProfile();
-    const postConditionAddress = profile.testnet;
-    const postConditionCode = NonFungibleConditionCode.DoesNotOwn;
-    const nonFungibleAssetInfo = createAssetInfo(
-      constants.assetAddress,
-      constants.assetContractName,
-      constants.assetName
-    );
-    const standardNonFungiblePostCondition =
-      makeStandardNonFungiblePostCondition(
-        postConditionAddress,
-        postConditionCode,
-        nonFungibleAssetInfo,
-        stringAsciiCV(constants.tokenAssetName)
-      );
-
+function Claim({ freeTokens }) {
+  const handleSubmit = async () => {
     const options = {
       contractAddress: constants.contractAddress,
       contractName: constants.velocityContract,
@@ -89,7 +67,7 @@ function ClaimForFree() {
         name: constants.appName,
         icon: window.location.origin + logo,
       },
-      postConditions: [standardNonFungiblePostCondition],
+      network,
       postConditionCode: PostConditionMode.Deny,
       onFinish: (data) => {
         console.log("Stacks Transaction:", data.stacksTransaction);
@@ -101,12 +79,60 @@ function ClaimForFree() {
   };
   return (
     <div>
-      <h3>Hurry up! Free NFTs are limited!</h3>
-      <button className="claim-button" onClick={handleClaim}>
-        Claim
-      </button>
+      {freeTokens < constants.tokensForFree ? (
+        <div>
+          <h3>Hurry up! Free NFTs are limited! Only {freeTokens} are left</h3>
+          <button className="submit-button" onClick={handleSubmit}>
+            Claim
+          </button>
+        </div>
+      ) : (
+        <div>
+          <h3>
+            Buy Velocity now! They cost as low as {constants.tokenCost} micro
+            STX
+          </h3>
+          <button className="submit-button" onClick={handleSubmit}>
+            Claim
+          </button>
+        </div>
+      )}
     </div>
   );
 }
 
-export { GetLastTokenId, ClaimForFree };
+function GetTotalTokens() {
+  const [ownerTokenBalance, setOwnerTokenBalance] = useState(0);
+  const profile = GetUserProfile();
+  const ownerAddress = standardPrincipalCV(profile.testnet);
+
+  useEffect(() => {
+    const handleSubmit = async () => {
+      const options = {
+        contractAddress: constants.contractAddress,
+        contractName: constants.velocityContract,
+        functionName: constants.balanceOf,
+        functionArgs: [ownerAddress],
+        network,
+        senderAddress: profile.testnet,
+      };
+      try {
+        const result = await callReadOnlyFunction(options);
+        const response = cvToValue(result);
+        console.log(response);
+        setOwnerTokenBalance(response);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    handleSubmit();
+  });
+
+  return (
+    <div>
+      <h1>You own {ownerTokenBalance} tokens</h1>
+    </div>
+  );
+}
+
+export { GetLastTokenId, Claim, GetTotalTokens };
