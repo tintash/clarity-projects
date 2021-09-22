@@ -4,6 +4,12 @@ This is the marketplace for trading `Velocity` NFTs. You can claim the first `10
 Owners can sell their `Velocity` for a minimum price of `10000` micro STX.
 Buyers can buy a `Velocity` for the specified price and a commission of `2.5%` will be cut from the total cost. That 2.5% will go to the contract owner and the remaining 97.5% will go to the seller.
 
+## How to start
+
+- Open terminal and change directory `cd` to this project's contract and execute `clarinet integrate`
+- Login with the `Devnet.toml` deployer login credentials in `Hiro Wallet Extension`
+- Open terminal and change directory `cd` to this project's front-end and execute `npm start` to start the application.
+
 ## How to Trade
 
 - First of all you will have to login with your Hiro Wallet to the website in order to start trading.
