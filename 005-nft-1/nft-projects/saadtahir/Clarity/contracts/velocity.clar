@@ -9,10 +9,8 @@
 (define-constant TOKEN_PRICE u10000)
 
 ;; ERR Constants
-(define-constant ERR_OWNER_ONLY (err u100))
 (define-constant ERR_TOKEN_OWNER_ONLY (err u101))
 (define-constant ERR_MAX_TOKEN_LIMIT_REACHED (err u102))
-(define-constant ERR_MAX_FREE_TOKEN_LIMIT_REACHED (err u103))
 
 ;; NFT
 (define-non-fungible-token velocity uint)
@@ -21,8 +19,6 @@
 (define-map tokens-count principal uint)
 (define-map tokens {owner: principal} {tokens: (list 1000 uint)})
 (define-data-var removing-token uint u0)
-(define-data-var owners (list 1000 {token-id: uint, owner: principal}) (list))
-(define-data-var removing-owner {token-id: uint, owner: principal} {token-id: u0, owner: 'ST1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE})
 (define-data-var last-token-id uint u0)
 
 (define-read-only (get-last-token-id) 
@@ -45,11 +41,6 @@
     (ok (nft-get-owner? velocity token-id))
 )
 
-;; This function returns the list of all token owners
-(define-read-only (get-owners)
-    (var-get owners)
-)
-
 ;; This function returns the list of all tokens owned by an owner
 (define-read-only (get-tokens (owner principal))
     (default-to (list) (get tokens (map-get? tokens {owner: owner})))
@@ -66,10 +57,8 @@
         (asserts! (is-eq tx-sender sender) ERR_TOKEN_OWNER_ONLY)
         (try! (nft-transfer? velocity token-id sender recipient))
         (decrement-account-token-balance sender)
-        (remove-owner token-id sender)
         (remove-token sender token-id)
         (increment-account-token-balance recipient)
-        (add-owner token-id recipient)
         (add-token recipient token-id)
         (ok true)
     )
@@ -91,7 +80,6 @@
         (asserts! (< token-id MAX_TOKEN_LIMIT) ERR_MAX_TOKEN_LIMIT_REACHED)
         (try! (nft-mint? velocity token-id recipient))
         (increment-account-token-balance recipient)
-        (add-owner token-id recipient)
         (add-token recipient token-id)
         (var-set last-token-id token-id)
         (ok token-id)
@@ -101,14 +89,12 @@
 (define-private (mint (amount uint) (recipient principal))
     (let
         (
-            (current-balance (balance-of recipient) )
             (token-id (+ (var-get last-token-id) u1))
         )
         (asserts! (< token-id MAX_TOKEN_LIMIT) ERR_MAX_TOKEN_LIMIT_REACHED)
         (try! (stx-transfer? amount recipient CONTRACT_OWNER))
         (try! (nft-mint? velocity token-id recipient))
         (increment-account-token-balance recipient)
-        (add-owner token-id recipient)
         (add-token recipient token-id)
         (var-set last-token-id token-id)
         (ok token-id)
@@ -121,26 +107,6 @@
 
 (define-private (decrement-account-token-balance (account principal))
     (map-set tokens-count account (- (balance-of account) u1))
-)
-
-;; This function adds token-owner tuple to global list
-(define-private (add-owner (token-id uint) (owner principal))
-    (var-set owners (unwrap-panic (as-max-len? (append (get-owners) {token-id: token-id, owner: owner}) u1000)))
-)
-
-;; This function removes token-owner tuple from global list
-(define-private (remove-owner (token-id uint) (owner principal))
-    (begin
-        (var-set removing-owner {token-id: token-id, owner: owner})
-        (var-set owners (unwrap-panic (as-max-len? (filter remove-owner-filter (get-owners)) u1000)))
-    )
-)
-
-(define-private (remove-owner-filter (owner-tuple {token-id: uint, owner: principal}))
-    (if (is-eq owner-tuple (var-get removing-owner))
-        false
-    true
-    )
 )
 
 (define-private (add-token (owner principal) (token-id uint))

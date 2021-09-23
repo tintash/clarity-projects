@@ -28,28 +28,27 @@
 ;; Put velocity token for sale so that people can buy
 ;; Only token owner can put the velocity token for sale
 ;; You can see a list of salable velocity tokens in the UI
-(define-public (put-velocity-for-sale (token-id uint) (price uint) (seller principal))
+(define-public (put-velocity-for-sale (token-id uint) (price uint))
     (begin
         ;; price should be greater than 10000
         (asserts! (>= price VELOCITY_MIN_PRICE_STX) ERR_VELOCITY_PRICE_MIN_LIMIT)
         ;; transfer velocity to contract owner
-        (try! (contract-call? .velocity transfer token-id seller (as-contract tx-sender)))
+        (try! (contract-call? .velocity transfer token-id tx-sender (as-contract tx-sender)))
         ;; add into velocity-for-sale
-        (add-velocity-for-sale token-id price seller)
+        (add-velocity-for-sale token-id price tx-sender)
         ;; return true
         (ok true)
     )
 )
 
 ;; You can buy velocity tokens for STX
-(define-public (buy-velocity (token-id uint) (buyer principal))
+(define-public (buy-velocity (token-id uint))
     (begin
-        ;; check if buyer is the tx-sender
-        (asserts! (is-eq buyer tx-sender) ERR_BUYER_ONLY)
         ;; check if the token-id is present for sale in velocity-for-sale
         (asserts! (is-some (get-velocity-for-sale token-id)) ERR_VELOCITY_NOT_FOR_SALE)
         (let
             (
+                (buyer tx-sender)
                 (token-seller (unwrap! (get seller (get-velocity-for-sale token-id)) ERR_UNWRAP_FAILED))
                 (token-price (unwrap! (get price (get-velocity-for-sale token-id)) ERR_UNWRAP_FAILED))
                 ;; cut out commission from the price
