@@ -85,11 +85,15 @@ function GetNFTsForSale() {
           <h1>This NFT is available for sale.</h1>
           <h2>Price: {tokenPrice}</h2>
           <h2>Seller: {tokenSeller}</h2>
-          <BuyVelocity
-            tokenId={tokenId}
-            tokenPrice={tokenPrice}
-            tokenSeller={tokenSeller}
-          />
+          {tokenSeller === profile.testnet ? (
+            <h1>You cannot buy your own tokens!</h1>
+          ) : (
+            <BuyVelocity
+              tokenId={tokenId}
+              tokenPrice={tokenPrice}
+              tokenSeller={tokenSeller}
+            />
+          )}
         </div>
       ) : (
         <div>
@@ -105,6 +109,7 @@ function BuyVelocity(props) {
   const tokenId = props.tokenId;
   const tokenPrice = props.tokenPrice;
   const tokenSeller = props.tokenSeller;
+  console.log(tokenSeller === profile.testnet);
 
   const handleSubmit = async (e) => {
     console.log("TokenID: " + tokenId);
