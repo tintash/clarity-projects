@@ -17,6 +17,7 @@ import "./BuyToken.css";
 import * as constants from "../Constants";
 import logo from "../velocity.svg";
 import BN from "bn.js";
+import MySpinner from "../My-Spinner/MySpinner";
 
 const testnet = new StacksTestnet();
 const mocknet = new StacksMocknet();
@@ -42,9 +43,12 @@ function GetNFTsForSale() {
   const [tokenId, setTokenId] = useState(0);
   const [tokenSeller, setTokenSeller] = useState("");
   const [tokenPrice, setTokenPrice] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    setLoading(true);
     const options = {
       contractAddress: constants.contractAddress,
       contractName: constants.velocityMarketContract,
@@ -53,6 +57,7 @@ function GetNFTsForSale() {
       network: testnet,
       senderAddress: profile.testnet,
     };
+
     try {
       const result = await callReadOnlyFunction(options);
       const response = cvToValue(result);
@@ -63,12 +68,30 @@ function GetNFTsForSale() {
         setTokenPrice(response.value.price.value);
         setTokenSeller(response.value.seller.value);
       }
+      
     } catch (err) {
       console.log(err);
     }
+    try {
+    const result = await callReadOnlyFunction(options);
+    const response = cvToValue(result);
+    if (response == null) {
+      setTokenPrice(0);
+      setTokenSeller("");
+    } else {
+      setTokenPrice(response.value.price.value);
+      setTokenSeller(response.value.seller.value);
+    }
+    
+  } catch (err) {
+    console.log(err);
+  }
+  setLoading(false)
+    
   };
 
   return (
+    <>
     <form onSubmit={handleSubmit}>
       <label>
         Enter Token Id:
@@ -78,13 +101,12 @@ function GetNFTsForSale() {
           onChange={(s) => setTokenId(s.target.value)}
         />
       </label>
-      <input className="button" type="submit" value="Check" />
+      <button type="submit">Check</button>
+      </form>
       <br />
       {tokenSeller !== "" ? (
-        <div>
-          <h1>This NFT is available for sale.</h1>
-          <h2>Price: {tokenPrice}</h2>
-          <h2>Seller: {tokenSeller}</h2>
+        loading? <MySpinner/> : (
+          <div>
           {tokenSeller === profile.testnet ? (
             <h1>You cannot buy your own tokens!</h1>
           ) : (
@@ -95,12 +117,13 @@ function GetNFTsForSale() {
             />
           )}
         </div>
+        )
       ) : (
         <div>
           <h1>This NFT is not available for sale</h1>
         </div>
       )}
-    </form>
+    </>
   );
 }
 
@@ -160,6 +183,9 @@ function BuyVelocity(props) {
   };
   return (
     <div>
+      <h1>This NFT is available for sale.</h1>
+      <h2>Price: {tokenPrice}</h2>
+      <h2>Seller: {tokenSeller}</h2>
       <button onClick={handleSubmit}>Buy Velocity</button>
     </div>
   );

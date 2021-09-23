@@ -23,38 +23,12 @@ function GetUserProfile() {
   return userSession.loadUserData().profile.stxAddress;
 }
 
-function GetLastTokenId({ handleFreeTokens }) {
-  const [soldTokens, setSoldTokens] = useState(0);
-  const profile = GetUserProfile();
-
-  useEffect(() => {
-    async function handleSubmit() {
-      const options = {
-        contractAddress: constants.contractAddress,
-        contractName: constants.velocityContract,
-        functionName: constants.getLastTokenId,
-        functionArgs: [],
-        network: testnet,
-        senderAddress: profile.testnet,
-      };
-      try {
-        const result = await callReadOnlyFunction(options);
-        const tokens = cvToValue(result.value);
-        const freeTokens = constants.tokensForFree - tokens;
-        setSoldTokens(tokens);
-        handleFreeTokens(freeTokens);
-      } catch (err) {
-        console.log(err);
-      }
-    }
-    handleSubmit();
-  }, [soldTokens, profile, handleFreeTokens]);
-
+function GetLastTokenId({ soldTokens}) {
   return (
     <div>
       <h2>Tokens sold: {soldTokens}</h2>
       <h2>
-        There are total of {constants.totalTokens} Velocity NFTs to be claimed
+        {constants.totalTokens} Velocity NFTs to be claimed
       </h2>
     </div>
   );
@@ -114,7 +88,8 @@ function Claim({ freeTokens }) {
     <div>
       {freeTokens < constants.tokensForFree ? (
         <div>
-          <h3>Hurry up! Free NFTs are limited! Only {freeTokens} are left</h3>
+          <h3>Only {freeTokens} remainng!</h3>
+          <h3>Claim yours for free Today</h3>
           <button className="submit-button" onClick={handleClaimForFree}>
             Claim
           </button>
@@ -134,33 +109,7 @@ function Claim({ freeTokens }) {
   );
 }
 
-function GetTotalTokens() {
-  const [ownerTokenBalance, setOwnerTokenBalance] = useState(0);
-  const profile = GetUserProfile();
-  const ownerAddress = standardPrincipalCV(profile.testnet);
-
-  useEffect(() => {
-    const handleSubmit = async () => {
-      const options = {
-        contractAddress: constants.contractAddress,
-        contractName: constants.velocityContract,
-        functionName: constants.balanceOf,
-        functionArgs: [ownerAddress],
-        network: testnet,
-        senderAddress: profile.testnet,
-      };
-      try {
-        const result = await callReadOnlyFunction(options);
-        const response = cvToValue(result);
-        console.log(response);
-        setOwnerTokenBalance(response);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    handleSubmit();
-  }, []);
-
+function GetTotalTokens({ownerTokenBalance}) {
   return (
     <div>
       <h1>You own {ownerTokenBalance} tokens</h1>

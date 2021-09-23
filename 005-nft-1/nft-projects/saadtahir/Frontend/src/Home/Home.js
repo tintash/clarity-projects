@@ -1,19 +1,78 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AppConfig, UserSession } from "@stacks/connect";
 import "./Home.css";
 import { Claim, GetLastTokenId, GetTotalTokens } from "../Velocity/Velocity";
 import { useHistory } from "react-router-dom";
+import * as constants from "../Constants";
+import {
+  callReadOnlyFunction,
+  cvToValue,
+  standardPrincipalCV,
+} from "@stacks/transactions";
+import {StacksTestnet } from "@stacks/network";
+import MySpinner from "../My-Spinner/MySpinner";
 
 const appConfig = new AppConfig(["store_write", "publish_data"]);
 const userSession = new UserSession({ appConfig });
+const testnet = new StacksTestnet();
+
+function GetUserProfile() {
+  return userSession.loadUserData().profile.stxAddress;
+}
 
 function Home(props) {
   const state = props.location.state;
   const [freeTokens, setFreeTokens] = useState(0);
+  const [soldTokens, setSoldTokens] = useState(0);
+  const profile = GetUserProfile();
+  const [ownerTokenBalance, setOwnerTokenBalance] = useState(0);
+  const ownerAddress = standardPrincipalCV(profile.testnet);
+  const [loading, setLoading] = useState(true);
 
-  const handleFreeTokens = (tokenVal) => {
-    setFreeTokens(tokenVal);
+  const setOptions=(funcName)=>{
+    return {
+      contractAddress: constants.contractAddress,
+      contractName: constants.velocityContract,
+      functionName: funcName,
+      functionArgs: funcName===constants.balanceOf?[ownerAddress]:[],
+      network: testnet,
+      senderAddress: profile.testnet,
+    };
   };
+
+  useEffect(() => {
+    const handleSubmit = async () => {
+      const options = setOptions(constants.balanceOf);
+      try {
+        const result = await callReadOnlyFunction(options);
+        const response = cvToValue(result);
+        setOwnerTokenBalance(response);
+        setLoading(false);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    handleSubmit();
+  }, []);
+
+  useEffect(() => {
+    async function handleSubmit() {
+      const options = setOptions(constants.getLastTokenId);
+      try {
+        const result = await callReadOnlyFunction(options);
+        const tokens = cvToValue(result.value);
+        const freeTokens = constants.tokensForFree - tokens;
+        setSoldTokens(tokens);
+        console.log(`Free Tokens: ${freeTokens}`);
+        setFreeTokens(freeTokens);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    handleSubmit();
+  }, []);
+
+
   const handleLogout = () => {
     userSession.signUserOut("/");
   };
@@ -26,13 +85,19 @@ function Home(props) {
       <button className="logout" onClick={handleLogout}>
         Logout
       </button>
-      <GetLastTokenId handleFreeTokens={handleFreeTokens} />
-      <Claim freeTokens={freeTokens} />
+      {
+        loading? null : <GetTotalTokens ownerTokenBalance={ownerTokenBalance} />
+      }
+      {
+        loading? <MySpinner/> : <GetLastTokenId soldTokens={soldTokens}/>
+      }
+      {
+        loading? null : <Claim freeTokens={freeTokens} />
+      }
       <br />
       <SellTokens />
       <br />
       <BuyTokens />
-      <GetTotalTokens />
     </div>
   );
 }

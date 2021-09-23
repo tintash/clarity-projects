@@ -26,18 +26,19 @@ function GetUserProfile() {
 }
 
 function SellToken() {
+  const [ownerTokens, setOwnerTokens] = useState(null);
+
   return (
     <div>
       <h1>Welcome to Token Trading Page</h1>
       <p>Here you can put your velocity for sale</p>
-      <PutVelocityForSale />
-      <GetOwnerNFTs />
+      <PutVelocityForSale ownerTokens={ownerTokens} />
+      <GetOwnerNFTs ownerTokens={ownerTokens} setOwnerTokens={setOwnerTokens}/>
     </div>
   );
 }
 
-function GetOwnerNFTs() {
-  const [ownerTokens, setOwnerTokens] = useState([]);
+function GetOwnerNFTs({ownerTokens, setOwnerTokens}) {
   const profile = GetUserProfile();
   const ownerAddress = standardPrincipalCV(profile.testnet);
 
@@ -67,8 +68,8 @@ function GetOwnerNFTs() {
   return (
     <div>
       <br />
-      {ownerTokens.length > 0 && <h1>You own {ownerTokens.length} tokens</h1>}
-      {ownerTokens.length > 0 &&
+      {ownerTokens?.length > 0 && <h1>You own {ownerTokens.length} tokens</h1>}
+      {ownerTokens?.length > 0 &&
         ownerTokens.map((token) => {
           return (
             <div className="gallery">
@@ -86,10 +87,16 @@ function GetOwnerNFTs() {
   );
 }
 
-function PutVelocityForSale() {
+function PutVelocityForSale({ownerTokens}) {
   const profile = GetUserProfile();
   const [tokenId, setTokenId] = useState(0);
   const [tokenPrice, setTokenPrice] = useState(10000);
+  const [listOfTokens, setListOfTokens] = useState(ownerTokens);
+
+  useEffect(() => {
+    setListOfTokens(ownerTokens);
+    console.log(ownerTokens);
+  }, [ownerTokens]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -97,6 +104,11 @@ function PutVelocityForSale() {
     console.log("Selling NFT");
     console.log("tokenId: " + tokenId);
     console.log("tokenPrice: " + tokenPrice);
+
+    if(tokenPrice<10000){
+      alert("Token Price too low");
+      return;
+    }
 
     const contractAddress = constants.contractAddress;
     const contractName = constants.velocityMarketContract;
@@ -134,16 +146,25 @@ function PutVelocityForSale() {
     await openContractCall(options);
   };
 
+  const handleChange = (e) => {
+    const { value } = e.target;
+    setTokenId(value);
+  };
+
+
   return (
     <form onSubmit={handleSubmit}>
-      <label>
-        Enter Token Id:
-        <input
-          type="number"
-          value={tokenId}
-          onChange={(s) => setTokenId(s.target.value)}
-        />
-      </label>
+      <label>Enter Token Id:</label>
+      <select
+        name="selectedToken"
+        value={tokenId}
+        onChange={handleChange}
+      >
+        <option selected disabled>-Select From Tokens-</option>
+        {listOfTokens?.length > 0
+          ? listOfTokens.map((token) => <option>{token.value}</option>)
+          : ''}
+      </select>
       <br />
       <label>
         Enter Token Price (min 10000STX):
@@ -153,7 +174,7 @@ function PutVelocityForSale() {
           onChange={(s) => setTokenPrice(s.target.value)}
         />
       </label>
-      <input className="button" type="submit" value="Sale" />
+      <button>Sale</button>
     </form>
   );
 }
