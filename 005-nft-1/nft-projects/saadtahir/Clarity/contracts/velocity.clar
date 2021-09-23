@@ -121,8 +121,5 @@
 )
 
 (define-private (remove-token-filter (token-id uint))
-    (if (is-eq token-id (var-get removing-token))
-        false
-    true
-    )
+    (not (is-eq token-id (var-get removing-token)))
 )
