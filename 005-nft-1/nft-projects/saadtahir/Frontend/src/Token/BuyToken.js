@@ -12,13 +12,14 @@ import {
   standardPrincipalCV,
   uintCV,
 } from "@stacks/transactions";
-import { StacksMocknet } from "@stacks/network";
+import { StacksMocknet, StacksTestnet } from "@stacks/network";
 import "./BuyToken.css";
 import * as constants from "../Constants";
 import logo from "../velocity.svg";
 import BN from "bn.js";
 
-const network = new StacksMocknet();
+const testnet = new StacksTestnet();
+const mocknet = new StacksMocknet();
 const appConfig = new AppConfig(["store_write", "publish_data"]);
 const userSession = new UserSession({ appConfig });
 
@@ -49,7 +50,7 @@ function GetNFTsForSale() {
       contractName: constants.velocityMarketContract,
       functionName: constants.getVelocityForSale,
       functionArgs: [uintCV(tokenId)],
-      network,
+      network: testnet,
       senderAddress: profile.testnet,
     };
     try {
@@ -139,7 +140,7 @@ function BuyVelocity(props) {
         name: constants.appName,
         icon: window.location.origin + logo,
       },
-      network,
+      network: testnet,
       userSession,
       postConditions: [nftTransferPostCondition, stxPostCondition],
       postConditionMode: PostConditionMode.Deny,

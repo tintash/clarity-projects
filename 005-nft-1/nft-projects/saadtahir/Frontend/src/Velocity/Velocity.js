@@ -6,12 +6,13 @@ import {
   PostConditionMode,
   standardPrincipalCV,
 } from "@stacks/transactions";
-import { StacksMocknet } from "@stacks/network";
+import { StacksMocknet, StacksTestnet } from "@stacks/network";
 import "./Velocity.css";
 import logo from "../velocity.svg";
 import * as constants from "../Constants";
 
-const network = new StacksMocknet();
+const testnet = new StacksTestnet();
+const mocknet = new StacksMocknet();
 const appConfig = new AppConfig(["store_write", "publish_data"]);
 const userSession = new UserSession({ appConfig });
 
@@ -30,7 +31,7 @@ function GetLastTokenId({ handleFreeTokens }) {
         contractName: constants.velocityContract,
         functionName: constants.getLastTokenId,
         functionArgs: [],
-        network,
+        network: testnet,
         senderAddress: profile.testnet,
       };
       try {
@@ -67,7 +68,7 @@ function Claim({ freeTokens }) {
         name: constants.appName,
         icon: window.location.origin + logo,
       },
-      network,
+      network: testnet,
       postConditionCode: PostConditionMode.Deny,
       onFinish: (data) => {
         console.log("Stacks Transaction:", data.stacksTransaction);
@@ -113,7 +114,7 @@ function GetTotalTokens() {
         contractName: constants.velocityContract,
         functionName: constants.balanceOf,
         functionArgs: [ownerAddress],
-        network,
+        network: testnet,
         senderAddress: profile.testnet,
       };
       try {

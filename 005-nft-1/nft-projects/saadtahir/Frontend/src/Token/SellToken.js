@@ -10,13 +10,14 @@ import {
   standardPrincipalCV,
   uintCV,
 } from "@stacks/transactions";
-import { StacksMocknet } from "@stacks/network";
+import { StacksMocknet, StacksTestnet } from "@stacks/network";
 import logo from "../velocity.svg";
 import "./SellToken.css";
 import * as constants from "../Constants";
 import * as Meta from "../MetaData/TokenMeta";
 
-const network = new StacksMocknet();
+const testnet = new StacksTestnet();
+const mocknet = new StacksMocknet();
 const appConfig = new AppConfig(["store_write", "publish_data"]);
 const userSession = new UserSession({ appConfig });
 
@@ -47,7 +48,7 @@ function GetOwnerNFTs() {
         contractName: constants.velocityContract,
         functionName: constants.getTokens,
         functionArgs: [ownerAddress],
-        network,
+        network: testnet,
         senderAddress: profile.testnet,
       };
       try {
@@ -123,7 +124,7 @@ function PutVelocityForSale() {
         name: constants.appName,
         icon: window.location.origin + logo,
       },
-      network,
+      network: testnet,
       userSession,
       postConditions: [standardNFTPostCondition],
       postConditionMode: PostConditionMode.Deny,
