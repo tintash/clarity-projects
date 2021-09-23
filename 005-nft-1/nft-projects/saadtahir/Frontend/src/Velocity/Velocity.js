@@ -3,6 +3,8 @@ import { AppConfig, openContractCall, UserSession } from "@stacks/connect";
 import {
   callReadOnlyFunction,
   cvToValue,
+  FungibleConditionCode,
+  makeStandardSTXPostCondition,
   PostConditionMode,
   standardPrincipalCV,
 } from "@stacks/transactions";
@@ -10,6 +12,7 @@ import { StacksMocknet, StacksTestnet } from "@stacks/network";
 import "./Velocity.css";
 import logo from "../velocity.svg";
 import * as constants from "../Constants";
+import BN from "bn.js";
 
 const testnet = new StacksTestnet();
 const mocknet = new StacksMocknet();
@@ -58,7 +61,7 @@ function GetLastTokenId({ handleFreeTokens }) {
 }
 
 function Claim({ freeTokens }) {
-  const handleSubmit = async () => {
+  const handleClaimForFree = async () => {
     const options = {
       contractAddress: constants.contractAddress,
       contractName: constants.velocityContract,
@@ -72,7 +75,36 @@ function Claim({ freeTokens }) {
       postConditionCode: PostConditionMode.Deny,
       onFinish: (data) => {
         console.log("Stacks Transaction:", data.stacksTransaction);
-        console.log("Transaction ID:", data.txId);
+        console.log("Transaction ID: 0x", data.txId);
+        console.log("Raw transaction:", data.txRaw);
+      },
+    };
+    await openContractCall(options);
+  };
+
+  const handleClaim = async () => {
+    const profile = GetUserProfile();
+    const tokenPrice = 10000;
+    const stxPostCondition = makeStandardSTXPostCondition(
+      profile.testnet,
+      FungibleConditionCode.Equal,
+      new BN(tokenPrice)
+    );
+    const options = {
+      contractAddress: constants.contractAddress,
+      contractName: constants.velocityContract,
+      functionName: constants.claim,
+      functionArgs: [],
+      appDetails: {
+        name: constants.appName,
+        icon: window.location.origin + logo,
+      },
+      network: testnet,
+      postCondtions: [stxPostCondition],
+      postConditionCode: PostConditionMode.Deny,
+      onFinish: (data) => {
+        console.log("Stacks Transaction:", data.stacksTransaction);
+        console.log("Transaction ID: 0x", data.txId);
         console.log("Raw transaction:", data.txRaw);
       },
     };
@@ -83,7 +115,7 @@ function Claim({ freeTokens }) {
       {freeTokens < constants.tokensForFree ? (
         <div>
           <h3>Hurry up! Free NFTs are limited! Only {freeTokens} are left</h3>
-          <button className="submit-button" onClick={handleSubmit}>
+          <button className="submit-button" onClick={handleClaimForFree}>
             Claim
           </button>
         </div>
@@ -93,7 +125,7 @@ function Claim({ freeTokens }) {
             Buy Velocity now! They cost as low as {constants.tokenCost} micro
             STX
           </h3>
-          <button className="submit-button" onClick={handleSubmit}>
+          <button className="submit-button" onClick={handleClaim}>
             Claim
           </button>
         </div>
@@ -127,7 +159,7 @@ function GetTotalTokens() {
       }
     };
     handleSubmit();
-  });
+  }, []);
 
   return (
     <div>

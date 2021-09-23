@@ -1,9 +1,7 @@
 export const appName = "Velocity NFT";
 
-// export const contractAddress = "ST5HYHBZ6CH0DHENSVCRTGKJ0CGTDFN09DRT38YK";
 export const contractAddress = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM";
 
-// export const assetAddress = "ST5HYHBZ6CH0DHENSVCRTGKJ0CGTDFN09DRT38YK";
 export const assetAddress = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM";
 export const assetContractName = "velocity";
 export const assetName = "velocity";

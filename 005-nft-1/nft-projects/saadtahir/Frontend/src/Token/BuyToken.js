@@ -135,7 +135,7 @@ function BuyVelocity(props) {
       contractAddress,
       contractName,
       functionName,
-      functionArgs: [uintCV(tokenId), standardPrincipalCV(profile.testnet)],
+      functionArgs: [uintCV(tokenId)],
       appDetails: {
         name: constants.appName,
         icon: window.location.origin + logo,
@@ -146,7 +146,7 @@ function BuyVelocity(props) {
       postConditionMode: PostConditionMode.Deny,
       onFinish: (data) => {
         console.log("Stacks Transaction:", data.stacksTransaction);
-        console.log("Transaction ID:", data.txId);
+        console.log("Transaction ID: 0x", data.txId);
         console.log("Raw transaction:", data.txRaw);
       },
     };
