@@ -10,14 +10,13 @@ import {
   standardPrincipalCV,
   uintCV,
 } from "@stacks/transactions";
-import { StacksMocknet, StacksTestnet } from "@stacks/network";
+import { StacksTestnet } from "@stacks/network";
 import logo from "../velocity.svg";
 import "./SellToken.css";
 import * as constants from "../Constants";
-import * as Meta from "../MetaData/TokenMeta";
+import LoadImage from "../Storage/LoadImage";
 
 const testnet = new StacksTestnet();
-const mocknet = new StacksMocknet();
 const appConfig = new AppConfig(["store_write", "publish_data"]);
 const userSession = new UserSession({ appConfig });
 
@@ -33,12 +32,12 @@ function SellToken() {
       <h1>Welcome to Token Trading Page</h1>
       <p>Here you can put your velocity for sale</p>
       <PutVelocityForSale ownerTokens={ownerTokens} />
-      <GetOwnerNFTs ownerTokens={ownerTokens} setOwnerTokens={setOwnerTokens}/>
+      <GetOwnerNFTs ownerTokens={ownerTokens} setOwnerTokens={setOwnerTokens} />
     </div>
   );
 }
 
-function GetOwnerNFTs({ownerTokens, setOwnerTokens}) {
+function GetOwnerNFTs({ ownerTokens, setOwnerTokens }) {
   const profile = GetUserProfile();
   const ownerAddress = standardPrincipalCV(profile.testnet);
 
@@ -73,12 +72,7 @@ function GetOwnerNFTs({ownerTokens, setOwnerTokens}) {
         ownerTokens.map((token) => {
           return (
             <div className="gallery">
-              <img
-                src={Meta.tokenMeta[token.value].url}
-                alt={logo}
-                width="250"
-                height="200"
-              />
+              <LoadImage tokenId={token.value} />
               <div className="desc">Token ID: {token.value}</div>
             </div>
           );
@@ -87,7 +81,7 @@ function GetOwnerNFTs({ownerTokens, setOwnerTokens}) {
   );
 }
 
-function PutVelocityForSale({ownerTokens}) {
+function PutVelocityForSale({ ownerTokens }) {
   const profile = GetUserProfile();
   const [tokenId, setTokenId] = useState(0);
   const [tokenPrice, setTokenPrice] = useState(10000);
@@ -105,7 +99,7 @@ function PutVelocityForSale({ownerTokens}) {
     console.log("tokenId: " + tokenId);
     console.log("tokenPrice: " + tokenPrice);
 
-    if(tokenPrice<10000){
+    if (tokenPrice < 10000) {
       alert("Token Price too low");
       return;
     }
@@ -151,19 +145,16 @@ function PutVelocityForSale({ownerTokens}) {
     setTokenId(value);
   };
 
-
   return (
     <form onSubmit={handleSubmit}>
       <label>Enter Token Id:</label>
-      <select
-        name="selectedToken"
-        value={tokenId}
-        onChange={handleChange}
-      >
-        <option selected disabled>-Select From Tokens-</option>
+      <select name="selectedToken" value={tokenId} onChange={handleChange}>
+        <option selected disabled>
+          -Select From Tokens-
+        </option>
         {listOfTokens?.length > 0
           ? listOfTokens.map((token) => <option>{token.value}</option>)
-          : ''}
+          : ""}
       </select>
       <br />
       <label>

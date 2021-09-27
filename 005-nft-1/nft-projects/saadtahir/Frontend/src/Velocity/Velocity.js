@@ -1,21 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { AppConfig, openContractCall, UserSession } from "@stacks/connect";
 import {
-  callReadOnlyFunction,
-  cvToValue,
   FungibleConditionCode,
   makeStandardSTXPostCondition,
   PostConditionMode,
-  standardPrincipalCV,
 } from "@stacks/transactions";
-import { StacksMocknet, StacksTestnet } from "@stacks/network";
+import { StacksTestnet } from "@stacks/network";
 import "./Velocity.css";
 import logo from "../velocity.svg";
 import * as constants from "../Constants";
 import BN from "bn.js";
 
 const testnet = new StacksTestnet();
-const mocknet = new StacksMocknet();
 const appConfig = new AppConfig(["store_write", "publish_data"]);
 const userSession = new UserSession({ appConfig });
 
@@ -23,13 +19,11 @@ function GetUserProfile() {
   return userSession.loadUserData().profile.stxAddress;
 }
 
-function GetLastTokenId({ soldTokens}) {
+function GetLastTokenId({ soldTokens }) {
   return (
     <div>
       <h2>Tokens sold: {soldTokens}</h2>
-      <h2>
-        {constants.totalTokens} Velocity NFTs to be claimed
-      </h2>
+      <h2>{constants.totalTokens} Velocity NFTs to be claimed</h2>
     </div>
   );
 }
@@ -109,7 +103,7 @@ function Claim({ freeTokens }) {
   );
 }
 
-function GetTotalTokens({ownerTokenBalance}) {
+function GetTotalTokens({ ownerTokenBalance }) {
   return (
     <div>
       <h1>You own {ownerTokenBalance} tokens</h1>

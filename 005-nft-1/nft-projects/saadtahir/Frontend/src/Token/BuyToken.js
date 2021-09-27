@@ -9,10 +9,9 @@ import {
   makeStandardSTXPostCondition,
   NonFungibleConditionCode,
   PostConditionMode,
-  standardPrincipalCV,
   uintCV,
 } from "@stacks/transactions";
-import { StacksMocknet, StacksTestnet } from "@stacks/network";
+import { StacksTestnet } from "@stacks/network";
 import "./BuyToken.css";
 import * as constants from "../Constants";
 import logo from "../velocity.svg";
@@ -20,7 +19,6 @@ import BN from "bn.js";
 import MySpinner from "../My-Spinner/MySpinner";
 
 const testnet = new StacksTestnet();
-const mocknet = new StacksMocknet();
 const appConfig = new AppConfig(["store_write", "publish_data"]);
 const userSession = new UserSession({ appConfig });
 
@@ -68,55 +66,54 @@ function GetNFTsForSale() {
         setTokenPrice(response.value.price.value);
         setTokenSeller(response.value.seller.value);
       }
-      
     } catch (err) {
       console.log(err);
     }
     try {
-    const result = await callReadOnlyFunction(options);
-    const response = cvToValue(result);
-    if (response == null) {
-      setTokenPrice(0);
-      setTokenSeller("");
-    } else {
-      setTokenPrice(response.value.price.value);
-      setTokenSeller(response.value.seller.value);
+      const result = await callReadOnlyFunction(options);
+      const response = cvToValue(result);
+      if (response == null) {
+        setTokenPrice(0);
+        setTokenSeller("");
+      } else {
+        setTokenPrice(response.value.price.value);
+        setTokenSeller(response.value.seller.value);
+      }
+    } catch (err) {
+      console.log(err);
     }
-    
-  } catch (err) {
-    console.log(err);
-  }
-  setLoading(false)
-    
+    setLoading(false);
   };
 
   return (
     <>
-    <form onSubmit={handleSubmit}>
-      <label>
-        Enter Token Id:
-        <input
-          type="number"
-          value={tokenId}
-          onChange={(s) => setTokenId(s.target.value)}
-        />
-      </label>
-      <button type="submit">Check</button>
+      <form onSubmit={handleSubmit}>
+        <label>
+          Enter Token Id:
+          <input
+            type="number"
+            value={tokenId}
+            onChange={(s) => setTokenId(s.target.value)}
+          />
+        </label>
+        <button type="submit">Check</button>
       </form>
       <br />
       {tokenSeller !== "" ? (
-        loading? <MySpinner/> : (
+        loading ? (
+          <MySpinner />
+        ) : (
           <div>
-          {tokenSeller === profile.testnet ? (
-            <h1>You cannot buy your own tokens!</h1>
-          ) : (
-            <BuyVelocity
-              tokenId={tokenId}
-              tokenPrice={tokenPrice}
-              tokenSeller={tokenSeller}
-            />
-          )}
-        </div>
+            {tokenSeller === profile.testnet ? (
+              <h1>You cannot buy your own tokens!</h1>
+            ) : (
+              <BuyVelocity
+                tokenId={tokenId}
+                tokenPrice={tokenPrice}
+                tokenSeller={tokenSeller}
+              />
+            )}
+          </div>
         )
       ) : (
         <div>
