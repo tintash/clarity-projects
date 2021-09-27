@@ -17,7 +17,10 @@
 (define-fungible-token refer-reward)
 ;; registered user info map 
 (define-map users 
-    principal { email: (string-ascii 200), num-transactions: uint, referrer: (optional principal)})
+    principal { email: (string-ascii 200) })
+;; user's referrer map 
+(define-map user-referrer
+    principal { num-transactions: uint, referrer: principal})
 
 ;; read-only functions 
 (define-read-only (get-name) (ok "Refer rewards"))
@@ -38,21 +41,21 @@
     (ok (some u"https://www.tintash.com/"))
 )
 
-(define-read-only (get-user (user principal)) 
-    (map-get? users user) 
+(define-read-only (get-user-referrer (user principal)) 
+    (map-get? user-referrer user) 
 )
 
 (define-read-only (get-referrer (user principal)) 
-    (default-to none (get referrer (get-user user)))
+    (get referrer (get-user-referrer user))
 )
 
 (define-read-only (get-num-transactions (user principal))
-    (default-to u0 (get num-transactions (get-user user)))
+    (default-to u0 (get num-transactions (get-user-referrer user)))
 )
 
 ;; private functions
 (define-private (remove-referrer (user principal)) 
-    (map-set users user (merge (unwrap! (get-user user) false) {referrer: none}))
+    (map-delete user-referrer user)
 )
 
 ;; public functions
@@ -80,7 +83,9 @@
         ;; !self refer  
         (asserts! (not (is-eq tx-sender user)) err-invalid-call)
         (asserts! (map-insert users user 
-            {email: email, num-transactions: u0, referrer: (some tx-sender)}) err-invalid-call)
+            {email: email}) err-invalid-call)
+        (asserts! (map-insert user-referrer user 
+            {num-transactions: u0, referrer: tx-sender}) err-invalid-call)
         (ok true)
     )
 )
@@ -89,7 +94,7 @@
 (define-public (signup-self (email (string-ascii 200))) 
     (begin 
         (asserts! (map-insert users tx-sender 
-            {email: email, num-transactions: u0, referrer: none}) err-invalid-call)
+            {email: email}) err-invalid-call)
         (ok true)
     )
 )
@@ -99,16 +104,16 @@
     (let
         (
             (transactions (+ (get-num-transactions tx-sender) u1))
-            (referrer (get-referrer tx-sender))
+            (referrer (unwrap! (get-referrer tx-sender) err-invalid-call))
         )
-        (map-set users tx-sender 
-            (merge (unwrap! (get-user tx-sender) err-invalid-call)
+        (map-set user-referrer tx-sender 
+            (merge (unwrap! (get-user-referrer tx-sender) err-invalid-call)
                     {num-transactions: transactions}))
         ;; reward to referer if required number of transactions  
         (if (is-eq transactions num-transactions-for-reward) 
             (begin 
                 (remove-referrer tx-sender)
-                (ft-mint? refer-reward token-reward (unwrap! referrer (ok true)))
+                (ft-mint? refer-reward token-reward referrer)
             ) 
             (ok true)
         )
