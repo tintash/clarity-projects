@@ -89,6 +89,9 @@ function PutVelocityForSale({ ownerTokens }) {
 
   useEffect(() => {
     setListOfTokens(ownerTokens);
+    if (ownerTokens?.length > 0) {
+      setTokenId(ownerTokens[0].value);
+    }
     console.log(ownerTokens);
   }, [ownerTokens]);
 
@@ -165,7 +168,7 @@ function PutVelocityForSale({ ownerTokens }) {
           onChange={(s) => setTokenPrice(s.target.value)}
         />
       </label>
-      <button>Sale</button>
+      {listOfTokens?.length > 0 && <button>Sale</button>}
     </form>
   );
 }
