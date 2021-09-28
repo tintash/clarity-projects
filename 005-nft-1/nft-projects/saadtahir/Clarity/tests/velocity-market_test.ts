@@ -16,7 +16,7 @@ Clarinet.test({
       Tx.contractCall(
         "velocity-market",
         "put-velocity-for-sale",
-        [types.uint(1), types.uint(2500), types.principal(owner.address)],
+        [types.uint(1), types.uint(2500)],
         deployer.address
       ),
     ]);
@@ -36,13 +36,13 @@ Clarinet.test({
       Tx.contractCall(
         "velocity-market",
         "put-velocity-for-sale",
-        [types.uint(1), types.uint(25000), types.principal(owner.address)],
+        [types.uint(1), types.uint(25000)],
         notOwner.address
       ),
     ]);
 
     block.receipts[0].result.expectOk().expectUint(1);
-    block.receipts[1].result.expectErr().expectUint(101);
+    block.receipts[1].result.expectErr().expectUint(1);
   },
 });
 
@@ -56,7 +56,7 @@ Clarinet.test({
       Tx.contractCall(
         "velocity-market",
         "put-velocity-for-sale",
-        [types.uint(1), types.uint(25000), types.principal(owner.address)],
+        [types.uint(1), types.uint(25000)],
         owner.address
       ),
       Tx.contractCall(
@@ -86,12 +86,12 @@ Clarinet.test({
       Tx.contractCall(
         "velocity-market",
         "buy-velocity",
-        [types.uint(1), types.principal(buyer.address)],
+        [types.uint(1)],
         notBuyer.address
       ),
     ]);
 
-    block.receipts[0].result.expectErr().expectUint(203);
+    block.receipts[0].result.expectErr().expectUint(200);
   },
 });
 
@@ -106,13 +106,13 @@ Clarinet.test({
       Tx.contractCall(
         "velocity-market",
         "put-velocity-for-sale",
-        [types.uint(1), types.uint(25000), types.principal(owner.address)],
+        [types.uint(1), types.uint(25000)],
         owner.address
       ),
       Tx.contractCall(
         "velocity-market",
         "buy-velocity",
-        [types.uint(2), types.principal(buyer.address)],
+        [types.uint(2)],
         buyer.address
       ),
     ]);
@@ -134,13 +134,13 @@ Clarinet.test({
       Tx.contractCall(
         "velocity-market",
         "put-velocity-for-sale",
-        [types.uint(1), types.uint(25000), types.principal(owner.address)],
+        [types.uint(1), types.uint(25000)],
         owner.address
       ),
       Tx.contractCall(
         "velocity-market",
         "buy-velocity",
-        [types.uint(1), types.principal(buyer.address)],
+        [types.uint(1)],
         buyer.address
       ),
       Tx.contractCall(
