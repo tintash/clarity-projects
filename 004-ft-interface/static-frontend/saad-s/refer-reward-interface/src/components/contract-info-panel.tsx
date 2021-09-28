@@ -80,7 +80,6 @@ export const ContractInfoPanel: React.FC = memo(() => {
         border={border()}
         borderRadius="12px"
         spacing="extra-loose"
-        // minHeight="calc(100vh - 200px)"
         minHeight="80%"
         width="100%"
       >

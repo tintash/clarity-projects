@@ -32,7 +32,6 @@ const SignedOutView: React.FC = () => {
 
 const UserPrincipal: React.FC = () => {
   const { onChange } = useUserPrincipalForm();
-  // const ref = useRef<HTMLInputElement | null>(null);
   return (
     <Stack
       isInline
@@ -42,10 +41,6 @@ const UserPrincipal: React.FC = () => {
       justifyContent="center"
       borderRadius="24px"
       as="form"
-      // onSubmit={(e) => {
-      //   e?.preventDefault();
-      //   onSubmit();
-      // }}
       mx="auto"
       position="relative"
       width="80%"
@@ -61,7 +56,6 @@ const UserPrincipal: React.FC = () => {
         placeholder="'ST1234..."
         width="100%"
         fontSize="17px"
-        // pr="70px"
         p="tight"
       />
     </Stack>
@@ -70,7 +64,6 @@ const UserPrincipal: React.FC = () => {
 
 const UserEmail: React.FC = () => {
   const { onChange } = useUserEmailForm();
-  // const ref = useRef<HTMLInputElement | null>(null);
   return (
     <Stack
       isInline
@@ -80,17 +73,12 @@ const UserEmail: React.FC = () => {
       justifyContent="center"
       borderRadius="24px"
       as="form"
-      // onSubmit={(e) => {
-      //   e?.preventDefault();
-      //   onSubmit();
-      // }}
       mx="auto"
       position="relative"
       width="80%"
     >
       <Text justifyContent="center"> Email: </Text>
       <Box
-        // ref={ref as any}
         onChange={onChange}
         color={color("text-caption")}
         as={Textarea}
@@ -100,7 +88,6 @@ const UserEmail: React.FC = () => {
         placeholder="email@domain.com"
         width="100%"
         fontSize="17px"
-        // pr="70px"
         p="tight"
       />
     </Stack>
@@ -108,7 +95,7 @@ const UserEmail: React.FC = () => {
 };
 
 const SignedInView: React.FC = () => {
-  const { isLoading, setIsLoading } = useLoading(LOADING_KEYS.AUTH);
+  const { isLoading } = useLoading(LOADING_KEYS.AUTH);
   const handleReferUserSend = useReferUserButton();
   const handleCompleteTransaction = usePerformTransaction();
   const { principalValue } = useUserPrincipalForm();
@@ -125,7 +112,6 @@ const SignedInView: React.FC = () => {
       <Stack
         p="extra-loose"
         alignItems="center"
-        // justifyContent="center"
         mx="auto"
         position="relative"
         width="600px"
@@ -148,7 +134,6 @@ const SignedInView: React.FC = () => {
       <Stack
         p="loose"
         alignItems="center"
-        // justifyContent="center"
         mx="auto"
         position="relative"
         width="600px"

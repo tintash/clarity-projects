@@ -1,8 +1,7 @@
 import React, { useCallback } from "react";
 import { toast } from "react-hot-toast";
 import { atom, useAtom } from "jotai";
-import { useLoading } from "./use-loading";
-import { LOADING_KEYS } from "../../store/ui";
+// import { useLoading } from "./use-loading"; -- TODO: useLoading not working properly here
 import { useConnect } from "@stacks/connect-react";
 import { useNetwork } from "./use-network";
 import { useCurrentAddress } from "./use-current-address";
@@ -13,15 +12,6 @@ import {
 } from "../constants";
 import { principalCV } from "@stacks/transactions/dist/clarity/types/principalCV";
 import { stringAsciiCV } from "@stacks/transactions";
-
-// import {
-//   cvToHex,
-//   cvToJSON,
-//   cvToString,
-//   hexToCV,
-//   uintCV,
-// } from "@stacks/transactions";
-// import BN from "bn.js";
 
 export const userPrincipalAtom = atom("");
 export const userEmailAtom = atom("");
@@ -63,7 +53,7 @@ export function useUserEmailForm() {
 export function useReferUserButton() {
   const address = useCurrentAddress();
   const [contractAddress, contractName] = REFER_REWARD_CONTRACT.split(".");
-  const { setIsLoading } = useLoading(LOADING_KEYS.AUTH);
+  // const { setIsLoading } = useLoading(LOADING_KEYS.AUTH);
   const { doContractCall } = useConnect();
 
   // const
@@ -102,7 +92,7 @@ export function useReferUserButton() {
 export function usePerformTransaction() {
   const address = useCurrentAddress();
   const [contractAddress, contractName] = REFER_REWARD_CONTRACT.split(".");
-  const { setIsLoading } = useLoading(LOADING_KEYS.AUTH);
+  // const { setIsLoading } = useLoading(LOADING_KEYS.AUTH);
   const { doContractCall } = useConnect();
 
   // const

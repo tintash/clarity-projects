@@ -7,22 +7,11 @@ import {
   RR_TOKEN_DECIMALS,
   RR_TOKEN_SUPPLY,
   RR_TOKEN_URI,
-  RR_REFER_USER,
 } from "../common/constants";
 import { principalCV } from "@stacks/transactions/dist/clarity/types/principalCV";
 import { cvToHex, cvToString, hexToCV } from "@stacks/transactions";
 import { atomWithQuery } from "jotai/query";
 import { atomFamily } from "jotai/utils";
-
-// export interface ReferReward {
-//   sender: string;
-//   content: string;
-//   attachment?: string;
-//   id: string;
-//   timestamp: number;
-//   isPending?: boolean;
-//   index?: number;
-// }
 
 export const incrementAtom = atom(0);
 
