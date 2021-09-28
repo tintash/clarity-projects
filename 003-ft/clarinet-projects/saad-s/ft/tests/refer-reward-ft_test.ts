@@ -5,28 +5,17 @@ import { Clarinet, Tx, Chain, Account, types } from 'https://deno.land/x/clarine
 import { assertEquals } from 'https://deno.land/std@0.90.0/testing/asserts.ts';
 
 Clarinet.test({
-    name: "refer-reward-ft -- mint / burn / transfer tokens",
+    name: "refer-reward-ft -- transfer tokens",
     async fn(chain: Chain, accounts: Map<string, Account>) {
         let eCaller = accounts.get('deployer')!;
         let eWallet1 = accounts.get('wallet_1')!;
         const tokens = 10;
         let block = chain.mineBlock([
-            Tx.contractCall ('refer-reward-ft', 'create-ft-by-owner', 
-                [types.uint(tokens), types.principal(eCaller.address)],
-                eCaller.address
-            ),
-            Tx.contractCall ('refer-reward-ft', 'destroy-ft', 
-                [types.uint(tokens)],
-                eCaller.address
-            ),
             Tx.contractCall ('refer-reward-ft', 'transfer', 
                 [types.uint(tokens), types.principal(eCaller.address), types.principal(eWallet1.address)],
                 eCaller.address
             ),
         ]);
-        
-        block.receipts[0].result.expectOk().expectBool(true);
-        block.receipts[0].result.expectOk().expectBool(true);
         block.receipts[0].result.expectOk().expectBool(true);
     },
 });
@@ -54,44 +43,11 @@ Clarinet.test({
         // verify balance
         let balance = chain.callReadOnlyFn('refer-reward-ft', 'get-balance-of',
         [types.principal(eCaller.address)], eCaller.address);
-        balance.result.expectOk().expectUint(0);
+        balance.result.expectOk().expectUint(10);
         // verify balance
         let totalSupply = chain.callReadOnlyFn('refer-reward-ft', 'get-total-supply',
         [], eCaller.address);
-        totalSupply.result.expectOk().expectUint(0);
-    },
-});
-
-Clarinet.test({
-    name: "user-mgmt -- users can signup",
-    async fn(chain: Chain, accounts: Map<string, Account>) {
-        let eUser = accounts.get('wallet_1')!;
-        let block = chain.mineBlock([
-            Tx.contractCall ('refer-reward-ft', 'signup-self', 
-                [types.ascii('email@domain.com')],
-                eUser.address
-            ),
-        ]);
-        block.receipts[0].result.expectOk().expectBool(true);
-    },
-});
-
-Clarinet.test({
-    name: "user-mgmt -- users cannot signup multiple times",
-    async fn(chain: Chain, accounts: Map<string, Account>) {
-        let eUser = accounts.get('wallet_2')!;
-        let block = chain.mineBlock([
-            Tx.contractCall ('refer-reward-ft', 'signup-self', 
-                [types.ascii('email@domain.com')],
-                eUser.address
-            ),
-            Tx.contractCall ('refer-reward-ft', 'signup-self', 
-                [types.ascii('email@domain.com')],
-                eUser.address
-            ),
-        ]);
-        block.receipts[0].result.expectOk().expectBool(true);
-        block.receipts[1].result.expectErr().expectUint(110);
+        totalSupply.result.expectOk().expectUint(10);
     },
 });
 
@@ -152,5 +108,19 @@ Clarinet.test({
         balance = chain.callReadOnlyFn('refer-reward-ft', 'get-balance-of',
             [types.principal(eReferrer.address)], eReferrer.address);
         balance.result.expectOk().expectUint(tokensReward);
+    },
+});
+
+Clarinet.test({
+    name: "user-mgmt -- unregistered user cannot make transacton",
+    async fn(chain: Chain, accounts: Map<string, Account>) {
+        let eUser = accounts.get('wallet_2')!;
+        
+        let block = chain.mineBlock([
+            Tx.contractCall ('refer-reward-ft', 'complete-transaction', 
+                [], eUser.address
+            ),
+        ]);
+        block.receipts[0].result.expectErr().expectUint(110);
     },
 });
