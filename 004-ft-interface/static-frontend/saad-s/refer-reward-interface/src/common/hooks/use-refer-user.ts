@@ -60,7 +60,7 @@ export function useReferUserButton() {
   const network = useNetwork();
 
   const onCancel = useCallback(() => {
-    toast.success("Cancelled!");
+    toast.error("Cancelled!");
     // void setIsLoading(false);
   }, [toast]);
 
@@ -71,7 +71,23 @@ export function useReferUserButton() {
 
   return useCallback(
     (userAddress: string, email: string) => {
-      if (!userAddress || !email) return null;
+      
+      if (!userAddress || !email) {
+        toast.error("input required!");
+        return null;
+      }
+      
+      if ((userAddress.length != address.length) || (!userAddress.startsWith("ST"))) {
+        toast.error("invalid principal!");
+        return null;
+      }
+
+      const reg = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      if(!reg.test(email.toLowerCase())) {
+        toast.error("invalid email");
+        return null;
+      }
+      
       console.log(userAddress, email);
       // void setIsLoading(true);
 
@@ -99,7 +115,7 @@ export function usePerformTransaction() {
   const network = useNetwork();
 
   const onCancel = useCallback(() => {
-    toast.success("Cancelled!");
+    toast.error("Cancelled!");
     // void setIsLoading(false);
   }, [toast]);
 

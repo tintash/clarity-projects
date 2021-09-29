@@ -35,3 +35,7 @@ yarn start
    1. @stacks/transactions
    2. jotai
 4. Add contract readonly functions in [refer-reward.ts](/src/store/refer-reward.ts)
+
+#### Issues 
+1. loading symbol issue 
+2. Responsiveness 

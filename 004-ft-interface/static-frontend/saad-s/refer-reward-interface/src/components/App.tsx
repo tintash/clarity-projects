@@ -1,4 +1,5 @@
 import React, { memo } from "react";
+import { Toaster } from 'react-hot-toast';
 import "../App.css";
 import { useAuthOptions } from "../common/hooks/use-auth-options";
 import { ThemeProvider, ColorModeProvider, Flex, color } from "@stacks/ui";
@@ -14,6 +15,7 @@ const AppWrapper: React.FC = memo(({ children }) => {
   return (
     <ThemeProvider>
       <ColorModeProvider defaultMode="light">
+        <Toaster position="bottom-center"/>
         <Connect authOptions={authOptions}>{children}</Connect>
       </ColorModeProvider>
     </ThemeProvider>

@@ -14,4 +14,4 @@ yarn start
 ### Flow description
 
 1. Token details are given in [README-tokens](README-tokens.md)
-2. App development are given in [README-dev](README-dev.md)
+2. App development details are given in [README-dev](README-dev.md)
