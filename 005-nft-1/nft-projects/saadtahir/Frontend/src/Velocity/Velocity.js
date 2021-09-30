@@ -5,13 +5,11 @@ import {
   makeStandardSTXPostCondition,
   PostConditionMode,
 } from "@stacks/transactions";
-import { StacksTestnet } from "@stacks/network";
 import "./Velocity.css";
 import logo from "../velocity.svg";
 import * as constants from "../Constants";
 import BN from "bn.js";
 
-const testnet = new StacksTestnet();
 const appConfig = new AppConfig(["store_write", "publish_data"]);
 const userSession = new UserSession({ appConfig });
 
@@ -28,7 +26,7 @@ function GetLastTokenId({ soldTokens }) {
   );
 }
 
-function Claim({ freeTokens }) {
+function Claim({ freeTokens, network }) {
   const handleClaimForFree = async () => {
     const options = {
       contractAddress: constants.contractAddress,
@@ -39,7 +37,7 @@ function Claim({ freeTokens }) {
         name: constants.appName,
         icon: window.location.origin + logo,
       },
-      network: testnet,
+      network,
       postConditionCode: PostConditionMode.Deny,
       onFinish: (data) => {
         console.log("Stacks Transaction:", data.stacksTransaction);
@@ -67,7 +65,7 @@ function Claim({ freeTokens }) {
         name: constants.appName,
         icon: window.location.origin + logo,
       },
-      network: testnet,
+      network,
       postCondtions: [stxPostCondition],
       postConditionCode: PostConditionMode.Deny,
       onFinish: (data) => {

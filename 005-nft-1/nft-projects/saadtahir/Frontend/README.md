@@ -8,6 +8,7 @@ Buyers can buy a `Velocity` for the specified price and a commission of `2.5%` w
 
 - Open terminal and change directory `cd` to this project's contract and execute `clarinet integrate`
 - Login with the `Devnet.toml` deployer login credentials in `Hiro Wallet Extension`
+- Make sure that `useMocknet` is set to `true` in order to use `Mocknet` in `App.js`
 - Open terminal and change directory `cd` to this project's front-end and execute `npm start` to start the application.
 
 ## How to Trade

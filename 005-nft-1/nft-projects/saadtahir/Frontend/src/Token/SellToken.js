@@ -10,13 +10,11 @@ import {
   standardPrincipalCV,
   uintCV,
 } from "@stacks/transactions";
-import { StacksTestnet } from "@stacks/network";
 import logo from "../velocity.svg";
 import "./SellToken.css";
 import * as constants from "../Constants";
 import LoadImage from "../Storage/LoadImage";
 
-const testnet = new StacksTestnet();
 const appConfig = new AppConfig(["store_write", "publish_data"]);
 const userSession = new UserSession({ appConfig });
 
@@ -24,20 +22,24 @@ function GetUserProfile() {
   return userSession.loadUserData().profile.stxAddress;
 }
 
-function SellToken() {
+function SellToken({ network }) {
   const [ownerTokens, setOwnerTokens] = useState(null);
 
   return (
     <div>
       <h1>Welcome to Token Trading Page</h1>
       <p>Here you can put your velocity for sale</p>
-      <PutVelocityForSale ownerTokens={ownerTokens} />
-      <GetOwnerNFTs ownerTokens={ownerTokens} setOwnerTokens={setOwnerTokens} />
+      <PutVelocityForSale ownerTokens={ownerTokens} network={network} />
+      <GetOwnerNFTs
+        ownerTokens={ownerTokens}
+        setOwnerTokens={setOwnerTokens}
+        network={network}
+      />
     </div>
   );
 }
 
-function GetOwnerNFTs({ ownerTokens, setOwnerTokens }) {
+function GetOwnerNFTs({ ownerTokens, setOwnerTokens, network }) {
   const profile = GetUserProfile();
   const ownerAddress = standardPrincipalCV(profile.testnet);
 
@@ -48,7 +50,7 @@ function GetOwnerNFTs({ ownerTokens, setOwnerTokens }) {
         contractName: constants.velocityContract,
         functionName: constants.getTokens,
         functionArgs: [ownerAddress],
-        network: testnet,
+        network,
         senderAddress: profile.testnet,
       };
       try {
@@ -81,7 +83,7 @@ function GetOwnerNFTs({ ownerTokens, setOwnerTokens }) {
   );
 }
 
-function PutVelocityForSale({ ownerTokens }) {
+function PutVelocityForSale({ ownerTokens, network }) {
   const profile = GetUserProfile();
   const [tokenId, setTokenId] = useState(0);
   const [tokenPrice, setTokenPrice] = useState(10000);
@@ -129,7 +131,7 @@ function PutVelocityForSale({ ownerTokens }) {
         name: constants.appName,
         icon: window.location.origin + logo,
       },
-      network: testnet,
+      network,
       userSession,
       postConditions: [standardNFTPostCondition],
       postConditionMode: PostConditionMode.Deny,

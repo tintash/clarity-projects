@@ -11,14 +11,12 @@ import {
   PostConditionMode,
   uintCV,
 } from "@stacks/transactions";
-import { StacksTestnet } from "@stacks/network";
 import "./BuyToken.css";
 import * as constants from "../Constants";
 import logo from "../velocity.svg";
 import BN from "bn.js";
 import MySpinner from "../My-Spinner/MySpinner";
 
-const testnet = new StacksTestnet();
 const appConfig = new AppConfig(["store_write", "publish_data"]);
 const userSession = new UserSession({ appConfig });
 
@@ -26,17 +24,17 @@ function GetUserProfile() {
   return userSession.loadUserData().profile.stxAddress;
 }
 
-function BuyToken() {
+function BuyToken({ network }) {
   return (
     <div>
       <h1>Welcome to Token Trading Page</h1>
       <p>Here you can buy velocity</p>
-      <GetNFTsForSale />
+      <GetNFTsForSale network={network} />
     </div>
   );
 }
 
-function GetNFTsForSale() {
+function GetNFTsForSale({ network }) {
   const profile = GetUserProfile();
   const [tokenId, setTokenId] = useState(0);
   const [tokenSeller, setTokenSeller] = useState("");
@@ -52,7 +50,7 @@ function GetNFTsForSale() {
       contractName: constants.velocityMarketContract,
       functionName: constants.getVelocityForSale,
       functionArgs: [uintCV(tokenId)],
-      network: testnet,
+      network,
       senderAddress: profile.testnet,
     };
 
@@ -111,6 +109,7 @@ function GetNFTsForSale() {
                 tokenId={tokenId}
                 tokenPrice={tokenPrice}
                 tokenSeller={tokenSeller}
+                network={network}
               />
             )}
           </div>
@@ -165,7 +164,7 @@ function BuyVelocity(props) {
         name: constants.appName,
         icon: window.location.origin + logo,
       },
-      network: testnet,
+      network: props.network,
       userSession,
       postConditions: [nftTransferPostCondition, stxPostCondition],
       postConditionMode: PostConditionMode.Deny,

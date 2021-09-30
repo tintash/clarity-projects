@@ -6,23 +6,28 @@ import Authentication from "./Authentication/Authentication";
 import Home from "./Home/Home";
 import SellToken from "./Token/SellToken";
 import BuyToken from "./Token/BuyToken.js";
-
+import { StacksTestnet, StacksMocknet } from "@stacks/network";
 // const HomeWithSpinner = WithSpinner(Home);
+const useMocknet = true;
 
 function App() {
   // const [loading, setLoading] = useState(true);
+  const network = useMocknet ? new StacksMocknet() : new StacksTestnet();
 
   return (
     <div className="App">
       <Router>
         <Switch>
           <Route exact path="/" component={Authentication} />
-          <Route path="/home" component={Home} />
-          {/* <Route path="/home" component={(props) => (
-            <HomeWithSpinner isLoading={loading} {...props} />
-          )} /> */}
-          <Route path="/sell-token" component={SellToken} />
-          <Route path="/buy-token" component={BuyToken} />
+          <Route path="/home">
+            <Home network={network} />
+          </Route>
+          <Route path="/sell-token">
+            <SellToken network={network} />
+          </Route>
+          <Route path="/buy-token">
+            <BuyToken network={network} />
+          </Route>
         </Switch>
       </Router>
     </div>

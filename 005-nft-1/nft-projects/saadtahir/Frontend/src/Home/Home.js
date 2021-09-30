@@ -9,19 +9,16 @@ import {
   cvToValue,
   standardPrincipalCV,
 } from "@stacks/transactions";
-import { StacksTestnet } from "@stacks/network";
 import MySpinner from "../My-Spinner/MySpinner";
 
 const appConfig = new AppConfig(["store_write", "publish_data"]);
 const userSession = new UserSession({ appConfig });
-const testnet = new StacksTestnet();
 
 function GetUserProfile() {
   return userSession.loadUserData().profile.stxAddress;
 }
 
-function Home(props) {
-  const state = props.location.state;
+function Home({ network }) {
   const [freeTokens, setFreeTokens] = useState(0);
   const [soldTokens, setSoldTokens] = useState(0);
   const profile = GetUserProfile();
@@ -35,7 +32,7 @@ function Home(props) {
       contractName: constants.velocityContract,
       functionName: funcName,
       functionArgs: funcName === constants.balanceOf ? [ownerAddress] : [],
-      network: testnet,
+      network: network,
       senderAddress: profile.testnet,
     };
   };
@@ -79,16 +76,23 @@ function Home(props) {
   return (
     <div>
       <h1>Welcome</h1>
-      <h4>Testnet: {state.testnet}</h4>
-      <h4>Mainnet: {state.mainnet}</h4>
+      <h4>Testnet: {profile.testnet}</h4>
+      <h4>Mainnet: {profile.mainnet}</h4>
       <button className="logout" onClick={handleLogout}>
         Logout
       </button>
       {loading ? null : (
-        <GetTotalTokens ownerTokenBalance={ownerTokenBalance} />
+        <GetTotalTokens
+          ownerTokenBalance={ownerTokenBalance}
+          network={network}
+        />
       )}
-      {loading ? <MySpinner /> : <GetLastTokenId soldTokens={soldTokens} />}
-      {loading ? null : <Claim freeTokens={freeTokens} />}
+      {loading ? (
+        <MySpinner />
+      ) : (
+        <GetLastTokenId soldTokens={soldTokens} network={network} />
+      )}
+      {loading ? null : <Claim freeTokens={freeTokens} network={network} />}
       <br />
       <SellTokens />
       <br />
