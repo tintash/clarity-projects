@@ -37,5 +37,5 @@ yarn start
 4. Add contract readonly functions in [refer-reward.ts](/src/store/refer-reward.ts)
 
 #### Issues 
-1. loading symbol issue 
+1. loading spinner on refer and transaction buttons
 2. Responsiveness 

@@ -1,8 +1,11 @@
 import React, { useCallback } from "react";
 import { toast } from "react-hot-toast";
 import { atom, useAtom } from "jotai";
-// import { useLoading } from "./use-loading"; -- TODO: useLoading not working properly here
 import { useConnect } from "@stacks/connect-react";
+import { principalCV } from "@stacks/transactions/dist/clarity/types/principalCV";
+import { stringAsciiCV } from "@stacks/transactions";
+
+import { useLoading } from "./use-loading"; 
 import { useNetwork } from "./use-network";
 import { useCurrentAddress } from "./use-current-address";
 import {
@@ -10,8 +13,7 @@ import {
   REFER_REWARD_CONTRACT,
   RR_PERFORM_TRANSACTION,
 } from "../constants";
-import { principalCV } from "@stacks/transactions/dist/clarity/types/principalCV";
-import { stringAsciiCV } from "@stacks/transactions";
+import { LOADING_KEYS } from "../../store/ui";
 
 export const userPrincipalAtom = atom("");
 export const userEmailAtom = atom("");
@@ -53,7 +55,7 @@ export function useUserEmailForm() {
 export function useReferUserButton() {
   const address = useCurrentAddress();
   const [contractAddress, contractName] = REFER_REWARD_CONTRACT.split(".");
-  // const { setIsLoading } = useLoading(LOADING_KEYS.AUTH);
+  const { setIsLoading } = useLoading(LOADING_KEYS.REFER);
   const { doContractCall } = useConnect();
 
   // const
@@ -61,13 +63,13 @@ export function useReferUserButton() {
 
   const onCancel = useCallback(() => {
     toast.error("Cancelled!");
-    // void setIsLoading(false);
-  }, [toast]);
+    void setIsLoading(false);
+  }, [toast, setIsLoading]);
 
   const onFinish = useCallback(() => {
     toast.success("Transaction sent!");
-    // void setIsLoading(false);
-  }, [toast]);
+    void setIsLoading(false);
+  }, [toast, setIsLoading]);
 
   return useCallback(
     (userAddress: string, email: string) => {
@@ -77,8 +79,23 @@ export function useReferUserButton() {
         return null;
       }
       
-      if ((userAddress.length != address.length) || (!userAddress.startsWith("ST"))) {
-        toast.error("invalid principal!");
+      if ((!userAddress.startsWith("SP")) && (!userAddress.startsWith("ST"))) {
+        toast.error("invalid principal value!");
+        console.log (userAddress, userAddress.length);
+        return null;
+      }
+
+      if (userAddress.length >= 128) {
+        toast.error("invalid principal length");
+        console.log (userAddress, userAddress.length);
+        return null;
+      }
+
+      // verify principal conversion
+      try {
+        principalCV(userAddress || "");
+      } catch (error) {
+        toast.error("invalid principal value!");
         return null;
       }
 
@@ -87,7 +104,7 @@ export function useReferUserButton() {
         toast.error("invalid email");
         return null;
       }
-      // void setIsLoading(true);
+      void setIsLoading(true);
 
       void doContractCall({
         contractAddress,
@@ -106,24 +123,23 @@ export function useReferUserButton() {
 export function usePerformTransaction() {
   const address = useCurrentAddress();
   const [contractAddress, contractName] = REFER_REWARD_CONTRACT.split(".");
-  // const { setIsLoading } = useLoading(LOADING_KEYS.AUTH);
+  const { setIsLoading } = useLoading(LOADING_KEYS.REFER);
   const { doContractCall } = useConnect();
 
-  // const
   const network = useNetwork();
 
   const onCancel = useCallback(() => {
     toast.error("Cancelled!");
-    // void setIsLoading(false);
-  }, [toast]);
+    void setIsLoading(false);
+  }, [toast, setIsLoading]);
 
   const onFinish = useCallback(() => {
     toast.success("Transaction sent!");
-    // void setIsLoading(false);
-  }, [toast]);
+    void setIsLoading(false);
+  }, [toast, setIsLoading]);
 
   return useCallback(() => {
-    // void setIsLoading(true);
+    void setIsLoading(true);
 
     void doContractCall({
       contractAddress,

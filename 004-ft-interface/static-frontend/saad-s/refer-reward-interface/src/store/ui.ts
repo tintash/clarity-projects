@@ -4,6 +4,7 @@ import { StacksMainnet, StacksTestnet } from "@stacks/network";
 
 export enum LOADING_KEYS {
   AUTH = "loading/AUTH",
+  REFER = "loading/REFER",
 }
 
 export const loadingAtom = atomFamily((key) => atom(false));

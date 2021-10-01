@@ -54,7 +54,7 @@ const UserPrincipal: React.FC = () => {
         resize="none"
         border={0}
         outline={0}
-        placeholder="'ST1234..."
+        placeholder="ST1234..."
         width="100%"
         fontSize="17px"
         p="tight"
@@ -96,7 +96,7 @@ const UserEmail: React.FC = () => {
 };
 
 const SignedInView: React.FC = () => {
-  const { isLoading } = useLoading(LOADING_KEYS.AUTH);
+  const { isLoading } = useLoading(LOADING_KEYS.REFER);
   const handleReferUserSend = useReferUserButton();
   const handleCompleteTransaction = usePerformTransaction();
   const { principalValue } = useUserPrincipalForm();
