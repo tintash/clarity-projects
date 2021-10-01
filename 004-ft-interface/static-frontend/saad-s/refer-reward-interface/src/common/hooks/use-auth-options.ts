@@ -1,10 +1,11 @@
+import { useCallback } from "react";
+import { FinishedAuthData } from "@stacks/connect-react";
+import { AuthOptions } from "@stacks/connect";
+
 import { useUserSession } from "./use-usersession";
 import { useLoading } from "./use-loading";
 import { LOADING_KEYS } from "../../store/ui";
 import { useUser } from "./use-user";
-import { useCallback } from "react";
-import { FinishedAuthData } from "@stacks/connect-react";
-import { AuthOptions } from "@stacks/connect";
 
 export function useAuthOptions() {
   const userSession = useUserSession();

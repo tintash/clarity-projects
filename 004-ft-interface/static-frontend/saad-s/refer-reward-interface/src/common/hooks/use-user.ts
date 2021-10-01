@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai';
-import { userAtom } from '../../store/auth';
 import { UserData } from '@stacks/auth';
+import { userAtom } from '../../store/auth';
 
 export function useUser() {
   const [user, setUser] = useAtom<UserData | undefined, UserData | undefined>(userAtom);

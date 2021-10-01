@@ -1,4 +1,9 @@
 import { atom } from "jotai";
+import { atomFamily } from "jotai/utils";
+import { atomWithQuery } from "jotai/query";
+import { cvToHex, cvToString, hexToCV } from "@stacks/transactions";
+import { principalCV } from "@stacks/transactions/dist/clarity/types/principalCV";
+
 import { smartContractsClientAtom } from "./api";
 import {
   REFER_REWARD_CONTRACT,
@@ -8,10 +13,6 @@ import {
   RR_TOKEN_SUPPLY,
   RR_TOKEN_URI,
 } from "../common/constants";
-import { principalCV } from "@stacks/transactions/dist/clarity/types/principalCV";
-import { cvToHex, cvToString, hexToCV } from "@stacks/transactions";
-import { atomWithQuery } from "jotai/query";
-import { atomFamily } from "jotai/utils";
 
 export const incrementAtom = atom(0);
 
@@ -67,7 +68,6 @@ export const tokenNameAtom = atomFamily(() =>
         },
       });
       if (data.okay && data.result) {
-        console.log(data.result);
         return cvToString(hexToCV(data.result))
           .replace("(ok ", "")
           .replace(")", "");
@@ -94,7 +94,6 @@ export const tokenSymbolAtom = atomFamily(() =>
         },
       });
       if (data.okay && data.result) {
-        console.log(data.result);
         return cvToString(hexToCV(data.result))
           .replace("(ok ", "")
           .replace(")", "");
@@ -121,7 +120,6 @@ export const tokenDecimalAtom = atomFamily(() =>
         },
       });
       if (data.okay && data.result) {
-        console.log(data.result);
         return cvToString(hexToCV(data.result))
           .replace("(ok ", "")
           .replace(")", "");
@@ -148,7 +146,6 @@ export const tokenTotalSupplyAtom = atomFamily(() =>
         },
       });
       if (data.okay && data.result) {
-        console.log(data.result);
         return cvToString(hexToCV(data.result))
           .replace("(ok ", "")
           .replace(")", "");
@@ -175,7 +172,6 @@ export const tokenURIAtom = atomFamily(() =>
         },
       });
       if (data.okay && data.result) {
-        console.log(data.result);
         return cvToString(hexToCV(data.result))
           .replace("(ok (some u", "")
           .replace("))", "");

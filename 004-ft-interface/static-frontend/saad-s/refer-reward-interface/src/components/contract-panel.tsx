@@ -1,9 +1,10 @@
 import React, { memo } from "react";
-import Textarea from "react-textarea-autosize";
+import { useAtom } from "jotai";
 import { Stack, Box, color, Button } from "@stacks/ui";
+
+import Textarea from "react-textarea-autosize";
 import { Caption, Text } from "./typography";
 import { border } from "../common/utils";
-import { useAtom } from "jotai";
 import { userAtom } from "../store/auth";
 import { AiOutlineDisconnect } from "react-icons/ai";
 import { useLoading } from "../common/hooks/use-loading";

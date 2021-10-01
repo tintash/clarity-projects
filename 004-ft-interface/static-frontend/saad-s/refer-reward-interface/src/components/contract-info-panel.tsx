@@ -1,8 +1,9 @@
 import React, { memo } from "react";
+import { useAtom } from "jotai";
 import { Stack, StackProps, Flex, Spinner } from "@stacks/ui";
+
 import { Title, Text, Caption } from "./typography";
 import { border } from "../common/utils";
-import { useAtom } from "jotai";
 import { userAtom } from "../store/auth";
 import { useGetTokenName } from "../common/hooks/use-get-token-name";
 import { useGetTokenSymbol } from "../common/hooks/use-get-token-symbol";

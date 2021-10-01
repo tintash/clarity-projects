@@ -1,6 +1,7 @@
 import React, { memo, useCallback } from "react";
 import { useAtom } from "jotai";
 import { Text, Stack } from "@stacks/ui";
+
 import { Button } from "./button";
 import { userAtom } from "../store/auth";
 import { useUser } from "../common/hooks/use-user";

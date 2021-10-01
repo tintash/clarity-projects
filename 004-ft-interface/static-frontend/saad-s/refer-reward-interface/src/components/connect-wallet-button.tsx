@@ -1,10 +1,10 @@
 import React from "react";
-import { Button } from "./button";
 import { useConnect } from "@stacks/connect-react";
-import { ButtonProps } from "@stacks/ui";
+import { Stack, ButtonProps } from "@stacks/ui";
+
 import { useLoading } from "../common/hooks/use-loading";
+import { Button } from "./button";
 import { LOADING_KEYS } from "../store/ui";
-import { Stack } from "@stacks/ui";
 
 export const ConnectWalletButton: React.FC<ButtonProps> = (props) => {
   const { doOpenAuth } = useConnect();

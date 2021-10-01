@@ -87,8 +87,6 @@ export function useReferUserButton() {
         toast.error("invalid email");
         return null;
       }
-      
-      console.log(userAddress, email);
       // void setIsLoading(true);
 
       void doContractCall({
@@ -125,7 +123,6 @@ export function usePerformTransaction() {
   }, [toast]);
 
   return useCallback(() => {
-    console.log("performing trasaction");
     // void setIsLoading(true);
 
     void doContractCall({

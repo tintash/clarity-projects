@@ -1,9 +1,10 @@
 import React, { memo } from "react";
 import { Toaster } from 'react-hot-toast';
-import "../App.css";
-import { useAuthOptions } from "../common/hooks/use-auth-options";
 import { ThemeProvider, ColorModeProvider, Flex, color } from "@stacks/ui";
 import { Connect } from "@stacks/connect-react";
+import "../App.css";
+
+import { useAuthOptions } from "../common/hooks/use-auth-options";
 import { ContractInfoPanel } from "./contract-info-panel";
 import { Header } from "./header";
 import { ContractPanel } from "./contract-panel";
