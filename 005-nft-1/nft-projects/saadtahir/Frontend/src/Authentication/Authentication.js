@@ -65,6 +65,15 @@ function Authentication() {
       <button className="login" onClick={handleLogin}>
         Login
       </button>
+      <br />
+      <br />
+      <i>
+        Note: You need a hiro wallet extension to login. Download it from{" "}
+        <a href="https://www.hiro.so/wallet/install-web">here</a>
+        <br />
+        You might also need to get STX from faucet on Testnet network. Get it
+        from <a href="https://explorer.stacks.co/sandbox/faucet">here</a>
+      </i>
     </div>
   );
 }

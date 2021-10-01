@@ -8,7 +8,7 @@ import SellToken from "./Token/SellToken";
 import BuyToken from "./Token/BuyToken.js";
 import { StacksTestnet, StacksMocknet } from "@stacks/network";
 // const HomeWithSpinner = WithSpinner(Home);
-const useMocknet = true;
+const useMocknet = false;
 
 function App() {
   // const [loading, setLoading] = useState(true);
