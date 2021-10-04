@@ -1,0 +1,66 @@
+@import '../../styles/Colors.scss';
+
+.outter-container {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-image: url('../../images/background.png');
+  background-size: cover;
+  display: flex;
+  align-items: center;
+
+  .content-container {
+    margin-left: 4rem;
+    background: white;
+    border-radius: 1.25rem;
+    box-shadow: 2px 2px 6px #888888;
+
+    .text-container {
+      margin: 3rem 10rem 3rem 3rem;
+
+      h2 {
+        margin: 0;
+        font-family: 'Montserrat';
+        font-size: 2rem;
+        color: $colorRegularText;
+        cursor: default;
+      }
+
+      h1 {
+        margin: 0;
+        font-family: 'Fredoka One';
+        font-size: 5rem;
+        font-weight: 500;
+        cursor: default;
+        color: transparent;
+        background: url('../../images/plainBackground.jpg');
+        background-size: 100%;
+        background-clip: text;
+        transition: all 0.2s;
+
+        &:hover {
+          letter-spacing: 0.3rem;
+        }
+      }
+
+      p {
+        margin: 1rem 0 0 0;
+        font-family: 'Montserrat';
+        font-size: 1.5rem;
+        color: $colorRegularText;
+        cursor: default;
+
+        span {
+          font-weight: bold;
+          color: $colorFocusText;
+        }
+      }
+    }
+
+    .button-container {
+      margin-bottom: 3rem;
+      display: flex;
+      justify-content: center;
+    }
+  }
+}
