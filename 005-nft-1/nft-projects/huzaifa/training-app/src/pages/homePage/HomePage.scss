@@ -12,7 +12,6 @@
     height: 100vh;
     display: flex;
     align-items: center;
-    // background: goldenrod;
 
     .profile-container {
       padding: 8rem 16rem;
@@ -53,24 +52,30 @@
     }
   }
 
-  // .section-action {
-  //   display: flex;
-  //   align-items: center;
-  //   justify-content: center;
-  //   background: greenyellow;
+  .section-action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
-  //   .buy-card {
-  //     width: 100px;
-  //     height: 100px;
-  //     display: flex;
-  //     flex-direction: column;
-  //     // background: url('../../images/buy.jpg');
-  //     // background-size: cover;
+    .section-action-heading {
+      margin: 0;
+      font-family: 'Montserrat';
+      font-size: 4rem;
+      color: $colorRegularText;
+      margin-bottom: 4rem;
+      cursor: default;
 
-  //     .buy-image {
-  //       width: 100px;
-  //       height: 100px;
-  //     }
-  //   }
-  // }
+      span {
+        color: $colorFocusText;
+      }
+    }
+
+    .action-cards {
+      width: 100vw;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      margin-bottom: 8rem;
+    }
+  }
 }

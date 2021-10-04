@@ -1,7 +1,9 @@
 import { useState } from 'react';
 
 import NavBar from '../../components/NavBar/NavBar';
+import ActionCard from '../../components/action-card/ActionCard';
 import CustomButton from '../../components/custom-button/CustomButton';
+import myImage from '../../images/buy.jpg';
 import './HomePage.scss';
 
 const HomePage = () => {
@@ -34,11 +36,21 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-      {/* <section className="section-action">
-        <div className="buy-card">
-          <img src="../../images/buy.jpg" alt="" className="buy-image" />
+      <section className="section-action">
+        <h1 className="section-action-heading">
+          Deal your
+          {' '}
+          <span>Velocity Tokens</span>
+          {' '}
+          today
+        </h1>
+        <div className="action-cards">
+          <ActionCard actionType="Claim" />
+          <ActionCard actionType="Buy" />
+          <ActionCard actionType="Sell" />
         </div>
-      </section> */}
+
+      </section>
     </div>
   );
 };
