@@ -1,0 +1,54 @@
+@import '../../styles/Colors.scss';
+
+.footer {
+  padding: 2rem 4rem;
+  background-color: white;
+
+  .footer-nav {
+    margin: 0 0 2rem 0;
+    list-style: none;
+    display: flex;
+    justify-content: center;
+
+    .footer-item {
+      margin-right: 2rem;
+
+      .footer-link {
+        font-family: 'Montserrat';
+        color: $colorRegularText;
+        text-decoration: none;
+        transition: all 0.3s;
+
+        &:hover {
+          color: $colorFocusText;
+        }
+      }
+    }
+  }
+
+  .footer-logo {
+    margin: 0 auto 4rem auto;
+    height: 4rem;
+    width: 4rem;
+    display: block;
+    transition: all 0.3s;
+
+    &:hover {
+      transform: scale(1.2);
+      color: $colorFocusText;
+      cursor: pointer;
+    }
+  }
+
+  .footer-copyright {
+    font-family: 'Montserrat';
+    color: $colorRegularText;
+    text-align: center;
+
+    .linkedin-link {
+      font-family: 'Montserrat';
+      color: $colorFocusText;
+      text-decoration: none;
+    }
+  }
+}

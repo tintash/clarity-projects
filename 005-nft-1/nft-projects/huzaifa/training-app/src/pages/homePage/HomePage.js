@@ -1,14 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import NavBar from '../../components/NavBar/NavBar';
 import ActionCard from '../../components/action-card/ActionCard';
 import CustomButton from '../../components/custom-button/CustomButton';
-import myImage from '../../images/buy.jpg';
+import Footer from '../../components/footer/Footer';
+import { YOU_OWN_TEXT, BECOME_OWNER_TEXT } from '../../styles/Strings';
 import './HomePage.scss';
 
 const HomePage = () => {
+  const [isVisible, setIsVisible] = useState(false);
   const [selected, setSelected] = useState(false);
-  const [isOwner, setIsOwner] = useState(false);
+  const [isOwner, setIsOwner] = useState(true);
+
+  const listenToScroll = () => {
+    const heightToShowFrom = 100;
+    const winScroll = document.body.scrollTop
+        || document.documentElement.scrollTop;
+
+    if (winScroll > heightToShowFrom) {
+      setIsVisible(true);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', listenToScroll);
+    return () =>
+      window.removeEventListener('scroll', listenToScroll);
+  }, []);
 
   const handleProfileClick = () => {
     setSelected(!selected);
@@ -24,19 +42,16 @@ const HomePage = () => {
             <span>owner</span>
           </h1>
           <p className="profile-container-text">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Culpa ipsam
-            asperiores dolores, aliquid dolor impedit nam recusandae vero assumenda
-            sed architecto similique, laboriosam, debitis error. Sunt laborum
-            tempore eum sit.
+            {isOwner ? YOU_OWN_TEXT : BECOME_OWNER_TEXT}
           </p>
           <div className="profile-container-button">
             <CustomButton onClick={handleProfileClick} selected={selected}>
-              Check Profile &gt;
+              My Profile &gt;
             </CustomButton>
           </div>
         </div>
       </section>
-      <section className="section-action">
+      <section className={`section-action ${isVisible ? ' fade-in-move-up' : 'invisible'}`}>
         <h1 className="section-action-heading">
           Deal your
           {' '}
@@ -51,6 +66,7 @@ const HomePage = () => {
         </div>
 
       </section>
+      <Footer />
     </div>
   );
 };

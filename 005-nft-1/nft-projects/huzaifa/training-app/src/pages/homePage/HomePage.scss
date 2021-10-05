@@ -52,6 +52,9 @@
     }
   }
 
+  .invisible {
+    visibility: hidden;
+  }
   .section-action {
     display: flex;
     flex-direction: column;
