@@ -1,0 +1,81 @@
+@import '../../styles/Colors.scss';
+
+.home-outter-container {
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  background: $colorSecondary;
+  flex-direction: column;
+
+  .section-profile {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+
+    .profile-container {
+      padding: 8rem 16rem;
+      margin: 0 4rem;
+      border-radius: 1.25rem;
+      background: url('../../images/plainBackground.jpg');
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      .profile-container-heading {
+        margin: 0 0 2rem 0;
+        font-family: 'Montserrat';
+        font-size: 8rem;
+        text-align: center;
+        color: rgb(240, 240, 240);
+        cursor: default;
+
+        span {
+          color: $colorFocusText;
+        }
+      }
+
+      .profile-container-text {
+        margin: 0 0 4rem 0;
+        font-family: 'Montserrat';
+        font-size: 1.5rem;
+        text-align: center;
+        color: $colorRegularText;
+        cursor: default;
+      }
+
+      .profile-container-button {
+        margin: 0;
+      }
+    }
+  }
+
+  .section-action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .section-action-heading {
+      margin: 0;
+      font-family: 'Montserrat';
+      font-size: 4rem;
+      color: $colorRegularText;
+      margin-bottom: 4rem;
+      cursor: default;
+
+      span {
+        color: $colorFocusText;
+      }
+    }
+
+    .action-cards {
+      width: 100vw;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      margin-bottom: 8rem;
+    }
+  }
+}
