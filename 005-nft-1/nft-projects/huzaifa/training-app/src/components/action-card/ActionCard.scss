@@ -1,0 +1,40 @@
+@import '../../styles/Colors.scss';
+
+.card-container {
+  width: 22rem;
+  padding: 0 2rem 2rem 2rem;
+  box-shadow: 2px 2px 6px #888888;
+  border-radius: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: white;
+
+  &:hover {
+    .card-image {
+      opacity: 0.7;
+    }
+  }
+
+  .card-image {
+    width: 22rem;
+    height: 18rem;
+    object-fit: cover;
+    border-radius: 1.25rem 1.25rem 0 0;
+    transition: all 0.3s;
+  }
+
+  .card-heading {
+    margin: 2rem 0 1rem 0;
+    font-family: 'Montserrat';
+    color: $colorFocusText;
+    cursor: default;
+  }
+
+  .card-text {
+    margin: 0 0 1rem 0;
+    font-family: 'Montserrat';
+    color: $colorRegularText;
+    cursor: default;
+  }
+}
