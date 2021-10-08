@@ -1,0 +1,59 @@
+@import '../../styles/Colors.scss';
+
+.sell-outer-container {
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  background-image: url('../../images/plainBackground.jpg');
+
+  .sell-container {
+    width: 100vw;
+    height: 100vh;
+    padding: 2rem 4rem;
+    overflow: hidden;
+
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+
+    .sell-info-container {
+      flex: 1.5;
+      padding: 1rem 2rem;
+      margin-right: 4rem;
+      box-shadow: 2px 2px 6px #888888;
+      border-radius: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: white;
+
+      .sell-heading {
+        margin: 0 0 2rem 0;
+        font-family: 'Montserrat';
+        color: $colorFocusText;
+        cursor: default;
+      }
+    }
+
+    .sell-tokens-container {
+      flex: 2.5;
+      width: 26rem;
+      height: 80%;
+      padding: 1rem 2rem;
+      box-shadow: 2px 2px 6px #888888;
+      border-radius: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: white;
+
+      .sell-tokens-heading {
+        margin: 0 0 2rem 0;
+        font-family: 'Montserrat';
+        color: $colorFocusText;
+        cursor: default;
+      }
+    }
+  }
+}

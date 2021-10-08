@@ -1,16 +1,20 @@
 import { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 
 import CustomButton from '../custom-button/CustomButton';
 import buyImage from '../../images/buy.jpg';
 import claimImage from '../../images/claim.jpg';
 import sellImage from '../../images/sell.jpg';
+import { BUY_CARD_TEXT, SELL_CARD_TEXT, CLAIM_CARD_TEXT } from '../../styles/Strings';
 import './ActionCard.scss';
 
 const ActionCard = ({ actionType }) => {
   const [isSelected, setIsSelected] = useState(false);
+  const history = useHistory();
 
   const clickHandler = () => {
     setIsSelected(!isSelected);
+    actionType === 'Buy' ? history.push('/buy') : actionType === 'Claim' ? history.push('/claim') : history.push('/sell');
   };
 
   return (
@@ -23,7 +27,7 @@ const ActionCard = ({ actionType }) => {
       </h1>
       <p className="card-text">
         {
-            actionType === 'Buy' ? 'Purchase your own unique velocity NFT. The procedure is simple, click below and become an owner of a one of a kind velocity NFT.' : actionType === 'Sell' ? 'Put your velocity NFTs for sale. Intersted buyers can then pay you the desired amount and become owners of your NFT.' : 'The first 1000 Velocity NFTs are absolutely free! You can hurry up and claim your NFTs and become part of our community!'
+            actionType === 'Buy' ? BUY_CARD_TEXT : actionType === 'Sell' ? SELL_CARD_TEXT : CLAIM_CARD_TEXT
         }
       </p>
       <CustomButton selected={isSelected} onClick={clickHandler}>{actionType}</CustomButton>

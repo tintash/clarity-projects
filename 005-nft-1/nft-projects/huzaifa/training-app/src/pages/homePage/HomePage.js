@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 
 import NavBar from '../../components/NavBar/NavBar';
 import ActionCard from '../../components/action-card/ActionCard';
@@ -11,9 +12,10 @@ const HomePage = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [selected, setSelected] = useState(false);
   const [isOwner, setIsOwner] = useState(true);
+  const history = useHistory();
 
   const listenToScroll = () => {
-    const heightToShowFrom = 100;
+    const heightToShowFrom = 50;
     const winScroll = document.body.scrollTop
         || document.documentElement.scrollTop;
 
@@ -23,6 +25,8 @@ const HomePage = () => {
   };
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+
     window.addEventListener('scroll', listenToScroll);
     return () =>
       window.removeEventListener('scroll', listenToScroll);
@@ -30,6 +34,7 @@ const HomePage = () => {
 
   const handleProfileClick = () => {
     setSelected(!selected);
+    history.push('/profile');
   };
   return (
     <div className="home-outter-container">
@@ -51,15 +56,15 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-      <section className={`section-action ${isVisible ? ' fade-in-move-up' : 'invisible'}`}>
-        <h1 className="section-action-heading">
+      <section className="section-action">
+        <h1 className={`section-action-heading ${isVisible ? ' fade-in' : 'invisible'}`}>
           Deal your
           {' '}
           <span>Velocity Tokens</span>
           {' '}
           today
         </h1>
-        <div className="action-cards">
+        <div className={`action-cards ${isVisible ? ' fade-in' : 'invisible'}`}>
           <ActionCard actionType="Claim" />
           <ActionCard actionType="Buy" />
           <ActionCard actionType="Sell" />

@@ -27,17 +27,11 @@
   }
 
   .footer-logo {
-    margin: 0 auto 4rem auto;
+    margin: 0 auto 2rem auto;
     height: 4rem;
     width: 4rem;
     display: block;
-    transition: all 0.3s;
-
-    &:hover {
-      transform: scale(1.2);
-      color: $colorFocusText;
-      cursor: pointer;
-    }
+    color: $colorFocusText;
   }
 
   .footer-copyright {
