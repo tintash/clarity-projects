@@ -34,6 +34,72 @@
         color: $colorFocusText;
         cursor: default;
       }
+
+      .selling-form {
+        width: 80%;
+        display: flex;
+        flex-direction: column;
+
+        .form-row {
+          margin: 0.5rem 0;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          transition: all 0.3s;
+
+          &:hover {
+            transform: scale(1.05);
+            cursor: default;
+          }
+
+          select {
+            width: 11rem;
+            height: 2rem;
+            font-family: 'Montserrat';
+            font-size: 0.9rem;
+            color: $colorRegularText;
+            border-radius: 0.3rem;
+            border: none;
+            outline: none;
+            background: $colorSecondary;
+
+            &:focus {
+              border: solid 1.5px $colorPrimary;
+            }
+          }
+
+          input {
+            width: 11rem;
+            font-family: 'Montserrat';
+            height: 2rem;
+            border-radius: 0.3rem;
+            border: none;
+            outline: none;
+            margin-left: 20px;
+            font-size: 0.9rem;
+            background: $colorSecondary;
+
+            &:focus {
+              border: solid 1.5px $colorPrimary;
+            }
+          }
+
+          .form-label {
+            margin: 0;
+            font-family: 'Montserrat';
+            font-weight: bolder;
+            color: $colorFocusText;
+            cursor: default;
+          }
+        }
+
+        .sell-button {
+          margin-top: 1rem;
+          width: 100%;
+          display: flex;
+          justify-content: center;
+        }
+      }
     }
 
     .sell-tokens-container {
