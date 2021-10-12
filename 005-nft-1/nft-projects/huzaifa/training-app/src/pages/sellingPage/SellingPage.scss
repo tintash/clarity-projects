@@ -104,7 +104,6 @@
 
     .sell-tokens-container {
       flex: 2.5;
-      width: 26rem;
       height: 80%;
       padding: 1rem 2rem;
       box-shadow: 2px 2px 6px #888888;
@@ -119,6 +118,15 @@
         font-family: 'Montserrat';
         color: $colorFocusText;
         cursor: default;
+      }
+
+      .sell-token-cards-container {
+        width: 100%;
+        height: 100%;
+        overflow-y: scroll;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
       }
     }
   }

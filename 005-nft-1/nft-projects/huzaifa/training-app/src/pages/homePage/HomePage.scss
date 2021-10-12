@@ -4,7 +4,8 @@
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
-  background: $colorSecondary;
+  background: url('../../images/BackgroundHome.png');
+  background-size: cover;
   flex-direction: column;
 
   .section-profile {
@@ -63,7 +64,7 @@
     .section-action-heading {
       margin: 0;
       font-family: 'Montserrat';
-      font-size: 4rem;
+      font-size: 4.5rem;
       color: $colorRegularText;
       margin-bottom: 4rem;
       cursor: default;

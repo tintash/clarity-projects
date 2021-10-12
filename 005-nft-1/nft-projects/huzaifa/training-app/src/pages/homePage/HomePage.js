@@ -8,6 +8,8 @@ import Footer from '../../components/footer/Footer';
 import { YOU_OWN_TEXT, BECOME_OWNER_TEXT } from '../../styles/Strings';
 import './HomePage.scss';
 
+import tokens from '../../tokens';
+
 const HomePage = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [selected, setSelected] = useState(false);

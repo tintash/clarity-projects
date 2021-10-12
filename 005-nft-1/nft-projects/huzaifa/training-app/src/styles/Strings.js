@@ -7,3 +7,5 @@ export const BUY_CARD_TEXT = 'Purchase unique velocity NFT. The procedure is sim
 export const SELL_CARD_TEXT = 'Put your velocity NFTs for sale. Intersted buyers can then pay you the desired amount and become owners of your NFT.';
 
 export const CLAIM_CARD_TEXT = 'The first 1000 Velocity NFTs are absolutely free! You can hurry up and claim your NFTs and become part of our community!';
+
+export const BUY_INFO_TEXT = 'Tap on any token to check the seller and purchase the token';

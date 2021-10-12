@@ -3,6 +3,8 @@ import { useEffect } from 'react';
 import Table from '../../components/table/Table';
 import NavBar from '../../components/NavBar/NavBar';
 import Footer from '../../components/footer/Footer';
+import TokenCard from '../../components/token-card/TokenCard';
+import tokens from '../../tokens';
 import { INFO_TABLE_LABELS, INFO_TABLE_VALUES } from '../../constants';
 import { getUserData } from '../../auth';
 
@@ -28,6 +30,17 @@ const ProfilePage = () => {
         </div>
         <div className="info-tokens-container fade-in">
           <h1 className="info-tokens-heading">Tokens Purchased</h1>
+          <div className="info-token-cards-container">
+            {
+              tokens.map((token) => (
+                <TokenCard
+                  tokenImage={token.image}
+                  tokenID={token.id}
+                  clickable={false}
+                />
+              ))
+            }
+          </div>
         </div>
       </div>
       <Footer />

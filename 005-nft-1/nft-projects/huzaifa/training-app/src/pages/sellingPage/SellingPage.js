@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import NavBar from '../../components/NavBar/NavBar';
 import Footer from '../../components/footer/Footer';
 import CustomButton from '../../components/custom-button/CustomButton';
+import TokenCard from '../../components/token-card/TokenCard';
+import tokens from '../../tokens';
 import { getUserData } from '../../auth';
 
 import './SellingPage.scss';
@@ -65,7 +67,18 @@ const SellingPage = () => {
           </form>
         </div>
         <div className="sell-tokens-container fade-in">
-          <h1 className="sell-tokens-heading">Tokens up for sale</h1>
+          <h1 className="sell-tokens-heading">My tokens for sale</h1>
+          <div className="sell-token-cards-container">
+            {
+              tokens.map((token) => (
+                <TokenCard
+                  tokenImage={token.image}
+                  tokenID={token.id}
+                  clickable={false}
+                />
+              ))
+            }
+          </div>
         </div>
       </div>
       <Footer />
