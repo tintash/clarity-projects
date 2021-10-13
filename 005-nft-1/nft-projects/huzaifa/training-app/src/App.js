@@ -18,27 +18,27 @@ function App() {
           exact
           path="/"
           connected={userSession.isUserSignedIn()}
-          component={() => <ConnectPage />}
+          component={ConnectPage}
         />
         <PrivateRoute
           path="/home"
           connected={userSession.isUserSignedIn()}
-          component={() => <HomePage />}
+          component={HomePage}
         />
         <PrivateRoute
           path="/profile"
           connected={userSession.isUserSignedIn()}
-          component={() => <ProfilePage />}
+          component={ProfilePage}
         />
         <PrivateRoute
           path="/sell"
           connected={userSession.isUserSignedIn()}
-          component={() => <SellingPage />}
+          component={SellingPage}
         />
         <PrivateRoute
           path="/buy"
           connected={userSession.isUserSignedIn()}
-          component={() => <BuyingPage />}
+          component={BuyingPage}
         />
       </Switch>
     </div>
