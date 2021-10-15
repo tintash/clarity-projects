@@ -5,6 +5,7 @@ import CustomButton from '../custom-button/CustomButton';
 import buyImage from '../../images/buy.jpg';
 import claimImage from '../../images/claim.jpg';
 import sellImage from '../../images/sell.jpg';
+import { claimTokens } from '../../helperFunctions';
 import { BUY_CARD_TEXT, SELL_CARD_TEXT, CLAIM_CARD_TEXT } from '../../styles/Strings';
 import './ActionCard.scss';
 
@@ -12,9 +13,13 @@ const ActionCard = ({ actionType }) => {
   const [isSelected, setIsSelected] = useState(false);
   const history = useHistory();
 
+  const handleClaim = async () => {
+    await claimTokens(setIsSelected);
+  };
+
   const clickHandler = () => {
     setIsSelected(!isSelected);
-    actionType === 'Buy' ? history.push('/buy') : actionType === 'Claim' ? history.push('/claim') : history.push('/sell');
+    actionType === 'Buy' ? history.push('/buy') : actionType === 'Claim' ? handleClaim() : history.push('/sell');
   };
 
   return (

@@ -9,3 +9,7 @@ export const SELL_CARD_TEXT = 'Put your velocity NFTs for sale. Intersted buyers
 export const CLAIM_CARD_TEXT = 'The first 1000 Velocity NFTs are absolutely free! You can hurry up and claim your NFTs and become part of our community!';
 
 export const BUY_INFO_TEXT = 'Tap on any token to check the seller and purchase the token';
+
+export const BUY_OWN_TOKEN_TEXT = 'You can not purchase your own token';
+
+export const CAN_NOT_BUY_TEXT = 'This token is not for sale currently';

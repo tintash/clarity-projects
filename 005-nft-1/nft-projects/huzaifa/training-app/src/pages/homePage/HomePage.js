@@ -5,17 +5,28 @@ import NavBar from '../../components/NavBar/NavBar';
 import ActionCard from '../../components/action-card/ActionCard';
 import CustomButton from '../../components/custom-button/CustomButton';
 import Footer from '../../components/footer/Footer';
+import { checkUserTokens, checkFreeTokens } from '../../helperFunctions';
 import { YOU_OWN_TEXT, BECOME_OWNER_TEXT } from '../../styles/Strings';
 import './HomePage.scss';
-
-import tokens from '../../tokens';
 
 const HomePage = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [selected, setSelected] = useState(false);
-  const [isOwner, setIsOwner] = useState(true);
+  const [isOwner, setIsOwner] = useState(false);
+  const [freeTokens, setFreeTokens] = useState(0);
   const history = useHistory();
 
+  // CALL ASYNC HELPER FUNCTIONS TO SET STATES //
+  useEffect(() => {
+    const callAsyncFunc = async () => {
+      const userTokens = await checkUserTokens();
+      userTokens > 0 ? setIsOwner(true) : setIsOwner(false);
+      setFreeTokens(await checkFreeTokens());
+    };
+    callAsyncFunc();
+  }, []);
+
+  // CALCULATE SCREEN SCROLLING //
   const listenToScroll = () => {
     const heightToShowFrom = 50;
     const winScroll = document.body.scrollTop
@@ -26,6 +37,7 @@ const HomePage = () => {
     }
   };
 
+  // ACTIVATE LISTENER FOR SCREEN SCROLLING //
   useEffect(() => {
     window.scrollTo(0, 0);
 
@@ -38,6 +50,7 @@ const HomePage = () => {
     setSelected(!selected);
     history.push('/profile');
   };
+
   return (
     <div className="home-outter-container">
       <NavBar />
@@ -67,7 +80,9 @@ const HomePage = () => {
           today
         </h1>
         <div className={`action-cards ${isVisible ? ' fade-in' : 'invisible'}`}>
-          <ActionCard actionType="Claim" />
+          {
+            freeTokens > 0 && <ActionCard actionType="Claim" />
+          }
           <ActionCard actionType="Buy" />
           <ActionCard actionType="Sell" />
         </div>

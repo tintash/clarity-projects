@@ -68,6 +68,10 @@
       color: $colorRegularText;
       margin-bottom: 4rem;
       cursor: default;
+      background: url('../../images/grainyBackground.jpg');
+      box-shadow: 5px 10px 8px #888888;
+      padding: 0 2rem;
+      border-radius: 2rem;
 
       span {
         color: $colorFocusText;
