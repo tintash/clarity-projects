@@ -3,17 +3,24 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@stacks/connect": "^6.2.0",
-    "@stacks/profile": "^2.0.1",
+    "@stacks/blockchain-api-client": "^0.69.0",
+    "@stacks/connect": "^5.5.0",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
+    "antd": "^4.16.13",
+    "firebase": "^9.1.1",
+    "firebase-tools": "^9.19.0",
     "node-sass": "^6.0.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-icons": "^4.2.0",
+    "react-redux": "^7.2.5",
     "react-router-dom": "^5.3.0",
     "react-scripts": "4.0.3",
+    "redux": "^4.1.1",
+    "redux-logger": "^3.0.6",
+    "styled-components": "^5.3.1",
     "web-vitals": "^1.1.2"
   },
   "lint-staged": {
@@ -41,6 +48,7 @@
     ]
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.15.6",
     "eslint-config-airbnb": "^18.2.1",
     "husky": "^7.0.2",
     "lint-staged": "^11.1.2",
