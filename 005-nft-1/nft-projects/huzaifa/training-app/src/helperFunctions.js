@@ -13,7 +13,7 @@ import {
   standardPrincipalCV,
 } from '@stacks/transactions';
 import { openContractCall } from '@stacks/connect';
-import { StacksMocknet } from '@stacks/network';
+import { StacksMocknet, StacksTestnet } from '@stacks/network';
 import BN from 'bn.js';
 
 import * as constants from './constants';
@@ -25,7 +25,7 @@ export const setOptions = (funcName, args = []) => ({
   contractName: constants.velocityContract,
   functionName: funcName,
   functionArgs: args,
-  network: new StacksMocknet(),
+  network: new StacksTestnet(),
   senderAddress: getUserData().profile.stxAddress.testnet,
 });
 
@@ -91,7 +91,7 @@ export const checkForSale = async (tokenId) => {
     contractName: constants.velocityMarketContract,
     functionName: constants.getVelocityForSale,
     functionArgs: [uintCV(tokenId)],
-    network: new StacksMocknet(),
+    network: new StacksTestnet(),
     senderAddress: getUserData().profile.stxAddress.testnet,
   };
   let tokenDetails = null;
@@ -137,7 +137,7 @@ export const claimTokens = async (setIsSelected) => {
       name: 'Training-App',
       icon: `${window.location.origin}/logo.svg`,
     },
-    network: new StacksMocknet(),
+    network: new StacksTestnet(),
     postConditionCode: PostConditionMode.Deny,
     onFinish: () => {
       setIsSelected(false);
@@ -176,7 +176,7 @@ export const buyToken = async (tokenId, tokenPrice, setButtonSelected) => {
       name: 'Training-App',
       icon: `${window.location.origin}/logo.svg`,
     },
-    network: new StacksMocknet(),
+    network: new StacksTestnet(),
     userSession,
     postConditions: [nftTransferPostCondition, stxPostCondition],
     postConditionMode: PostConditionMode.Deny,
@@ -217,7 +217,7 @@ export const sellToken = async (tokenId, tokenPrice, setSelected) => {
       name: 'Training-App',
       icon: `${window.location.origin}/logo.svg`,
     },
-    network: new StacksMocknet(),
+    network: new StacksTestnet(),
     userSession,
     postConditions: [standardNFTPostCondition],
     postConditionMode: PostConditionMode.Deny,

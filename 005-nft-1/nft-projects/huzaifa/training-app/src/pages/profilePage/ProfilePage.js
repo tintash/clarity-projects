@@ -15,7 +15,7 @@ import './ProfilePage.scss';
 const ProfilePage = () => {
   const [testnet] = useState(getUserData().profile.stxAddress.testnet);
   const [mainnet] = useState(getUserData().profile.stxAddress.mainnet);
-  const [tokensOwned, setTokensOwned] = useState(-1);
+  const [tokensOwned, setTokensOwned] = useState();
   const [userTokensList, setUserTokensList] = useState(null);
   const [tokensListLoading, setTokensListLoading] = useState(true);
 
