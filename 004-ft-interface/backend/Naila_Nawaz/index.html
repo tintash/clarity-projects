@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+    <head>
+        <title>ASSIGNMENT4-TASK1</title>
+    </head>
+    <body>
+        <p>
+            Hello World!
+        </p>
+        </break>
+
+        <p>
+            <form action="/register" method="POST">
+                <input type="text" name="regAddress" id="regAddress" placeholder="input address">
+                <input type="submit" value="Register">
+            </form>
+        </p>
+        </break>
+        
+        <p>
+            <form action="/play" method="POST">
+                <input type="submit" value="PlayGame">
+            </form>
+        </p>
+        </break>
+
+        <p>
+            <a href="token-uri">
+                <input type=button  
+                value='Get Token Uri'>
+            </a>
+        </p>
+        </break>
+
+        <p>
+            <a href="random-number">
+                <input type=button 
+                value='Generate Random Number'>
+            </a>
+        </p>
+        </break>
+
+        <p>
+            <input type="text" id="balAddress" placeholder="input address">
+            <input type=button 
+            id="balanceBtn"
+            value='Check Balance'>
+        </p>
+        <script>
+            document.getElementById("balanceBtn").addEventListener("click", function(){
+                var address =  document.getElementById("balAddress").value;
+                var url = 'http://localhost:8000/get-balance-of/' + address;
+                window.location.href = url;
+            });
+        </script>
+    </body>
+</html>
