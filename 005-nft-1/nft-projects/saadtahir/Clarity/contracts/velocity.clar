@@ -101,6 +101,23 @@
     )
 )
 
+;; This is just to check if the user can mint any token he wants to
+(define-public (custom-claim (token-id uint))
+    (custom-mint TOKEN_PRICE tx-sender token-id)
+)
+
+(define-private (custom-mint (amount uint) (recipient principal) (token-id uint))
+    (begin
+        (asserts! (< token-id MAX_TOKEN_LIMIT) ERR_MAX_TOKEN_LIMIT_REACHED)
+        (try! (stx-transfer? amount recipient CONTRACT_OWNER))
+        (try! (nft-mint? velocity token-id recipient))
+        (increment-account-token-balance recipient)
+        (add-token recipient token-id)
+        (var-set last-token-id token-id)
+        (ok token-id)
+    )
+)
+
 (define-private (increment-account-token-balance (account principal))
     (map-set tokens-count account (+ (balance-of account) u1))
 )
