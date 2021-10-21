@@ -1,0 +1,33 @@
+* {
+  box-sizing: border-box;
+}
+
+//Simple Fade In Annimation//
+.fade-in {
+  animation: fadeIn 1s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+//Fading In While Moving Upwards Annimation//
+.fade-in-move-up {
+  animation: fadeInMoveUp 1s;
+}
+
+@keyframes fadeInMoveUp {
+  from {
+    opacity: 0;
+    transform: translateY(300px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,96 @@
+@import '../../styles/Colors.scss';
+
+.home-outter-container {
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  background: url('../../images/BackgroundHome.png');
+  background-size: cover;
+  flex-direction: column;
+
+  .section-profile {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+
+    .profile-container {
+      padding: 8rem 16rem;
+      margin: 0 4rem;
+      width: 100%;
+      height: 76%;
+      border-radius: 1.25rem;
+      background: url('../../images/plainBackground.jpg');
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      .profile-container-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .profile-container-heading {
+          margin: 0 0 2rem 0;
+          font-family: 'Montserrat';
+          font-size: 8rem;
+          text-align: center;
+          color: rgb(240, 240, 240);
+          cursor: default;
+
+          span {
+            color: $colorFocusText;
+          }
+        }
+
+        .profile-container-text {
+          margin: 0 0 4rem 0;
+          font-family: 'Montserrat';
+          font-size: 1.5rem;
+          text-align: center;
+          color: $colorRegularText;
+          cursor: default;
+        }
+
+        .profile-container-button {
+          margin: 0;
+        }
+      }
+    }
+  }
+
+  .invisible {
+    visibility: hidden;
+  }
+  .section-action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .section-action-heading {
+      margin: 0;
+      font-family: 'Montserrat';
+      font-size: 4.5rem;
+      color: $colorRegularText;
+      margin-bottom: 4rem;
+      cursor: default;
+      background: url('../../images/grainyBackground.jpg');
+      box-shadow: 5px 10px 8px #888888;
+      padding: 0 2rem;
+      border-radius: 2rem;
+
+      span {
+        color: $colorFocusText;
+      }
+    }
+
+    .action-cards {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      margin-bottom: 8rem;
+    }
+  }
+}

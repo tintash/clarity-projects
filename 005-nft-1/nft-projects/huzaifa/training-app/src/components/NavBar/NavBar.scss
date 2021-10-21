@@ -1,0 +1,67 @@
+@import '../../styles/Colors.scss';
+
+.nav-bar-container {
+  width: 100vw;
+  height: 64px;
+  z-index: 1;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  background: white;
+
+  .app-logo {
+    width: 35px;
+    height: 35px;
+    color: $colorRegularText;
+    transition: all 0.3s;
+
+    &:hover {
+      transform: scale(1.2);
+      color: $colorFocusText;
+      cursor: pointer;
+    }
+  }
+
+  .app-name {
+    color: $colorRegularText;
+    font-family: 'Fredoka One';
+    letter-spacing: 0.05rem;
+    font-size: 1.8rem;
+    font-weight: normal;
+    transition: all 0.5s;
+
+    &:hover {
+      letter-spacing: 0.4rem;
+      color: $colorFocusText;
+      cursor: default;
+    }
+  }
+
+  .disconnect-wallet {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: $colorRegularText;
+    transition: all 0.3s;
+
+    &:hover {
+      transform: scale(1.2);
+      color: $colorFocusText;
+      cursor: pointer;
+    }
+
+    .disconnect-logo {
+      width: 25px;
+      height: 25px;
+    }
+
+    .disconnect-text {
+      font-size: 0.8rem;
+      margin: 0;
+    }
+  }
+}
