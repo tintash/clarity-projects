@@ -1,0 +1,14 @@
+[project]
+name = "clarity-saad-dao"
+requirements = []
+[contracts.dao]
+path = "contracts/dao.clar"
+depends_on = ['dao-token']
+
+[contracts.dao-token-trait]
+path = "contracts/dao-token-trait.clar"
+depends_on = []
+
+[contracts.dao-token]
+path = "contracts/dao-token.clar"
+depends_on = ['dao-token-trait']
