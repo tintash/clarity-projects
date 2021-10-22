@@ -12,6 +12,7 @@
 (use-trait dao-token-trait .dao-token-trait.dao-token-trait)
 
 (define-constant contract-owner tx-sender)
+(define-constant stx-per-dao-token u1000000) ;; mints 1 dao token
 
 (define-constant ERR_NOT_CONTRACT_OWNER (err u1000))
 (define-constant ERR_NOT_A_MEMBER (err u1001))
@@ -27,9 +28,10 @@
 (define-constant ERR_MEMBER_ALREADY_VOTED (err u1011))
 (define-constant ERR_PROPOSAL_NOT_PROCESSED (err u1012))
 (define-constant ERR_CONTRACT_HAS_INSUFFICIENT_DAO_BALANCE (err u1013))
+(define-constant ERR_NOT_ENOUGH_STX_TO_MINT_DAO (err u1014))
 
 ;; non resetable data
-(define-data-var member-registration-cost uint u10000000) ;; 10 STX
+(define-data-var member-registration-cost-in-dao uint u10) ;; 10 DAO
 (define-data-var time-for-proposal uint u10) ;; Proposal to be executed after these blocks
 (define-data-var members (list 100 principal) (list))
 
@@ -60,8 +62,8 @@
     (var-get time-for-proposal)
 )
 
-(define-read-only (get-member-registration-cost) 
-    (var-get member-registration-cost)
+(define-read-only (get-member-registration-cost-in-dao) 
+    (var-get member-registration-cost-in-dao)
 )
 
 (define-read-only (get-members) 
@@ -99,20 +101,50 @@
     )
 )
 
-(define-public (set-member-registration-cost (amount uint))
+(define-public (set-member-registration-cost-in-dao (amount uint))
     (begin
         (asserts! (is-eq contract-owner tx-sender) ERR_NOT_CONTRACT_OWNER)
-        (ok (var-set member-registration-cost amount))
+        (ok (var-set member-registration-cost-in-dao amount))
     )
 )
 
 ;; In order to become a member, you will have to transfer STX to the contract and mint dao-tokens in return
 (define-public (register-member (token-trait <dao-token-trait>))
-    (begin
+    (let
+        (
+            (required-stx (* stx-per-dao-token (var-get member-registration-cost-in-dao)))
+        )
         (asserts! (not (is-some (index-of (var-get members) tx-sender))) ERR_ALREADY_A_MEMBER)
-        (asserts! (> (stx-get-balance tx-sender) (var-get member-registration-cost)) ERR_NOT_ENOUGH_STX_TO_REGISTER)
-        (try! (contract-call? token-trait faucet (var-get member-registration-cost)))
+        (try! (stx-transfer? required-stx tx-sender (as-contract tx-sender)))
+        (try! (contract-call? token-trait faucet (var-get member-registration-cost-in-dao)))
         (add-member tx-sender)
+        (ok true)
+    )
+)
+
+(define-public (get-dao 
+                        (token-trait <dao-token-trait>)
+                        (dao-token-amount uint))
+    (let
+        (
+            (required-stx (* stx-per-dao-token dao-token-amount))
+        )
+        (asserts! (> (stx-get-balance tx-sender) required-stx) ERR_NOT_ENOUGH_STX_TO_MINT_DAO)
+        (try! (stx-transfer? required-stx tx-sender (as-contract tx-sender)))
+        (try! (contract-call? token-trait faucet dao-token-amount))
+        (ok true)
+    )
+)
+
+(define-public (transfer-dao-to-contract 
+                                    (token-trait <dao-token-trait>)
+                                    (dao-amount uint))
+    (let
+        (
+            (user-dao (unwrap! (contract-call? token-trait get-balance tx-sender) ERR_UNRECOGNIZED_CALL))
+        )
+        (asserts! (>= user-dao dao-amount) ERR_NOT_ENOUGH_DAO)
+        (try! (contract-call? token-trait transfer? dao-amount tx-sender (as-contract tx-sender)))
         (ok true)
     )
 )
@@ -129,7 +161,7 @@
         )
         (asserts! (is-some (index-of (var-get members) tx-sender)) ERR_NOT_A_MEMBER)
         (asserts! (> member-dao u0) ERR_NOT_ENOUGH_DAO)
-        (try! (contract-call? token-trait transfer? u1 tx-sender (as-contract tx-sender)))
+        (try! (transfer-dao-to-contract token-trait charity-amount))
         (var-set proposal-id-count proposal-id)
         (map-set proposals {id: proposal-id} 
                             {proposer: tx-sender, 
@@ -187,9 +219,7 @@
 
 ;; Here you will have to process all proposals from processed-proposals map
 ;; and select the one with max votes
-(define-public (evaluate-processed-proposal-votes
-                                                 (token-trait <dao-token-trait>))
-    ;; get processed-proposals
+(define-public (evaluate-processed-proposal-votes (token-trait <dao-token-trait>))
     (let
         (
             (current-processed-proposals (get-processed-proposals))
@@ -198,8 +228,7 @@
         (var-set winning-proposal-id processed-proposal-id)
         (fold find-winning-proposal current-processed-proposals u0)
         (try! (execute-proposal token-trait (var-get winning-proposal-id)))
-        (print (var-get winning-proposal-id))
-        (ok true)
+        (ok (var-get winning-proposal-id))
     )
 )
 
@@ -229,15 +258,16 @@
             (
                 (proposal-proposer (get proposer (unwrap! (get-proposal proposal-id) ERR_UNWRAPPING_FAILED)))
                 (proposal-organisation (get organisation (unwrap! (get-proposal proposal-id) ERR_UNWRAPPING_FAILED)))
-                (proposal-charity-amount (get charity-amount (unwrap! (get-proposal proposal-id) ERR_UNWRAPPING_FAILED)))
+                (proposal-charity-amount-in-dao (get charity-amount (unwrap! (get-proposal proposal-id) ERR_UNWRAPPING_FAILED)))
                 (proposal-required-time (get required-time (unwrap! (get-proposal proposal-id) ERR_UNWRAPPING_FAILED)))
                 (contract-dao (unwrap! (as-contract (contract-call? token-trait get-balance tx-sender)) ERR_UNRECOGNIZED_CALL))
-                (proposal-charity-amount-in-dao (/ proposal-charity-amount (get-member-registration-cost)))
             )
             (asserts! (is-some (index-of (get-processed-proposals) proposal-id)) ERR_PROPOSAL_NOT_PROCESSED)
             ;; check if required time is reached
             (asserts! (>= block-height proposal-required-time) ERR_PROPOSAL_NOT_READY)
             ;; check if contract has enough money in dao-tokens
+            (print contract-dao)
+            (print proposal-charity-amount-in-dao)
             (asserts! (>= contract-dao proposal-charity-amount-in-dao) ERR_CONTRACT_HAS_INSUFFICIENT_DAO_BALANCE)
             ;; make transfer in dao tokens to organisation
             (try! (as-contract (contract-call? token-trait transfer? proposal-charity-amount-in-dao tx-sender proposal-organisation)))
@@ -249,6 +279,17 @@
             (ok true)
         )
     )
+)
+
+(define-public (convert (token-trait <dao-token-trait>) (dao-token-amount uint))
+  (let
+    (
+      (sender tx-sender)
+    )
+    (try! (as-contract (stx-transfer? (* dao-token-amount stx-per-dao-token) tx-sender sender)))
+    (try! (contract-call? token-trait burn dao-token-amount))
+    (ok true)
+  )
 )
 
 (define-private (add-proposal-on-block-height (proposal-id uint))

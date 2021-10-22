@@ -4,6 +4,7 @@
 
 (define-constant ERR_NOT_CONTRACT_OWNER (err u2000))
 (define-constant ERR_NOT_TOKEN_OWNER (err u2001))
+(define-constant ERR_NOT_ENOUGH_STX_TO_MINT_DAO (err u2002))
 
 (define-fungible-token dao-token)
 
@@ -27,22 +28,15 @@
   )
 )
 
-(define-public (convert (dao-token-amount uint) (sender principal))
-  (begin
-    (asserts! (is-eq sender tx-sender) ERR_NOT_TOKEN_OWNER)
-    (ok true)
-
-  )
-)
-
 (define-read-only (get-balance (principal principal))
   (ok (ft-get-balance dao-token principal))
 )
 
 ;; Don't use faucet from here because you won't get registered even you have the tokens
-(define-public (faucet (stx-cost uint))
-  (begin
-    (try! (stx-transfer? stx-cost tx-sender (as-contract tx-sender)))
-    (ft-mint? dao-token u10 tx-sender)
-  )
+(define-public (faucet (dao-token-amount uint))
+  (ft-mint? dao-token dao-token-amount tx-sender)
+)
+
+(define-public (burn (dao-token-amount uint))
+  (ft-burn? dao-token dao-token-amount tx-sender)
 )
