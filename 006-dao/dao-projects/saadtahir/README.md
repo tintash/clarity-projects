@@ -8,8 +8,6 @@ An implementation of DAO contract in clarity language. Users can register as a m
 2. `clarinet console` and use the following commands on clarinet console
 3. `clarinet test` to run all the tests.
 
-## Functions
-
 ## clarinet console commands
 
 Following set of commands can be run on clarinet console using `clarinet console` command on terminal. The commands registers the deployer as member, creates a proposal that transfers 10STX to the organisation as charity, casts a yes vote, advances the chain tip to 20 to process the required proposal in the required time of 10 blocks, evaluates all the proposals in the processed-proposals list and executes the transaction on success. Your output should be 10 DAO tokens in the organisation's stacks address which can then be converted by that organisation principal using `convert` function in dao contract.
