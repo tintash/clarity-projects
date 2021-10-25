@@ -1,13 +1,3 @@
-;; DAO Contract rules
-;; The contract should take votes for a certain proposal to be accepted
-;; There is a block-height time that executes the proposal
-;; People who have the dao-token can vote only
-;; On proposal completion (accepted/rejected), the dao-tokens are sent back to the people who voted yes/no
-;; People can become a member by sending STX and becoming a member
-;; The proposal can be a simple charity where a certain amount is transfered to a principal as charity if it is accepted
-;; People who want to give charity can send STX to the contract which will then transfer that amount on propsal acceptance
-;; All the proposals will have fixed time limit and when the time limit is reached, the proposal with
-;; the most yes votes will get selected
 
 (use-trait dao-token-trait .dao-token-trait.dao-token-trait)
 
@@ -29,9 +19,10 @@
 (define-constant ERR_PROPOSAL_NOT_PROCESSED (err u1012))
 (define-constant ERR_CONTRACT_HAS_INSUFFICIENT_DAO_BALANCE (err u1013))
 (define-constant ERR_NOT_ENOUGH_STX_TO_MINT_DAO (err u1014))
+(define-constant ERR_NO_PROPOSAL_IN_PROCESS (err u1015))
 
 ;; non resetable data
-(define-data-var member-registration-cost-in-dao uint u10) ;; 10 DAO
+(define-data-var member-registration-cost-in-dao uint u100)
 (define-data-var time-for-proposal uint u10) ;; Proposal to be executed after these blocks
 (define-data-var members (list 100 principal) (list))
 
@@ -108,6 +99,31 @@
     )
 )
 
+(define-public (convert (token-trait <dao-token-trait>) (dao-token-amount uint))
+  (let
+    (
+      (sender tx-sender)
+    )
+    (try! (as-contract (stx-transfer? (* dao-token-amount stx-per-dao-token) tx-sender sender)))
+    (try! (contract-call? token-trait burn dao-token-amount))
+    (ok true)
+  )
+)
+
+(define-public (add-dao 
+                        (token-trait <dao-token-trait>)
+                        (dao-token-amount uint))
+    (let
+        (
+            (required-stx (* stx-per-dao-token dao-token-amount))
+        )
+        (asserts! (>= (stx-get-balance tx-sender) required-stx) ERR_NOT_ENOUGH_STX_TO_MINT_DAO)
+        (try! (stx-transfer? required-stx tx-sender (as-contract tx-sender)))
+        (try! (as-contract (contract-call? token-trait mint dao-token-amount tx-sender)))
+        (ok true)
+    )
+)
+
 ;; In order to become a member, you will have to transfer STX to the contract and mint dao-tokens in return
 (define-public (register-member (token-trait <dao-token-trait>))
     (let
@@ -116,35 +132,8 @@
         )
         (asserts! (not (is-some (index-of (var-get members) tx-sender))) ERR_ALREADY_A_MEMBER)
         (try! (stx-transfer? required-stx tx-sender (as-contract tx-sender)))
-        (try! (contract-call? token-trait faucet (var-get member-registration-cost-in-dao)))
+        (try! (contract-call? token-trait mint (var-get member-registration-cost-in-dao) tx-sender))
         (add-member tx-sender)
-        (ok true)
-    )
-)
-
-(define-public (get-dao 
-                        (token-trait <dao-token-trait>)
-                        (dao-token-amount uint))
-    (let
-        (
-            (required-stx (* stx-per-dao-token dao-token-amount))
-        )
-        (asserts! (> (stx-get-balance tx-sender) required-stx) ERR_NOT_ENOUGH_STX_TO_MINT_DAO)
-        (try! (stx-transfer? required-stx tx-sender (as-contract tx-sender)))
-        (try! (contract-call? token-trait faucet dao-token-amount))
-        (ok true)
-    )
-)
-
-(define-public (transfer-dao-to-contract 
-                                    (token-trait <dao-token-trait>)
-                                    (dao-amount uint))
-    (let
-        (
-            (user-dao (unwrap! (contract-call? token-trait get-balance tx-sender) ERR_UNRECOGNIZED_CALL))
-        )
-        (asserts! (>= user-dao dao-amount) ERR_NOT_ENOUGH_DAO)
-        (try! (contract-call? token-trait transfer? dao-amount tx-sender (as-contract tx-sender)))
         (ok true)
     )
 )
@@ -155,13 +144,11 @@
         (charity-amount uint)) 
     (let
         (
-            (member-dao (unwrap! (contract-call? token-trait get-balance tx-sender) ERR_UNRECOGNIZED_CALL))
             (proposal-id (+ (var-get proposal-id-count) u1))
             (required-time (+ block-height (get-time-for-proposal)))
         )
         (asserts! (is-some (index-of (var-get members) tx-sender)) ERR_NOT_A_MEMBER)
-        (asserts! (> member-dao u0) ERR_NOT_ENOUGH_DAO)
-        (try! (transfer-dao-to-contract token-trait charity-amount))
+        (try! (transfer-dao-to-contract token-trait u1))
         (var-set proposal-id-count proposal-id)
         (map-set proposals {id: proposal-id} 
                             {proposer: tx-sender, 
@@ -180,55 +167,62 @@
                         (token-trait <dao-token-trait>)
                         (vote bool)
                         (proposal-id uint))
-    (let
-        (
-            (member-dao (unwrap! (contract-call? token-trait get-balance tx-sender) ERR_UNRECOGNIZED_CALL))
-            (proposal-total-votes (unwrap! (get votes (get-votes-on-proposal proposal-id)) ERR_UNWRAPPING_FAILED))
-            (proposal-vote-difference (unwrap! (get vote-difference (get-proposal-votes proposal-id)) ERR_UNWRAPPING_FAILED))
-        )
-        (asserts! (is-some (index-of (var-get members) tx-sender)) ERR_NOT_A_MEMBER)
+    (begin
         (asserts! (is-some (map-get? proposals {id: proposal-id})) ERR_INVALID_PROPOSAL_ID)
-        (asserts! (> member-dao u0) ERR_NOT_ENOUGH_DAO)
-        (asserts! (is-none (index-of (get-processed-proposals) proposal-id)) ERR_PROPOSAL_ALREADY_IN_PROCESS)
-        (asserts! (or (is-none (get vote (get-vote-by-member proposal-id)))
-                      (is-eq (get vote (get-vote-by-member proposal-id)) (some false))
-                  ) ERR_MEMBER_ALREADY_VOTED)
-        (try! (contract-call? token-trait transfer? u1 tx-sender (as-contract tx-sender)))
-        (map-set votes-by-member {proposal-id: proposal-id, member: tx-sender} {vote: vote})
-        (map-set votes-on-proposal {proposal-id: proposal-id} {votes: (+ u1 proposal-total-votes)})
-        (if (is-eq vote true)
-            (map-set proposal-votes {proposal-id: proposal-id} {vote-difference: (+ proposal-vote-difference 1)})
-        (map-set proposal-votes {proposal-id: proposal-id} {vote-difference: (- proposal-vote-difference 1)})
+        (let
+            (
+                (proposal-total-votes (unwrap! (get votes (get-votes-on-proposal proposal-id)) ERR_UNWRAPPING_FAILED))
+                (proposal-vote-difference (unwrap! (get vote-difference (get-proposal-votes proposal-id)) ERR_UNWRAPPING_FAILED))
+            )
+            (asserts! (is-some (index-of (var-get members) tx-sender)) ERR_NOT_A_MEMBER)
+            (asserts! (is-none (index-of (get-processed-proposals) proposal-id)) ERR_PROPOSAL_ALREADY_IN_PROCESS)
+            (asserts! (or (is-none (get vote (get-vote-by-member proposal-id)))
+                        (is-eq (get vote (get-vote-by-member proposal-id)) (some false))
+                    ) ERR_MEMBER_ALREADY_VOTED)
+            (try! (transfer-dao-to-contract token-trait u1))
+            (map-set votes-by-member {proposal-id: proposal-id, member: tx-sender} {vote: vote})
+            (map-set votes-on-proposal {proposal-id: proposal-id} {votes: (+ u1 proposal-total-votes)})
+            (if (is-eq vote true)
+                (map-set proposal-votes {proposal-id: proposal-id} {vote-difference: (+ proposal-vote-difference 1)})
+            (map-set proposal-votes {proposal-id: proposal-id} {vote-difference: (- proposal-vote-difference 1)})
+            )
+            (ok true)
         )
-        (ok true)
     )
 )
 
 (define-public (process-proposal (proposal-id uint))
-    (let
-        (
-            (proposal-time (unwrap! (get required-time (get-proposal proposal-id)) ERR_UNWRAPPING_FAILED))
-        )
+    (begin
         (asserts! (is-some (map-get? proposals {id: proposal-id})) ERR_INVALID_PROPOSAL_ID)
-        (asserts! (is-none (index-of (get-processed-proposals) proposal-id)) ERR_PROPOSAL_ALREADY_IN_PROCESS)
-        (asserts! (>= block-height proposal-time) ERR_PROPOSAL_NOT_READY)
-        (add-to-processed-proposals proposal-id)
-        (ok true)
+        (let
+            (
+                (proposal-time (unwrap! (get required-time (get-proposal proposal-id)) ERR_UNWRAPPING_FAILED))
+            )
+            (asserts! (is-none (index-of (get-processed-proposals) proposal-id)) ERR_PROPOSAL_ALREADY_IN_PROCESS)
+            (asserts! (>= block-height proposal-time) ERR_PROPOSAL_NOT_READY)
+            (add-to-processed-proposals proposal-id)
+            (ok true)
+        )
     )
 )
 
 ;; Here you will have to process all proposals from processed-proposals map
 ;; and select the one with max votes
 (define-public (evaluate-processed-proposal-votes (token-trait <dao-token-trait>))
-    (let
-        (
-            (current-processed-proposals (get-processed-proposals))
-            (processed-proposal-id (unwrap! (element-at (get-processed-proposals) u0) ERR_UNWRAPPING_FAILED))
+    (begin
+        (asserts! (> (len (get-processed-proposals)) u0) ERR_NO_PROPOSAL_IN_PROCESS)
+        (let
+            (
+                (current-processed-proposals (get-processed-proposals))
+                (processed-proposal-id (unwrap! (element-at (get-processed-proposals) u0) ERR_UNWRAPPING_FAILED))
+            )
+            (var-set winning-proposal-id processed-proposal-id)
+            (print (var-get winning-proposal-id))
+            (fold find-winning-proposal current-processed-proposals u0)
+            (print (var-get winning-proposal-id))
+            (try! (execute-proposal token-trait (var-get winning-proposal-id)))
+            (ok (var-get winning-proposal-id))
         )
-        (var-set winning-proposal-id processed-proposal-id)
-        (fold find-winning-proposal current-processed-proposals u0)
-        (try! (execute-proposal token-trait (var-get winning-proposal-id)))
-        (ok (var-get winning-proposal-id))
     )
 )
 
@@ -266,30 +260,29 @@
             ;; check if required time is reached
             (asserts! (>= block-height proposal-required-time) ERR_PROPOSAL_NOT_READY)
             ;; check if contract has enough money in dao-tokens
-            (print contract-dao)
-            (print proposal-charity-amount-in-dao)
             (asserts! (>= contract-dao proposal-charity-amount-in-dao) ERR_CONTRACT_HAS_INSUFFICIENT_DAO_BALANCE)
             ;; make transfer in dao tokens to organisation
             (try! (as-contract (contract-call? token-trait transfer? proposal-charity-amount-in-dao tx-sender proposal-organisation)))
             ;; reset lists and variables if necessary
-            (var-set processed-proposals (list u100))
+            (var-set processed-proposals (list))
             (var-set proposal-id-count u0)
             (var-set removing-processed-proposals u0)
-            (var-set winning-proposal-id u0)
             (ok true)
         )
     )
 )
 
-(define-public (convert (token-trait <dao-token-trait>) (dao-token-amount uint))
-  (let
-    (
-      (sender tx-sender)
+(define-private (transfer-dao-to-contract 
+                                    (token-trait <dao-token-trait>)
+                                    (dao-amount uint))
+    (let
+        (
+            (user-dao (unwrap! (contract-call? token-trait get-balance tx-sender) ERR_UNRECOGNIZED_CALL))
+        )
+        (asserts! (>= user-dao dao-amount) ERR_NOT_ENOUGH_DAO)
+        (try! (contract-call? token-trait transfer? dao-amount tx-sender (as-contract tx-sender)))
+        (ok true)
     )
-    (try! (as-contract (stx-transfer? (* dao-token-amount stx-per-dao-token) tx-sender sender)))
-    (try! (contract-call? token-trait burn dao-token-amount))
-    (ok true)
-  )
 )
 
 (define-private (add-proposal-on-block-height (proposal-id uint))
