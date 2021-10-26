@@ -12,6 +12,10 @@ User can also see `proposals-on-block-height` meaning which proposals are presen
 If a User is already registered as a member, he cannot call `register-member` function twice.
 Users can `convert` dao tokens to STX at any time using the `convert` method.
 
+# Remarks
+
+We are taking an assumption that the contract deployer will add funds and mint tokens in the contract
+
 # How to run it
 
 1. `clainet check` to check for errors if any.
