@@ -22,74 +22,88 @@ Users can `convert` dao tokens to STX at any time using the `convert` method.
 
 Following set of commands can be run on clarinet console using `clarinet console` command on terminal. The commands registers the deployer as member, creates a proposal that transfers 10STX to the organisation as charity, casts a yes vote, advances the chain tip to 20 to process the required proposal in the required time of 10 blocks, evaluates all the proposals in the processed-proposals list and executes the transaction on success. Your output should be 10 DAO tokens in the organisation's stacks address which can then be converted by that organisation principal using `convert` function in dao contract.
 
-(contract-call? .dao add-dao .dao-token u100000)<br>
-(contract-call? .dao register-member .dao-token)<br>
-(contract-call? .dao propose-proposal .dao-token 'STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6 u10)<br>
-(contract-call? .dao cast-vote .dao-token true u1)<br>
-(contract-call? .dao process-proposal u1)<br>
-::advance_chain_tip 20<br>
-(contract-call? .dao process-proposal u1)<br>
-(contract-call? .dao evaluate-processed-proposal-votes .dao-token)<br>
-::set_tx_sender STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6<br>
-(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.dao convert 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.dao-token u10)<br>
-::get_assets_maps<br>
+`(contract-call? .dao add-dao .dao-token u100000)`
+
+`(contract-call? .dao register-member .dao-token)`
+
+`(contract-call? .dao propose-proposal .dao-token 'STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6 u10)`
+
+`(contract-call? .dao cast-vote .dao-token true u1)`
+
+`(contract-call? .dao process-proposal u1)`
+
+`::advance_chain_tip 20`
+
+`(contract-call? .dao process-proposal u1)`
+
+`(contract-call? .dao evaluate-processed-proposal-votes .dao-token)`
+
+`::set_tx_sender STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6`
+
+`(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.dao convert 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.dao-token u10)`
+
+`::get_assets_maps`
 
 # Diagrams
 
 ## Register Member
 
-sequenceDiagram<br>
-participant Dao_Token<br>
-participant Dao<br>
-participant Member<br>
-Member ->> Dao: Register Member<br>
-Member -->> Dao: Transfer 10 STX<br>
-Dao -->> Dao_Token: Mint 10 Dao Tokens<br>
-Dao ->> Member: Transfer 10 Dao Tokens<br>
+sequenceDiagram
+participant Dao_Token
+participant Dao
+participant Member
+Member ->> Dao: Register Member
+Member -->> Dao: Transfer 10 STX
+Dao -->> Dao_Token: Mint 10 Dao Tokens
+Dao ->> Member: Transfer 10 Dao Tokens
 
 ## Propose Proposal
 
-sequenceDiagram<br>
-participant Dao<br>
-participant Member<br>
-Member ->> Dao: Propose Proposal<br>
-Member -->> Dao: Transfer 1 Dao Token<br>
-Dao -->> Dao: Creates Proposal at +10 block-height<br>
+sequenceDiagram<br />
+participant Dao<br />
+participant Member<br />
+Member ->> Dao: Propose Proposal<br />
+Member -->> Dao: Transfer 1 Dao Token<br />
+Dao -->> Dao: Creates Proposal at +10 block-height<br />
 
 ## Cast Vote
 
-sequenceDiagram<br>
-participant Dao<br>
-participant Member<br>
-Member ->> Dao: Cast Vote (Yes, No)<br>
-Member -->> Dao: Transfer 1 Dao Token<br>
-Dao -->> Dao: (++, --) vote-difference against proposal-id<br>
+sequenceDiagram<br />
+participant Dao<br />
+participant Member<br />
+Member ->> Dao: Cast Vote (Yes, No)<br />
+Member -->> Dao: Transfer 1 Dao Token<br />
+Dao -->> Dao: (++, --) vote-difference against proposal-id<br />
 
 ## Process Proposal
 
-sequenceDiagram<br>
-participant Dao<br>
-participant Member<br>
-Member ->> Dao: Process Proposal<br>
-Dao -->> Dao: Validate block height reached<br>
-Dao -->> Dao: Add proposal id to processed-proposals<br>
+sequenceDiagram<br />
+participant Dao<br />
+participant Member<br />
+Member ->> Dao: Process Proposal<br />
+Dao -->> Dao: Validate block height reached<br />
+Dao -->> Dao: Add proposal id to processed-proposals<br />
 
 ## Evaluate Proposal
 
-sequenceDiagram<br>
-participant Organisation<br>
-participant Dao<br>
-participant Member<br>
-Member ->> Dao: Evaluate Proposal<br>
-Dao -->> Dao: Loop through the processed proposals list<br>
-Dao -->> Dao: Find the winning proposal-id with greatest vote-difference<br>
-Dao -->> Dao: Execute the winning proposal<br>
-Dao ->> Organisation: Transfer charity-amount<br>
+sequenceDiagram<br />
+participant Organisation<br />
+participant Dao<br />
+participant Member<br />
+Member ->> Dao: Evaluate Proposal<br />
+Dao -->> Dao: Loop through the processed proposals list<br />
+Dao -->> Dao: Find the winning proposal-id with greatest vote-difference<br />
+Dao -->> Dao: Execute the winning proposal<br />
+Dao ->> Organisation: Transfer charity-amount<br />
 
 ## Convert
 
-sequenceDiagram<br>
-participant Organisation<br>
-participant Dao<br>
-Organisation ->> Dao: Convert Tokens to STX<br>
-Dao -->> Organisation: Receive STX (1 STX per Token)<br>
+sequenceDiagram<br />
+participant Organisation<br />
+participant Dao<br />
+Organisation ->> Dao: Convert Tokens to STX<br />
+Dao -->> Organisation: Receive STX (1 STX per Token)<br />
+
+```
+
+```
