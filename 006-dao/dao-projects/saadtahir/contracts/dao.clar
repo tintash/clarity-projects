@@ -213,19 +213,21 @@
         (let
             (
                 (current-processed-proposals (get-processed-proposals))
+                (processed-proposal-id (unwrap-panic (element-at current-processed-proposals u0)))
             )
-            (fold find-winning-proposal current-processed-proposals u0)
+            (var-set winning-proposal-id processed-proposal-id)
+            (fold find-winning-proposal current-processed-proposals processed-proposal-id)
             (try! (execute-proposal token-trait))
             (ok (var-get winning-proposal-id))
         )
     )
 )
 
-(define-private (find-winning-proposal (proposal-id uint) (inital-proposal-id uint))
+(define-private (find-winning-proposal (proposal-id uint) (winning-id uint))
     (let
         (
             (vote-difference (get-proposal-votes proposal-id))
-            (winning-vote-difference (get-proposal-votes (var-get winning-proposal-id)))
+            (winning-vote-difference (get-proposal-votes winning-id))
         )
         ;; check the vote difference with the currently winning-proposal-id
         (if (> vote-difference winning-vote-difference)
