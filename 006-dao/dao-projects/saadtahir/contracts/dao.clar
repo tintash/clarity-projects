@@ -78,6 +78,10 @@
     (var-get processed-proposals)
 )
 
+(define-read-only (search-processed-proposal (proposal-id uint))
+    (index-of (get-processed-proposals) proposal-id)
+)
+
 (define-read-only (get-proposal-votes (proposal-id uint))
     (default-to 0 (get vote-difference (map-get? proposal-votes {proposal-id: proposal-id})))
 )
@@ -172,7 +176,7 @@
                 (proposal-vote-difference (get-proposal-votes proposal-id))
             )
             (asserts! (is-eq (get-member tx-sender) true) ERR_NOT_A_MEMBER)
-            (asserts! (is-none (index-of (get-processed-proposals) proposal-id)) ERR_PROPOSAL_ALREADY_IN_PROCESS)
+            (asserts! (is-none (search-processed-proposal proposal-id)) ERR_PROPOSAL_ALREADY_IN_PROCESS)
             (asserts! (is-none (get-vote-by-member proposal-id)) ERR_MEMBER_ALREADY_VOTED)
             (try! (transfer-dao-to-contract token-trait u1))
             (map-set votes-by-member {proposal-id: proposal-id, member: tx-sender} {vote: vote})
@@ -193,7 +197,7 @@
             (
                 (proposal-end-block-height (unwrap-panic (get end-block-height (get-proposal proposal-id))))
             )
-            (asserts! (is-none (index-of (get-processed-proposals) proposal-id)) ERR_PROPOSAL_ALREADY_IN_PROCESS)
+            (asserts! (is-none (search-processed-proposal proposal-id)) ERR_PROPOSAL_ALREADY_IN_PROCESS)
             (asserts! (>= block-height proposal-end-block-height) ERR_PROPOSAL_NOT_READY)
             (add-to-processed-proposals proposal-id)
             (ok true)
@@ -209,7 +213,6 @@
         (let
             (
                 (current-processed-proposals (get-processed-proposals))
-                (processed-proposal-id (unwrap-panic (element-at current-processed-proposals u0)))
             )
             (fold find-winning-proposal current-processed-proposals u0)
             (try! (execute-proposal token-trait))
