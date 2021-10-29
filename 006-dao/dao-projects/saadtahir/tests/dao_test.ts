@@ -635,3 +635,28 @@ Clarinet.test({
     assertEquals("[]", block.receipts[2].result);
   },
 });
+
+Clarinet.test({
+  name: "Ensure that dao tokens are convertable back to tokens",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    var deployer = accounts.get("deployer")!;
+    var tokenTrait = `${deployer.address}.dao-token`;
+
+    let block = chain.mineBlock([
+      Tx.contractCall(
+        "dao",
+        "register-member",
+        [types.principal(tokenTrait)],
+        deployer.address
+      ),
+      Tx.contractCall(
+        "dao",
+        "convert",
+        [types.principal(tokenTrait), types.uint(10)],
+        deployer.address
+      ),
+    ]);
+
+    block.receipts[1].result.expectOk().expectBool(true);
+  },
+});
