@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2021-10-29 15:41:34</td>
+            <td class="headerValue">2021-10-29 15:50:33</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">24</td>
@@ -173,7 +173,7 @@
 <a name="111"><span class="lineNum">     111 </span><span class="lineCov">          1 :       (sender tx-sender)</span></a>
 <a name="112"><span class="lineNum">     112 </span>            :     )</a>
 <a name="113"><span class="lineNum">     113 </span><span class="lineCov">          8 :     (try! (as-contract (stx-transfer? (* dao-token-amount stx-per-dao-token) tx-sender sender)))</span></a>
-<a name="114"><span class="lineNum">     114 </span><span class="lineCov">          3 :     (try! (contract-call? token-trait burn dao-token-amount))</span></a>
+<a name="114"><span class="lineNum">     114 </span><span class="lineCov">          6 :     (try! (contract-call? token-trait transfer? dao-token-amount tx-sender (as-contract tx-sender)))</span></a>
 <a name="115"><span class="lineNum">     115 </span><span class="lineCov">          2 :     (ok true)</span></a>
 <a name="116"><span class="lineNum">     116 </span>            :   )</a>
 <a name="117"><span class="lineNum">     117 </span>            : )</a>

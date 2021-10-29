@@ -1537,7 +1537,7 @@ DA:104,0
 DA:109,1
 DA:111,1
 DA:113,8
-DA:114,3
+DA:114,6
 DA:115,2
 DA:122,0
 DA:124,0
@@ -1642,17 +1642,17 @@ FN:6,transfer?
 FN:13,get-balance
 FN:17,mint
 FN:21,burn
-FNDA:1,burn
 FNDA:1,mint
+FNDA:1,transfer?
 FNF:4
 FNH:2
 DA:3,0
-DA:8,0
-DA:9,0
-DA:10,0
+DA:8,1
+DA:9,4
+DA:10,4
 DA:15,0
 DA:19,3
-DA:23,3
+DA:23,0
 end_of_record
 TN:Ensure that dao tokens are convertable back to tokens
 SF:/Users/saadtahir/Documents/My Clarity Projects/clarity-saad-dao/contracts/dao-token-trait.clar
@@ -3053,17 +3053,18 @@ FN:6,transfer?
 FN:13,get-balance
 FN:17,mint
 FN:21,burn
+FNDA:1,burn
 FNDA:1,mint
 FNDA:1,transfer?
 FNF:4
-FNH:2
+FNH:3
 DA:3,0
 DA:8,1
 DA:9,5
 DA:10,0
 DA:15,0
 DA:19,3
-DA:23,0
+DA:23,3
 end_of_record
 TN:Ensure that transfer can only be called by token owner
 SF:/Users/saadtahir/Documents/My Clarity Projects/clarity-saad-dao/contracts/dao-token-trait.clar

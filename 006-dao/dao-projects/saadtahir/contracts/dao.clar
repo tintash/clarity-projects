@@ -111,7 +111,7 @@
       (sender tx-sender)
     )
     (try! (as-contract (stx-transfer? (* dao-token-amount stx-per-dao-token) tx-sender sender)))
-    (try! (contract-call? token-trait burn dao-token-amount))
+    (try! (contract-call? token-trait transfer? dao-token-amount tx-sender (as-contract tx-sender)))
     (ok true)
   )
 )

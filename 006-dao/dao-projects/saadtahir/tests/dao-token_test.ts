@@ -30,6 +30,7 @@ Clarinet.test({
         ],
         notOwner.address
       ),
+      Tx.contractCall("dao-token", "burn", [types.uint(1)], owner.address),
     ]);
 
     block.receipts[1].result.expectErr().expectUint(2000);
