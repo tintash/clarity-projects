@@ -637,6 +637,73 @@ Clarinet.test({
 });
 
 Clarinet.test({
+  name: "Ensure that executed proposal cannot be processed again",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    var deployer = accounts.get("deployer")!;
+    var member = accounts.get("deployer")!;
+    var organisation = accounts.get("wallet_2")!;
+    var tokenTrait = `${deployer.address}.dao-token`;
+
+    chain.mineBlock([
+      Tx.contractCall(
+        "dao",
+        "add-dao",
+        [types.principal(tokenTrait), types.uint(100000)],
+        deployer.address
+      ),
+      Tx.contractCall(
+        "dao",
+        "register-member",
+        [types.principal(tokenTrait)],
+        member.address
+      ),
+      Tx.contractCall(
+        "dao",
+        "propose-proposal",
+        [
+          types.principal(tokenTrait),
+          types.principal(organisation.address),
+          types.uint(10000),
+        ],
+        member.address
+      ),
+      Tx.contractCall(
+        "dao",
+        "cast-vote",
+        [types.principal(tokenTrait), types.bool(true), types.uint(1)],
+        member.address
+      ),
+    ]);
+
+    chain.mineEmptyBlock(10);
+
+    let block = chain.mineBlock([
+      Tx.contractCall(
+        "dao",
+        "process-proposal",
+        [types.uint(1)],
+        deployer.address
+      ),
+      Tx.contractCall(
+        "dao",
+        "evaluate-processed-proposal-votes",
+        [types.principal(tokenTrait)],
+        deployer.address
+      ),
+      Tx.contractCall(
+        "dao",
+        "process-proposal",
+        [types.uint(1)],
+        deployer.address
+      ),
+    ]);
+
+    block.receipts[1].result.expectOk().expectUint(1);
+    block.receipts[2].result.expectErr().expectUint(1008);
+  },
+});
+
+Clarinet.test({
   name: "Ensure that dao tokens are convertable back to tokens",
   async fn(chain: Chain, accounts: Map<string, Account>) {
     var deployer = accounts.get("deployer")!;
@@ -651,7 +718,7 @@ Clarinet.test({
       ),
       Tx.contractCall(
         "dao",
-        "convert",
+        "convert-dao-to-stx",
         [types.principal(tokenTrait), types.uint(10)],
         deployer.address
       ),

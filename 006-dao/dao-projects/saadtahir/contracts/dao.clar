@@ -3,6 +3,8 @@
 
 (define-constant contract-owner tx-sender)
 (define-constant stx-per-dao-token u1000000) ;; mints 1 dao token
+(define-constant propose-proposal-amount u1)
+(define-constant cast-vote-amount u1)
 
 (define-constant ERR_NOT_CONTRACT_OWNER (err u1000))
 (define-constant ERR_NOT_A_MEMBER (err u1001))
@@ -105,7 +107,7 @@
     )
 )
 
-(define-public (convert (token-trait <dao-token-trait>) (dao-token-amount uint))
+(define-public (convert-dao-to-stx (token-trait <dao-token-trait>) (dao-token-amount uint))
   (let
     (
       (sender tx-sender)
@@ -136,7 +138,7 @@
         (
             (required-stx (* stx-per-dao-token (var-get member-registration-cost-in-dao)))
         )
-        (asserts! (is-eq (get-member tx-sender) false) ERR_ALREADY_A_MEMBER)
+        (asserts! (not (get-member tx-sender)) ERR_ALREADY_A_MEMBER)
         (try! (stx-transfer? required-stx tx-sender (as-contract tx-sender)))
         (try! (contract-call? token-trait mint (var-get member-registration-cost-in-dao) tx-sender))
         (map-set members {principal: tx-sender} {isMember: true})
@@ -153,8 +155,8 @@
             (proposal-id (+ (var-get proposal-id-count) u1))
             (end-block-height (+ block-height (get-time-for-proposal)))
         )
-        (asserts! (is-eq (get-member tx-sender) true) ERR_NOT_A_MEMBER)
-        (try! (transfer-dao-to-contract token-trait u1))
+        (asserts! (get-member tx-sender) ERR_NOT_A_MEMBER)
+        (try! (transfer-dao-to-contract token-trait propose-proposal-amount))
         (var-set proposal-id-count proposal-id)
         (map-set proposals {id: proposal-id} 
                             {proposer: tx-sender, 
@@ -181,13 +183,13 @@
                 (proposal-total-votes (get-votes-on-proposal proposal-id))
                 (proposal-vote-difference (get-proposal-votes proposal-id))
             )
-            (asserts! (is-eq (get-member tx-sender) true) ERR_NOT_A_MEMBER)
+            (asserts! (get-member tx-sender) ERR_NOT_A_MEMBER)
             (asserts! (is-none (search-processed-proposal proposal-id)) ERR_PROPOSAL_CURRENTLY_IN_PROCESS)
             (asserts! (is-none (get-vote-by-member proposal-id)) ERR_MEMBER_ALREADY_VOTED)
-            (try! (transfer-dao-to-contract token-trait u1))
+            (try! (transfer-dao-to-contract token-trait cast-vote-amount))
             (map-set votes-by-member {proposal-id: proposal-id, member: tx-sender} {vote: vote})
             (map-set votes-on-proposal {proposal-id: proposal-id} {votes: (+ u1 proposal-total-votes)})
-            (if (is-eq vote true)
+            (if vote
                 (map-set proposal-votes {proposal-id: proposal-id} {vote-difference: (+ proposal-vote-difference 1)})
             (map-set proposal-votes {proposal-id: proposal-id} {vote-difference: (- proposal-vote-difference 1)})
             )
@@ -204,7 +206,7 @@
                 (proposal-end-block-height (unwrap-panic (get end-block-height (get-proposal proposal-id))))
             )
             (asserts! (is-none (search-processed-proposal proposal-id)) ERR_PROPOSAL_CURRENTLY_IN_PROCESS)
-            (asserts! (is-eq (get-proposal-in-process proposal-id) false) ERR_PROPOSAL_ALREADY_PROCESSED)
+            (asserts! (not (get-proposal-in-process proposal-id)) ERR_PROPOSAL_ALREADY_PROCESSED)
             (asserts! (>= block-height proposal-end-block-height) ERR_PROPOSAL_NOT_READY)
             (add-to-processed-proposals proposal-id)
             (ok true)
@@ -251,23 +253,14 @@
     (let
         (
             (proposal-id (var-get winning-proposal-id))
-            (proposal-proposer (get proposer (unwrap-panic (get-proposal proposal-id))))
-            (proposal-organisation (get organisation (unwrap-panic (get-proposal proposal-id))))
-            (proposal-charity-amount (get charity-amount (unwrap-panic (get-proposal proposal-id))))
-            (proposal-end-block-height (get end-block-height (unwrap-panic (get-proposal proposal-id))))
+            (proposal (unwrap-panic (get-proposal proposal-id)))
+            (proposal-organisation (get organisation proposal))
+            (proposal-charity-amount (get charity-amount proposal))
             (contract-dao (unwrap-panic (as-contract (contract-call? token-trait get-balance tx-sender))))
         )
-        ;; check if contract has enough money in dao-tokens
         (asserts! (>= contract-dao proposal-charity-amount) ERR_CONTRACT_HAS_INSUFFICIENT_DAO_BALANCE)
-        ;; make transfer in dao tokens to organisation
         (try! (as-contract (contract-call? token-trait transfer? proposal-charity-amount tx-sender proposal-organisation)))
-        (map-set proposals {id: proposal-id} 
-                            {proposer: proposal-proposer, 
-                            organisation: proposal-organisation, 
-                            charity-amount: proposal-charity-amount, 
-                            end-block-height: proposal-end-block-height,
-                            processed: true})
-        ;; reset lists and variables if necessary
+        (map-set proposals {id: proposal-id} (merge proposal {processed: true}))
         (var-set processed-proposals (list))
         (var-set proposal-id-count u0)
         (var-set removing-processed-proposals u0)

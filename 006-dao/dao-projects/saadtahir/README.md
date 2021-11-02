@@ -10,7 +10,7 @@ User votes are tracked for each proposal so no more than one votes can be casted
 Only **100 members** can join the dao members list.
 User can also see `proposals-on-block-height` meaning which proposals are present at 225 block-height.
 If a User is already registered as a member, he cannot call `register-member` function twice.
-Users can `convert` dao tokens to STX at any time using the `convert` method.
+Users can `convert-dao-to-stx` dao tokens to STX at any time using the `convert-dao-to-stx` method.
 
 # Remarks
 
@@ -24,7 +24,7 @@ We are taking an assumption that the contract deployer will add funds and mint t
 
 # Clarinet console commands
 
-Following set of commands can be run on clarinet console using `clarinet console` command on terminal. The commands registers the deployer as member, creates a proposal that transfers 10STX to the organisation as charity, casts a yes vote, advances the chain tip to 20 to process the required proposal in the required time of 10 blocks, evaluates all the proposals in the processed-proposals list and executes the transaction on success. Your output should be 10 DAO tokens in the organisation's stacks address which can then be converted by that organisation principal using `convert` function in dao contract.
+Following set of commands can be run on clarinet console using `clarinet console` command on terminal. The commands registers the deployer as member, creates a proposal that transfers 10STX to the organisation as charity, casts a yes vote, advances the chain tip to 20 to process the required proposal in the required time of 10 blocks, evaluates all the proposals in the processed-proposals list and executes the transaction on success. Your output should be 10 DAO tokens in the organisation's stacks address which can then be converted by that organisation principal using `convert-dao-to-stx` function in dao contract.
 
 `(contract-call? .dao add-dao .dao-token u100000)`
 
@@ -44,7 +44,7 @@ Following set of commands can be run on clarinet console using `clarinet console
 
 `::set_tx_sender STNHKEPYEPJ8ET55ZZ0M5A34J0R3N5FM2CMMMAZ6`
 
-`(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.dao convert 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.dao-token u10)`
+`(contract-call? 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.dao convert-dao-to-stx 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.dao-token u10)`
 
 `::get_assets_maps`
 
@@ -100,7 +100,7 @@ Dao -->> Dao: Find the winning proposal-id with greatest vote-difference<br />
 Dao -->> Dao: Execute the winning proposal<br />
 Dao ->> Organisation: Transfer charity-amount<br />
 
-## Convert
+## Convert Dao to STX
 
 sequenceDiagram<br />
 participant Organisation<br />
