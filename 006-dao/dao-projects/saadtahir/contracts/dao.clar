@@ -217,18 +217,15 @@
 ;; Here you will have to process all proposals from processed-proposals map
 ;; and select the one with max votes
 (define-public (evaluate-processed-proposal-votes (token-trait <dao-token-trait>))
-    (begin
-        (asserts! (> (len (get-processed-proposals)) u0) ERR_NO_PROPOSAL_IN_PROCESS)
-        (let
-            (
-                (current-processed-proposals (get-processed-proposals))
-                (processed-proposal-id (unwrap-panic (element-at current-processed-proposals u0)))
-            )
-            (var-set winning-proposal-id processed-proposal-id)
-            (fold find-winning-proposal current-processed-proposals processed-proposal-id)
-            (try! (execute-proposal token-trait))
-            (ok (var-get winning-proposal-id))
+    (let
+        (
+            (current-processed-proposals (get-processed-proposals))
+            (processed-proposal-id (unwrap! (element-at current-processed-proposals u0) ERR_NO_PROPOSAL_IN_PROCESS))
         )
+        (var-set winning-proposal-id processed-proposal-id)
+        (fold find-winning-proposal current-processed-proposals processed-proposal-id)
+        (try! (execute-proposal token-trait))
+        (ok (var-get winning-proposal-id))
     )
 )
 

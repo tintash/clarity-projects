@@ -31,13 +31,13 @@
             <td class="headerValue">coverage.lcov</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">130</td>
-            <td class="headerCovTableEntry">137</td>
-            <td class="headerCovTableEntryHi">94.9 %</td>
+            <td class="headerCovTableEntry">128</td>
+            <td class="headerCovTableEntry">135</td>
+            <td class="headerCovTableEntryHi">94.8 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2021-11-02 12:49:50</td>
+            <td class="headerValue">2021-11-02 12:53:44</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">24</td>
@@ -140,7 +140,7 @@
 <a name="78"><span class="lineNum">      78 </span>            : )</a>
 <a name="79"><span class="lineNum">      79 </span>            : </a>
 <a name="80"><span class="lineNum">      80 </span>            : (define-read-only (get-processed-proposals)</a>
-<a name="81"><span class="lineNum">      81 </span><span class="lineCov">         32 :     (var-get processed-proposals)</span></a>
+<a name="81"><span class="lineNum">      81 </span><span class="lineCov">         29 :     (var-get processed-proposals)</span></a>
 <a name="82"><span class="lineNum">      82 </span>            : )</a>
 <a name="83"><span class="lineNum">      83 </span>            : </a>
 <a name="84"><span class="lineNum">      84 </span>            : (define-read-only (search-processed-proposal (proposal-id uint))</a>
@@ -279,77 +279,74 @@
 <a name="217"><span class="lineNum">     217 </span>            : ;; Here you will have to process all proposals from processed-proposals map</a>
 <a name="218"><span class="lineNum">     218 </span>            : ;; and select the one with max votes</a>
 <a name="219"><span class="lineNum">     219 </span>            : (define-public (evaluate-processed-proposal-votes (token-trait &lt;dao-token-trait&gt;))</a>
-<a name="220"><span class="lineNum">     220 </span><span class="lineCov">          4 :     (begin</span></a>
-<a name="221"><span class="lineNum">     221 </span><span class="lineCov">         21 :         (asserts! (&gt; (len (get-processed-proposals)) u0) ERR_NO_PROPOSAL_IN_PROCESS)</span></a>
-<a name="222"><span class="lineNum">     222 </span><span class="lineCov">          3 :         (let</span></a>
-<a name="223"><span class="lineNum">     223 </span>            :             (</a>
-<a name="224"><span class="lineNum">     224 </span><span class="lineCov">          3 :                 (current-processed-proposals (get-processed-proposals))</span></a>
-<a name="225"><span class="lineNum">     225 </span><span class="lineCov">         12 :                 (processed-proposal-id (unwrap-panic (element-at current-processed-proposals u0)))</span></a>
-<a name="226"><span class="lineNum">     226 </span>            :             )</a>
-<a name="227"><span class="lineNum">     227 </span><span class="lineCov">          6 :             (var-set winning-proposal-id processed-proposal-id)</span></a>
-<a name="228"><span class="lineNum">     228 </span><span class="lineCov">          9 :             (fold find-winning-proposal current-processed-proposals processed-proposal-id)</span></a>
-<a name="229"><span class="lineNum">     229 </span><span class="lineCov">          9 :             (try! (execute-proposal token-trait))</span></a>
-<a name="230"><span class="lineNum">     230 </span><span class="lineCov">          4 :             (ok (var-get winning-proposal-id))</span></a>
-<a name="231"><span class="lineNum">     231 </span>            :         )</a>
-<a name="232"><span class="lineNum">     232 </span>            :     )</a>
-<a name="233"><span class="lineNum">     233 </span>            : )</a>
-<a name="234"><span class="lineNum">     234 </span>            : </a>
-<a name="235"><span class="lineNum">     235 </span>            : (define-private (find-winning-proposal (proposal-id uint) (winning-id uint))</a>
-<a name="236"><span class="lineNum">     236 </span><span class="lineCov">          3 :     (let</span></a>
-<a name="237"><span class="lineNum">     237 </span>            :         (</a>
-<a name="238"><span class="lineNum">     238 </span><span class="lineCov">          6 :             (vote-difference (get-proposal-votes proposal-id))</span></a>
-<a name="239"><span class="lineNum">     239 </span><span class="lineCov">          6 :             (winning-vote-difference (get-proposal-votes winning-id))</span></a>
-<a name="240"><span class="lineNum">     240 </span>            :         )</a>
-<a name="241"><span class="lineNum">     241 </span>            :         ;; check the vote difference with the currently winning-proposal-id</a>
-<a name="242"><span class="lineNum">     242 </span><span class="lineCov">         12 :         (if (&gt; vote-difference winning-vote-difference)</span></a>
-<a name="243"><span class="lineNum">     243 </span><span class="lineNoCov">          0 :             (begin</span></a>
-<a name="244"><span class="lineNum">     244 </span><span class="lineNoCov">          0 :                 (var-set winning-proposal-id proposal-id)</span></a>
-<a name="245"><span class="lineNum">     245 </span><span class="lineNoCov">          0 :                 proposal-id</span></a>
-<a name="246"><span class="lineNum">     246 </span>            :             )</a>
-<a name="247"><span class="lineNum">     247 </span><span class="lineCov">          3 :         (var-get winning-proposal-id)</span></a>
-<a name="248"><span class="lineNum">     248 </span>            :         )</a>
-<a name="249"><span class="lineNum">     249 </span>            :     )</a>
-<a name="250"><span class="lineNum">     250 </span>            : )</a>
-<a name="251"><span class="lineNum">     251 </span>            : </a>
-<a name="252"><span class="lineNum">     252 </span>            : (define-private (execute-proposal (token-trait &lt;dao-token-trait&gt;))</a>
-<a name="253"><span class="lineNum">     253 </span><span class="lineCov">          3 :     (let</span></a>
-<a name="254"><span class="lineNum">     254 </span>            :         (</a>
-<a name="255"><span class="lineNum">     255 </span><span class="lineCov">          3 :             (proposal-id (var-get winning-proposal-id))</span></a>
-<a name="256"><span class="lineNum">     256 </span><span class="lineCov">          9 :             (proposal (unwrap-panic (get-proposal proposal-id)))</span></a>
-<a name="257"><span class="lineNum">     257 </span><span class="lineCov">          6 :             (proposal-organisation (get organisation proposal))</span></a>
-<a name="258"><span class="lineNum">     258 </span><span class="lineCov">          6 :             (proposal-charity-amount (get charity-amount proposal))</span></a>
-<a name="259"><span class="lineNum">     259 </span><span class="lineCov">         12 :             (contract-dao (unwrap-panic (as-contract (contract-call? token-trait get-balance tx-sender))))</span></a>
-<a name="260"><span class="lineNum">     260 </span>            :         )</a>
-<a name="261"><span class="lineNum">     261 </span><span class="lineCov">         13 :         (asserts! (&gt;= contract-dao proposal-charity-amount) ERR_CONTRACT_HAS_INSUFFICIENT_DAO_BALANCE)</span></a>
-<a name="262"><span class="lineNum">     262 </span><span class="lineCov">         12 :         (try! (as-contract (contract-call? token-trait transfer? proposal-charity-amount tx-sender proposal-organisation)))</span></a>
-<a name="263"><span class="lineNum">     263 </span><span class="lineCov">         10 :         (map-set proposals {id: proposal-id} (merge proposal {processed: true}))</span></a>
-<a name="264"><span class="lineNum">     264 </span><span class="lineCov">          4 :         (var-set processed-proposals (list))</span></a>
-<a name="265"><span class="lineNum">     265 </span><span class="lineCov">          4 :         (var-set proposal-id-count u0)</span></a>
-<a name="266"><span class="lineNum">     266 </span><span class="lineCov">          4 :         (var-set removing-processed-proposals u0)</span></a>
-<a name="267"><span class="lineNum">     267 </span><span class="lineCov">          4 :         (ok true)</span></a>
-<a name="268"><span class="lineNum">     268 </span>            :     )</a>
-<a name="269"><span class="lineNum">     269 </span>            : )</a>
-<a name="270"><span class="lineNum">     270 </span>            : </a>
-<a name="271"><span class="lineNum">     271 </span>            : (define-private (transfer-dao-to-contract </a>
-<a name="272"><span class="lineNum">     272 </span>            :                                     (token-trait &lt;dao-token-trait&gt;)</a>
-<a name="273"><span class="lineNum">     273 </span>            :                                     (dao-amount uint))</a>
-<a name="274"><span class="lineNum">     274 </span><span class="lineCov">         21 :     (let</span></a>
-<a name="275"><span class="lineNum">     275 </span>            :         (</a>
-<a name="276"><span class="lineNum">     276 </span><span class="lineCov">         84 :             (user-dao (unwrap! (contract-call? token-trait get-balance tx-sender) ERR_UNRECOGNIZED_CALL))</span></a>
-<a name="277"><span class="lineNum">     277 </span>            :         )</a>
-<a name="278"><span class="lineNum">     278 </span><span class="lineCov">         85 :         (asserts! (&gt;= user-dao dao-amount) ERR_NOT_ENOUGH_DAO)</span></a>
-<a name="279"><span class="lineNum">     279 </span><span class="lineCov">        120 :         (try! (contract-call? token-trait transfer? dao-amount tx-sender (as-contract tx-sender)))</span></a>
-<a name="280"><span class="lineNum">     280 </span><span class="lineCov">         40 :         (ok true)</span></a>
-<a name="281"><span class="lineNum">     281 </span>            :     )</a>
-<a name="282"><span class="lineNum">     282 </span>            : )</a>
-<a name="283"><span class="lineNum">     283 </span>            : </a>
-<a name="284"><span class="lineNum">     284 </span>            : (define-private (add-proposal-on-block-height (proposal-id uint))</a>
-<a name="285"><span class="lineNum">     285 </span><span class="lineCov">         88 :     (map-set proposals-on-block-height {block: block-height} {proposal-ids: (unwrap-panic (as-max-len? (append (get-proposals-on-block-height block-height) proposal-id) u100))})</span></a>
-<a name="286"><span class="lineNum">     286 </span>            : )</a>
-<a name="287"><span class="lineNum">     287 </span>            : </a>
-<a name="288"><span class="lineNum">     288 </span>            : (define-private (add-to-processed-proposals (proposal-id uint))</a>
-<a name="289"><span class="lineNum">     289 </span><span class="lineCov">         30 :     (var-set processed-proposals (unwrap-panic (as-max-len? (append (get-processed-proposals) proposal-id) u100)))</span></a>
-<a name="290"><span class="lineNum">     290 </span>            : )</a>
+<a name="220"><span class="lineNum">     220 </span><span class="lineCov">          4 :     (let</span></a>
+<a name="221"><span class="lineNum">     221 </span>            :         (</a>
+<a name="222"><span class="lineNum">     222 </span><span class="lineCov">          4 :             (current-processed-proposals (get-processed-proposals))</span></a>
+<a name="223"><span class="lineNum">     223 </span><span class="lineCov">         20 :             (processed-proposal-id (unwrap! (element-at current-processed-proposals u0) ERR_NO_PROPOSAL_IN_PROCESS))</span></a>
+<a name="224"><span class="lineNum">     224 </span>            :         )</a>
+<a name="225"><span class="lineNum">     225 </span><span class="lineCov">          6 :         (var-set winning-proposal-id processed-proposal-id)</span></a>
+<a name="226"><span class="lineNum">     226 </span><span class="lineCov">          9 :         (fold find-winning-proposal current-processed-proposals processed-proposal-id)</span></a>
+<a name="227"><span class="lineNum">     227 </span><span class="lineCov">          9 :         (try! (execute-proposal token-trait))</span></a>
+<a name="228"><span class="lineNum">     228 </span><span class="lineCov">          4 :         (ok (var-get winning-proposal-id))</span></a>
+<a name="229"><span class="lineNum">     229 </span>            :     )</a>
+<a name="230"><span class="lineNum">     230 </span>            : )</a>
+<a name="231"><span class="lineNum">     231 </span>            : </a>
+<a name="232"><span class="lineNum">     232 </span>            : (define-private (find-winning-proposal (proposal-id uint) (winning-id uint))</a>
+<a name="233"><span class="lineNum">     233 </span><span class="lineCov">          3 :     (let</span></a>
+<a name="234"><span class="lineNum">     234 </span>            :         (</a>
+<a name="235"><span class="lineNum">     235 </span><span class="lineCov">          6 :             (vote-difference (get-proposal-votes proposal-id))</span></a>
+<a name="236"><span class="lineNum">     236 </span><span class="lineCov">          6 :             (winning-vote-difference (get-proposal-votes winning-id))</span></a>
+<a name="237"><span class="lineNum">     237 </span>            :         )</a>
+<a name="238"><span class="lineNum">     238 </span>            :         ;; check the vote difference with the currently winning-proposal-id</a>
+<a name="239"><span class="lineNum">     239 </span><span class="lineCov">         12 :         (if (&gt; vote-difference winning-vote-difference)</span></a>
+<a name="240"><span class="lineNum">     240 </span><span class="lineNoCov">          0 :             (begin</span></a>
+<a name="241"><span class="lineNum">     241 </span><span class="lineNoCov">          0 :                 (var-set winning-proposal-id proposal-id)</span></a>
+<a name="242"><span class="lineNum">     242 </span><span class="lineNoCov">          0 :                 proposal-id</span></a>
+<a name="243"><span class="lineNum">     243 </span>            :             )</a>
+<a name="244"><span class="lineNum">     244 </span><span class="lineCov">          3 :         (var-get winning-proposal-id)</span></a>
+<a name="245"><span class="lineNum">     245 </span>            :         )</a>
+<a name="246"><span class="lineNum">     246 </span>            :     )</a>
+<a name="247"><span class="lineNum">     247 </span>            : )</a>
+<a name="248"><span class="lineNum">     248 </span>            : </a>
+<a name="249"><span class="lineNum">     249 </span>            : (define-private (execute-proposal (token-trait &lt;dao-token-trait&gt;))</a>
+<a name="250"><span class="lineNum">     250 </span><span class="lineCov">          3 :     (let</span></a>
+<a name="251"><span class="lineNum">     251 </span>            :         (</a>
+<a name="252"><span class="lineNum">     252 </span><span class="lineCov">          3 :             (proposal-id (var-get winning-proposal-id))</span></a>
+<a name="253"><span class="lineNum">     253 </span><span class="lineCov">          9 :             (proposal (unwrap-panic (get-proposal proposal-id)))</span></a>
+<a name="254"><span class="lineNum">     254 </span><span class="lineCov">          6 :             (proposal-organisation (get organisation proposal))</span></a>
+<a name="255"><span class="lineNum">     255 </span><span class="lineCov">          6 :             (proposal-charity-amount (get charity-amount proposal))</span></a>
+<a name="256"><span class="lineNum">     256 </span><span class="lineCov">         12 :             (contract-dao (unwrap-panic (as-contract (contract-call? token-trait get-balance tx-sender))))</span></a>
+<a name="257"><span class="lineNum">     257 </span>            :         )</a>
+<a name="258"><span class="lineNum">     258 </span><span class="lineCov">         13 :         (asserts! (&gt;= contract-dao proposal-charity-amount) ERR_CONTRACT_HAS_INSUFFICIENT_DAO_BALANCE)</span></a>
+<a name="259"><span class="lineNum">     259 </span><span class="lineCov">         12 :         (try! (as-contract (contract-call? token-trait transfer? proposal-charity-amount tx-sender proposal-organisation)))</span></a>
+<a name="260"><span class="lineNum">     260 </span><span class="lineCov">         10 :         (map-set proposals {id: proposal-id} (merge proposal {processed: true}))</span></a>
+<a name="261"><span class="lineNum">     261 </span><span class="lineCov">          4 :         (var-set processed-proposals (list))</span></a>
+<a name="262"><span class="lineNum">     262 </span><span class="lineCov">          4 :         (var-set proposal-id-count u0)</span></a>
+<a name="263"><span class="lineNum">     263 </span><span class="lineCov">          4 :         (var-set removing-processed-proposals u0)</span></a>
+<a name="264"><span class="lineNum">     264 </span><span class="lineCov">          4 :         (ok true)</span></a>
+<a name="265"><span class="lineNum">     265 </span>            :     )</a>
+<a name="266"><span class="lineNum">     266 </span>            : )</a>
+<a name="267"><span class="lineNum">     267 </span>            : </a>
+<a name="268"><span class="lineNum">     268 </span>            : (define-private (transfer-dao-to-contract </a>
+<a name="269"><span class="lineNum">     269 </span>            :                                     (token-trait &lt;dao-token-trait&gt;)</a>
+<a name="270"><span class="lineNum">     270 </span>            :                                     (dao-amount uint))</a>
+<a name="271"><span class="lineNum">     271 </span><span class="lineCov">         21 :     (let</span></a>
+<a name="272"><span class="lineNum">     272 </span>            :         (</a>
+<a name="273"><span class="lineNum">     273 </span><span class="lineCov">         84 :             (user-dao (unwrap! (contract-call? token-trait get-balance tx-sender) ERR_UNRECOGNIZED_CALL))</span></a>
+<a name="274"><span class="lineNum">     274 </span>            :         )</a>
+<a name="275"><span class="lineNum">     275 </span><span class="lineCov">         85 :         (asserts! (&gt;= user-dao dao-amount) ERR_NOT_ENOUGH_DAO)</span></a>
+<a name="276"><span class="lineNum">     276 </span><span class="lineCov">        120 :         (try! (contract-call? token-trait transfer? dao-amount tx-sender (as-contract tx-sender)))</span></a>
+<a name="277"><span class="lineNum">     277 </span><span class="lineCov">         40 :         (ok true)</span></a>
+<a name="278"><span class="lineNum">     278 </span>            :     )</a>
+<a name="279"><span class="lineNum">     279 </span>            : )</a>
+<a name="280"><span class="lineNum">     280 </span>            : </a>
+<a name="281"><span class="lineNum">     281 </span>            : (define-private (add-proposal-on-block-height (proposal-id uint))</a>
+<a name="282"><span class="lineNum">     282 </span><span class="lineCov">         88 :     (map-set proposals-on-block-height {block: block-height} {proposal-ids: (unwrap-panic (as-max-len? (append (get-proposals-on-block-height block-height) proposal-id) u100))})</span></a>
+<a name="283"><span class="lineNum">     283 </span>            : )</a>
+<a name="284"><span class="lineNum">     284 </span>            : </a>
+<a name="285"><span class="lineNum">     285 </span>            : (define-private (add-to-processed-proposals (proposal-id uint))</a>
+<a name="286"><span class="lineNum">     286 </span><span class="lineCov">         30 :     (var-set processed-proposals (unwrap-panic (as-max-len? (append (get-processed-proposals) proposal-id) u100)))</span></a>
+<a name="287"><span class="lineNum">     287 </span>            : )</a>
 </pre>
       </td>
     </tr>
