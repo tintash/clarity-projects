@@ -1,23 +1,23 @@
-const {
+import {
   callReadOnlyFunction,
   makeContractCall,
   cvToJSON,
   stringAsciiCV,
   standardPrincipalCV,
   broadcastTransaction,
-} = require("@stacks/transactions");
-const { StacksTestnet } = require("@stacks/network");
+} from "@stacks/transactions";
+import { StacksTestnet } from "@stacks/network";
 
-const { mnemonicToSeedSync } = require("bip39");
-const { fromSeed } = require("bip32");
-const blockstack = require("blockstack");
-const bitcoin = require("bitcoinjs-lib");
+import { mnemonicToSeedSync } from "bip39";
+import { fromSeed } from "bip32";
+import blockstack from "blockstack";
+import * as bitcoin from "bitcoinjs-lib";
 
 const network = new StacksTestnet();
 var mnemonic =
   "inside claim kick easily assist trim cat silk culture pumpkin drastic claim tail bleak journey lunar nose apple result draw fiscal present unlock evil";
 
-const {
+import {
   REFER_REWARD_CONTRACT,
   RR_TOKEN_NAME,
   RR_TOKEN_SYMBOL,
@@ -26,79 +26,52 @@ const {
   RR_TOKEN_URI,
   RR_REFER_USER,
   RR_PERFORM_TRANSACTION,
-} = require("./constants");
+} from "./constants";
 
-async function getTokenName() {
+async function makeReadOnlyCall(functionName) {
   const [contractAddress, contractName] = REFER_REWARD_CONTRACT.split(".");
   const data = await callReadOnlyFunction({
     contractAddress: contractAddress,
     contractName: contractName,
-    functionName: RR_TOKEN_NAME,
+    functionName: functionName,
     functionArgs: [],
     network,
     senderAddress: contractAddress,
   });
+  return data;
+}
+
+export async function getTokenName() {
+  const data = await makeReadOnlyCall(RR_TOKEN_NAME);
   return cvToJSON(data).value.value;
 }
 
-async function getTokenSymbol() {
-  const [contractAddress, contractName] = REFER_REWARD_CONTRACT.split(".");
-  const data = await callReadOnlyFunction({
-    contractAddress: contractAddress,
-    contractName: contractName,
-    functionName: RR_TOKEN_SYMBOL,
-    functionArgs: [],
-    network,
-    senderAddress: contractAddress,
-  });
+export async function getTokenSymbol() {
+  const data = await makeReadOnlyCall(RR_TOKEN_SYMBOL);
   return cvToJSON(data).value.value;
 }
 
-async function getTokenDecimals() {
-  const [contractAddress, contractName] = REFER_REWARD_CONTRACT.split(".");
-  const data = await callReadOnlyFunction({
-    contractAddress: contractAddress,
-    contractName: contractName,
-    functionName: RR_TOKEN_DECIMALS,
-    functionArgs: [],
-    network,
-    senderAddress: contractAddress,
-  });
+export async function getTokenDecimals() {
+  const data = await makeReadOnlyCall(RR_TOKEN_DECIMALS);
   return cvToJSON(data).value.value;
 }
 
-async function getTokenSupply() {
-  const [contractAddress, contractName] = REFER_REWARD_CONTRACT.split(".");
-  const data = await callReadOnlyFunction({
-    contractAddress: contractAddress,
-    contractName: contractName,
-    functionName: RR_TOKEN_SUPPLY,
-    functionArgs: [],
-    network,
-    senderAddress: contractAddress,
-  });
+export async function getTokenSupply() {
+  const data = await makeReadOnlyCall(RR_TOKEN_SUPPLY);
   return cvToJSON(data).value.value;
 }
 
-async function getTokenURI() {
-  const [contractAddress, contractName] = REFER_REWARD_CONTRACT.split(".");
-  const data = await callReadOnlyFunction({
-    contractAddress: contractAddress,
-    contractName: contractName,
-    functionName: RR_TOKEN_URI,
-    functionArgs: [],
-    network,
-    senderAddress: contractAddress,
-  });
+export async function getTokenURI() {
+  const data = await makeReadOnlyCall(RR_TOKEN_URI);
   return cvToJSON(data).value.value.value;
 }
 
-function setMnemonic(secret) {
+export function setMnemonic(secret) {
   mnemonic = secret;
   return mnemonic;
 }
 
-async function referUser(req) {
+export async function referUser(req) {
   const newUserAddress = standardPrincipalCV(req.query.useraddress);
   const newUserEmail = stringAsciiCV(req.query.useremail);
 
@@ -123,7 +96,7 @@ async function referUser(req) {
   return JSON.stringify(result);
 }
 
-async function completeTransaction() {
+export async function completeTransaction() {
   const seed = mnemonicToSeedSync(mnemonic);
   const master = fromSeed(seed);
   const child = master.derivePath("m/44'/5757'/0'/0/0");
@@ -144,14 +117,3 @@ async function completeTransaction() {
   const result = await broadcastTransaction(transaction, network);
   return JSON.stringify(result);
 }
-
-module.exports = {
-  getTokenName,
-  getTokenSymbol,
-  getTokenDecimals,
-  getTokenSupply,
-  getTokenURI,
-  setMnemonic,
-  referUser,
-  completeTransaction,
-};
