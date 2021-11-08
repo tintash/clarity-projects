@@ -13,22 +13,11 @@ import { fromSeed } from "bip32";
 import blockstack from "blockstack";
 import * as bitcoin from "bitcoinjs-lib";
 
+import * as constants from "./constants";
+
 const network = new StacksTestnet();
 var mnemonic =
   "inside claim kick easily assist trim cat silk culture pumpkin drastic claim tail bleak journey lunar nose apple result draw fiscal present unlock evil";
-
-// import {
-//   REFER_REWARD_CONTRACT,
-//   RR_TOKEN_NAME,
-//   RR_TOKEN_SYMBOL,
-//   RR_TOKEN_DECIMALS,
-//   RR_TOKEN_SUPPLY,
-//   RR_TOKEN_URI,
-//   RR_REFER_USER,
-//   RR_PERFORM_TRANSACTION,
-// } from "./constants";
-
-import * as constants from "./constants";
 
 async function makeReadOnlyCall(functionName) {
   const [contractAddress, contractName] =
