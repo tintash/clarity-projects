@@ -1,6 +1,6 @@
 ## Overview
 
-Velocity-nft is a marketplace for people to buy cars containing special attributes. The common car name is velocity. People can buy, sell, trade velocity. The app uses React JS as front end and @stacks/connect to connect with the wallet for transaction handling and authentication. @stacks/storage will be used as database and each user data will be saved in their respective UUID.json. In order to get profit from each transaction, you need to collect commision on every transfer people make e.g 2.5%. Keep the limit of tokens to 1000 and give 1000 tokens for free to all the people who register.
+Velocity-nft is a marketplace for people to buy cars containing special attributes. The common car name is velocity. People can buy, sell, trade velocity. The app uses React JS as front end and @stacks/connect to connect with the wallet for transaction handling and authentication. @stacks/storage will be used as database and each user data will be saved in their respective UUID.json. In order to get profit from each transaction, you need to collect commision on every transfer people make e.g 2.5%. Total tokens that can every exist are 1000. 100 of them are free to be claimed and then the remaining 900 can be claimed for 10000 stx.
 
 ## velocity.clar
 
@@ -9,7 +9,9 @@ Implements nft-trait **SIP009 NFT trait on mainnet**. There is a max token limit
 1. **get-token-uri** generates a dynamic uri for each token-id.
 2. **get-meta** and **get-nft-meta** returns a video link for that nft. (you can customise this as well to return a dynamic meta for each token)
 3. **balance-of** returns the total number of nfts each principal has.
-4. **claim** can be used by tx-sender to claim the velocity token for free.
+4. **claim** can be used by tx-sender to claim the velocity tokens.
+5. **get-owners** is used to get the list of all owners that own NFTs. data-var **tokens** is used for it.
+6. **get-tokens** is used to get tokens owned by a single owner. data-map **owners** is used for it.
 
 ## velocity-market.clar
 
@@ -17,7 +19,7 @@ This contract will be the market place where users can buy, sell, trade, informa
 
 ## nft-trait.clar
 
-SIP009 NFT trait
+Implementing SIP009 NFT trait
 
 ## string-conversion.clar
 

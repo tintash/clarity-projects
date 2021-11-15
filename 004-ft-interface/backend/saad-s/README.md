@@ -13,7 +13,7 @@ So for now this app requires a manual mnemonic input, which can be done by makin
 2. `npm install`
 3. install extension for REST requests
    - `code --install-extension humao.rest-client`
-4. `node src/app.js`
+4. `npm start`
 5. open [request.rest](requests.rest) file and click the "Send Request" button against a request
 
 ### Read-Only contract calls

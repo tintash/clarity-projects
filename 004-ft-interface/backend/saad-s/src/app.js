@@ -1,6 +1,6 @@
-const express = require("express");
-const logger = require("./logger");
-const {
+import express from "express";
+import { logger } from "./logger";
+import {
   getTokenName,
   getTokenSymbol,
   getTokenDecimals,
@@ -9,7 +9,7 @@ const {
   referUser,
   completeTransaction,
   setMnemonic,
-} = require("./contract-calls");
+} from "./contract-calls";
 
 const app = express();
 app.use(express.json());

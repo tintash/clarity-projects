@@ -2,3 +2,7 @@
 *.swp
 Testnet.toml
 .DS_Store
+*.firebase/
+*.firebaserc
+firebase.json
+history.txt

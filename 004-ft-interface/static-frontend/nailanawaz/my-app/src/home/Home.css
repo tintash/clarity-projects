@@ -1,0 +1,58 @@
+.Home {
+    text-align: center;
+  }
+  
+  .login-btn {
+    height: 40px;
+    width: 150px;
+    margin-top: 25px
+  }
+  
+  .header {
+    margin-top: 30px;
+  }
+
+  .btn {
+    margin-top: 30px;
+    height: 40px;
+    width: 140px;
+    margin-left: 10px;
+  }
+
+  .div {
+    display: flex;
+  }
+  
+  .input {
+    margin-top: 30px !important;
+    height: 35px !important;
+    width: 152px !important;
+    margin-left: 10px;
+  }
+
+  .tx {
+    margin-top: 30px !important;
+    height: 35px !important;
+    width: 350px !important;
+    margin-left: 10px;
+  }
+
+  .success-msg{
+    margin-top: 40px;
+    margin-left: 2px;
+    color:darkgreen;
+  }
+
+  .Title {
+    box-sizing: border-box;
+    width: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    padding: 1em;
+    margin-bottom: 2em;
+    background-color: rgb(26, 101, 192);
+    color: #fff;
+    margin-left: 20%;
+    margin-top: 2%
+  }
