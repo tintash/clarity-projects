@@ -1,0 +1,11 @@
+[project]
+name = "coc"
+requirements = []
+costs_version = 1
+[contracts.coc]
+path = "contracts/coc.clar"
+depends_on = ["sipxxx-semi-fungible-token-trait"]
+
+[contracts.sipxxx-semi-fungible-token-trait]
+path = "contracts/sipxxx-semi-fungible-token-trait.clar"
+depends_on = []
