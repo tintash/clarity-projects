@@ -23,12 +23,12 @@
 (define-constant heroes u3)
 
 ;; upgradable resource types 
-(define-constant townhall u0)
-(define-constant defenses u1)
-(define-constant buildings u2)
-(define-constant walls u3)
-(define-constant troops u4)
-(define-constant hero-levels u5)
+(define-constant townhall u10)
+(define-constant defenses u11)
+(define-constant buildings u12)
+(define-constant walls u13)
+(define-constant troops u14)
+(define-constant hero-levels u15)
 
 ;; costs map
 (define-map upgrade-cost {resource: uint, level: uint} 
@@ -38,18 +38,14 @@
 (define-map max-subtoken-supply uint uint) 
 
 ;; resource levels of a player
-;; (define-map player-level principal 
-;;         {townhall: uint, defenses: uint, buildings: uint, walls: uint, troops: uint, heroes: uint}) 
 (define-map player-level {player: principal, resource: uint} uint) 
 
-;; TODO: define initalization function
-;; init economy max limits 
+;; init economy max limits per player
 (map-set max-subtoken-supply gold u7500000)
 (map-set max-subtoken-supply elixir u7500000)
 (map-set max-subtoken-supply dark-elixir u40000)
 (map-set max-subtoken-supply heroes u4)
 
-;; TODO: define initalization function
 ;; init upgrade costs for level 1 to level 2
 (map-set upgrade-cost {resource: townhall, level: u2} 
         {gold: u5000, elixir: u5000, dark-elixir: u0})
@@ -64,10 +60,10 @@
 (map-set upgrade-cost {resource: hero-levels, level: u2} 
         {gold: u200000, elixir: u200000, dark-elixir: u1000})
 
-;;//////////////////////////////////////////////
+;; //////////////////////////////////////////////
 ;; Implementing sipxxx-semi-fungible-token-trait
 (define-read-only (get-balance (token-id uint) (who principal))
-	(ok (get-balance-uint token-id who))
+	(ok (get-balance-or-default token-id who))
 )
 
 (define-read-only (get-overall-balance (who principal))
@@ -93,13 +89,14 @@
 (define-public (transfer (token-id uint) (amount uint) (sender principal) (recipient principal))
 	(let
 		(
-			(sender-balance (get-balance-uint token-id sender))
+			(sender-balance (get-balance-or-default token-id sender))
+            (recipient-balance (get-balance-or-default token-id recipient))
 		)
 		(asserts! (is-eq tx-sender sender) err-invalid-sender)
 		(asserts! (<= amount sender-balance) err-insufficient-balance)
 		(try! (ft-transfer? clash-of-clans amount sender recipient))
 		(set-balance token-id (- sender-balance amount) sender)
-		(set-balance token-id (+ (get-balance-uint token-id recipient) amount) recipient)
+		(set-balance token-id (+ recipient-balance amount) recipient)
 		(print {type: "sft_transfer_event", token-id: token-id, amount: amount, sender: sender, recipient: recipient})
 		(ok true)
 	)
@@ -120,7 +117,7 @@
 (define-public (transfer-many-memo (transfers (list 200 {token-id: uint, amount: uint, sender: principal, recipient: principal, memo: (buff 34)})))
 	(fold transfer-many-memo-iter transfers (ok true))
 )
-;;/////////////////////////////////////////
+;; /////////////////////////////////////////
 
 ;; ////////////////////////////////////////
 ;; helper functions for sipxxx-semi-fungible-token-trait implementation
@@ -128,7 +125,7 @@
 	(map-set token-balances {token-id: token-id, owner: owner} balance)
 )
 
-(define-private (get-balance-uint (token-id uint) (who principal))
+(define-private (get-balance-or-default (token-id uint) (who principal))
 	(default-to u0 (map-get? token-balances {token-id: token-id, owner: who}))
 )
 
@@ -144,7 +141,7 @@
 	(begin
 		(asserts! (is-eq tx-sender contract-owner) err-owner-only)
 		(try! (ft-mint? clash-of-clans amount recipient))
-		(set-balance token-id (+ (get-balance-uint token-id recipient) amount) recipient)
+		(set-balance token-id (+ (get-balance-or-default token-id recipient) amount) recipient)
 		(map-set token-supplies token-id (+ (unwrap-panic (get-total-supply token-id)) amount))
 		(print {type: "coc_mint", token-id: token-id, amount: amount, recipient: recipient})
 		(ok true)
@@ -154,7 +151,7 @@
 (define-private (burn (token-id uint) (amount uint) (sender principal)) 
 	(let 
 		(
-			(sender-balance (get-balance-uint token-id sender))
+			(sender-balance (get-balance-or-default token-id sender))
 		)
 		(asserts! (is-eq tx-sender sender) err-invalid-sender)
 		(asserts! (>= sender-balance amount) err-insufficient-balance)
