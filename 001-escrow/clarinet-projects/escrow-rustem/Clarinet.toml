@@ -1,0 +1,7 @@
+[project]
+name = "escrow-rustem"
+requirements = []
+costs_version = 1
+[contracts.escrow]
+path = "contracts/escrow.clar"
+depends_on = []
