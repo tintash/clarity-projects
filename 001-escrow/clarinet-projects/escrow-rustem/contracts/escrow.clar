@@ -7,6 +7,7 @@
 (define-constant err-buyer-required (err u105))
 (define-constant err-no-value (err u106))
 (define-constant err-not-enough (err u107))
+(define-constant err-seller-eq-buyer (err u108))
 
 ;; Data
 (define-map orders uint {buyer: (optional principal), seller: principal, x2price: uint})
@@ -28,11 +29,13 @@
     (let
         (
             (order (unwrap! (get-order id) err-not-started))
+            (seller (get seller order))
             (x2price (get x2price order))
         )
         (asserts! (is-none (get buyer order)) err-buyer-already-exists)
+        (asserts! (not (is-eq tx-sender seller)) err-seller-eq-buyer)
         (asserts! (>= amount x2price) err-not-enough)
-        (map-set orders id (merge {buyer: tx-sender} order))
+        (map-set orders id (merge order {buyer: (some tx-sender)}))
         (stx-transfer? x2price tx-sender (as-contract tx-sender))
     )
 )
@@ -50,6 +53,7 @@
             (try! (as-contract (stx-transfer? x2price tx-sender (unwrap-panic buyer))))
             false
         )
+        (map-delete orders id)
         (as-contract (stx-transfer? x2price tx-sender seller))
     )
 )
@@ -64,6 +68,7 @@
             (price (/ x2price u2))
         )
         (asserts!  (is-eq tx-sender buyer) err-buyer-only)
+        (map-delete orders id)
         (try! (as-contract (stx-transfer? price tx-sender buyer)))
         (as-contract (stx-transfer? (+ price x2price) tx-sender seller))
     )
