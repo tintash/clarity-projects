@@ -6,3 +6,4 @@ Testnet.toml
 *.firebaserc
 firebase.json
 history.txt
+.vscode

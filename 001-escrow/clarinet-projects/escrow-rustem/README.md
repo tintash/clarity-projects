@@ -10,4 +10,6 @@
  costs to deposit. `Seller` will pay the fee and costs paid by `seller` and `buyer` will be returned back to them.
 * Public function `confirm-deal` can be called only by `buyer` only after public functions `seller-deposit` and `buyer-deposit` have been called.
  `Buyer` and `seller` at that point transfered to the contract 2 times of product price each so total amount on the contract deposit 4 times price of product.
-  Because `buyer` should pay for the product, `buyer` will get only 1/2 of deposit costs and `seller` will get 3/2 of deposit costs. 
+  Because `buyer` should pay for the product, `buyer` will get only 1/2 of deposit costs and `seller` will get 3/2 of deposit costs.
+
+  ![Sequence Diagram](diagrams/escrow-diagram.png)
