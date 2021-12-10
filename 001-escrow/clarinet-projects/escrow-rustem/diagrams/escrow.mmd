@@ -1,0 +1,29 @@
+sequenceDiagram
+  participant Buyer
+  participant Contract
+  participant Seller
+  Buyer -->> Seller: Negotiate purchase, send shipping address
+  Seller ->> Contract: Transfer 20 STX
+  Note over Seller, Contract: call the 'seller-deposit' function
+  alt Success Flow
+    Buyer ->> Contract: Transfer 20 STX
+    Note over Buyer, Contract: call the 'buyer-deposit' function
+    Seller -->> Buyer: Ship item to buyer
+    Buyer ->> Contract: Buyer confirm goods received
+    Note over Buyer, Contract: call the 'buyer-confirm' function
+    activate Contract
+    Contract ->> Buyer: Transfer 10 STX
+    Contract ->> Seller: Transfer 30 STX
+    deactivate Contract
+  else Unsuccess Flow
+    opt 
+        Buyer ->> Contract: Transfer 20 STX
+        Note over Buyer, Contract: call the 'buyer-deposit' function
+    end
+    Seller ->> Contract: Breaks the deal
+    Note over Seller, Contract: call the 'break-deal' function
+    activate Contract
+    Contract ->> Buyer: Transfer 20 STX
+    Contract ->> Seller: Transfer 20 STX
+    deactivate Contract
+  end
