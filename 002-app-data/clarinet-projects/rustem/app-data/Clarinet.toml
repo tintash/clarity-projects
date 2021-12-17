@@ -1,0 +1,20 @@
+[project]
+name = "app-data"
+requirements = []
+costs_version = 1
+
+[contracts.escrow-traits]
+path = "contracts/escrow-traits.clar"
+depends_on = []
+
+[contracts.escrow-data]
+path = "contracts/escrow-data.clar"
+depends_on = ["escrow-traits"]
+
+[contracts.escrow-v1]
+path = "contracts/escrow-v1.clar"
+depends_on = ["escrow-traits"]
+
+[contracts.escrow-v2]
+path = "contracts/escrow-v2.clar"
+depends_on = ["escrow-traits", "escrow-v1"]
