@@ -3,7 +3,6 @@
 
 ;; Errors
 (define-constant contract-owner tx-sender)
-(define-constant this-contract (as-contract tx-sender))
 
 (define-constant ERR-OWNER-ONLY (err u100))
 (define-constant ERR-UNAUTHORIZED (err u101))
@@ -61,13 +60,13 @@
 (define-public (pay-to-contract (amount uint))
     (begin
         (asserts! (is-authorized contract-caller) ERR-UNAUTHORIZED)
-        (stx-transfer? amount tx-sender this-contract)
+        (stx-transfer? amount tx-sender (as-contract tx-sender))
     )
 )
 
 (define-public (contract-pay-to-recipient (amount uint) (recipient principal))
     (begin
         (asserts! (is-authorized contract-caller) ERR-UNAUTHORIZED)
-        (stx-transfer? amount this-contract recipient)
+        (as-contract (stx-transfer? amount tx-sender recipient))
     )
 )
