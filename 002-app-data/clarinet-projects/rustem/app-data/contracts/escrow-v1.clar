@@ -53,11 +53,10 @@
             (buyer (get buyer order))
         )
         (asserts!  (is-eq tx-sender seller) ERR-SELLER-ONLY)
-        (if (is-some buyer)
+        (and (is-some buyer)
             (try! (contract-call? escrow-data
                                   contract-pay-to-recipient
                                   x2price (unwrap-panic buyer)))
-            false
         )
         (try! (contract-call? escrow-data delete-order id))
         (contract-call? escrow-data contract-pay-to-recipient x2price seller)
