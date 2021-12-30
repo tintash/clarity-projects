@@ -1,0 +1,10 @@
+sequenceDiagram
+  participant stakeholders
+  participant users
+  participant dao_ft
+  
+  stakeholders ->>+ dao_ft: can upvote/downvote proposals
+  Note over stakeholders, dao_ft: each Stakeholder has weight of vote proportional to amount of owned FTs
+  dao_ft ->>- dao_ft: check expiration date of proposal
+  users ->>+ dao_ft: can check if proposal succed after expiration date passed
+  dao_ft ->>- dao_ft: check expiration date of proposal

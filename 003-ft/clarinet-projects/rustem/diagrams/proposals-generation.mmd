@@ -1,0 +1,15 @@
+sequenceDiagram
+  participant users
+  participant contributors
+  participant stakeholders
+  participant dao_ft
+  participant contract_owner
+  
+  contract_owner ->> dao_ft: set price in STXs for ft
+  users ->>+ dao_ft: buy fungible tokens by STX and became contributors
+  dao_ft ->>- contributors: set a users that buy ft as contributors
+  users ->>+ dao_ft: buy >= 100 fungible tokens by STX and became contributors
+  dao_ft ->>- stakeholders: set a users that buy eq or more than 100 ft as contributors
+  contributors ->> dao_ft: can create proposals
+  stakeholders ->> dao_ft: can create proposals and vote for proposals
+  
