@@ -1,0 +1,7 @@
+[project]
+name = "ft-dao"
+requirements = []
+costs_version = 1
+[contracts.ft-dao]
+path = "contracts/ft-dao.clar"
+depends_on = []
