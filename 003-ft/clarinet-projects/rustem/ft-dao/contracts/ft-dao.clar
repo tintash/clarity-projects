@@ -79,10 +79,7 @@
 			(votes-against (unwrap-panic (get votes-against (get-proposal proposal-id))))
 		)
 		(asserts! (>= block-height live-period) ERR-VOTE-IN-PROGRESS)
-		(if (> votes-for votes-against)
-			(ok true)
-			(ok false)
-		)
+		(ok (> votes-for votes-against))
 	)
 )
 
@@ -92,7 +89,7 @@
 
 (define-public (set-ft-price (amount uint)) 
     (begin
-        (asserts! (is-eq tx-sender contract-owner) ERR-OWNER-ONLY) 
+        (asserts! (is-eq contract-caller contract-owner) ERR-OWNER-ONLY) 
         (ok (var-set ft-price amount))
     )
 )
@@ -101,6 +98,7 @@
 	(begin
 		(asserts! (> num-tokens u0) ERR-NO-VALUE)
 		(try! (ft-mint? dao-token num-tokens tx-sender))
+		(print {ft-price: (var-get ft-price), num-tokens: num-tokens, tx-sender: tx-sender})
 		(stx-transfer? (* num-tokens (var-get ft-price)) tx-sender (as-contract tx-sender))
 	)
 )
@@ -122,6 +120,7 @@
 				(proposal-id (+ (var-get last-proposal-id) u1))
 			)
 			(var-set last-proposal-id proposal-id)
+			(print {name: name, proposal-id: proposal-id, tx-sender: tx-sender})
 			(ok (map-set proposals proposal-id
 			             {name: name,
 						  live-period: (+ minimum-voting-period expire-at),
@@ -168,6 +167,7 @@
 				)
 			)
 		)
+		(print {vote: vote, proposal-id: proposal-id, tx-sender: tx-sender})
 		(ok (map-set proposals-votes {stakeholder: tx-sender, proposal-id: proposal-id} vote))
 	)
 )
