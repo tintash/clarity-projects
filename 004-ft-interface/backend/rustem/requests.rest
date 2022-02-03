@@ -1,0 +1,36 @@
+
+get http://localhost:3000/contractAPI/tokenName
+
+###
+get http://localhost:3000/contractAPI/tokenSymbol
+
+###
+get http://localhost:3000/contractAPI/tokenDecimals
+
+###
+get http://localhost:3000/contractAPI/tokenSupply
+
+###
+get http://localhost:3000/contractAPI/tokenURI
+
+
+###
+POST http://localhost:3000/contractAPI/setMnemonic HTTP/1.1
+Content-Type: application/json
+
+{
+    "mnemonic": "sell invite acquire kitten bamboo drastic jelly vivid peace spawn twice guilt pave pen trash pretty park cube fragile unaware remain midnight betray rebuild"
+}
+
+###
+get http://localhost:3000/getProposal
+    ?id=1
+
+###
+get http://localhost:3000/mintFT
+    ?amount=100
+
+###
+get http://localhost:3000/createProposal
+    ?name=Proposal1
+    &expireAt=3
