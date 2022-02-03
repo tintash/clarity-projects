@@ -66,7 +66,7 @@
     (var-get ft-price)
 )
 
-(define-private (get-proposal (proposal-id uint))
+(define-read-only (get-proposal (proposal-id uint))
 	(map-get? proposals proposal-id)
 )
 
