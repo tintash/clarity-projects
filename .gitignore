@@ -8,3 +8,4 @@ firebase.json
 history.txt
 .vscode
 coverage
+dist
