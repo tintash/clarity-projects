@@ -84,25 +84,28 @@ export function setMnemonic(secret) {
 }
 
 export async function mintFT(req) {
-  const amountFT = uintCV(req.query.amount);
+  const amountFT = uintCV(req.body.amount);
 
+  // generating privatkey from mnemonic
   const seed = mnemonicToSeedSync(mnemonic);
   const master = fromSeed(seed);
   const child = master.derivePath("m/44'/5757'/0'/0/0");
   const ecPair = bitcoin.ECPair.fromPrivateKey(child.privateKey);
   const privkey = blockstack.ecPairToHexString(ecPair);
   // const senderAddress = blockstack.ecPairToAddress(ecPair);
+  
+  // generating transactions post Conditions
   const senderAddress = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM";
-
-  const [contractAddress, contractName] =
-    constants.DAO_FT_CONTRACT.split(".");
-
   const postConditionAddress = senderAddress;
   const postConditionCode = FungibleConditionCode.GreaterEqual;
   const postConditionAmount = 1000000n;
   const postConditions = [
     makeStandardSTXPostCondition(postConditionAddress, postConditionCode, postConditionAmount),
   ];
+  
+  // Preparing transactions options
+  const [contractAddress, contractName] =
+  constants.DAO_FT_CONTRACT.split(".");
 
   const txOptions = {
     contractAddress,
@@ -116,26 +119,21 @@ export async function mintFT(req) {
     anchorMode: AnchorMode.Any,
   };
 
-  // const transaction = await makeContractCall(txOptions);
-
-  // const broadcastResponse = await broadcastTransaction(transaction, network);
-  // return JSON.stringify(broadcastResponse);
   return sendTx(txOptions);
 }
 
 export async function createProposal(req) {
-  const newProposalName = stringAsciiCV(req.query.name);
-  const newProposalExpire = uintCV(req.query.expireAt);
+  const newProposalName = stringAsciiCV(req.body.name);
+  const newProposalExpire = uintCV(req.body.expireAt);
 
+  // generating privatkey from mnemonic
   const seed = mnemonicToSeedSync(mnemonic);
   const master = fromSeed(seed);
   const child = master.derivePath("m/44'/5757'/0'/0/0");
   const ecPair = bitcoin.ECPair.fromPrivateKey(child.privateKey);
   const privkey = blockstack.ecPairToHexString(ecPair);
 
-  const [contractAddress, contractName] =
-  constants.DAO_FT_CONTRACT.split(".");
-
+  // generating transactions post Conditions
   const senderAddress = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM";
   const postConditionAddress = senderAddress;
   const postConditionCode = FungibleConditionCode.GreaterEqual;
@@ -143,6 +141,10 @@ export async function createProposal(req) {
   const postConditions = [
     makeStandardSTXPostCondition(postConditionAddress, postConditionCode, postConditionAmount),
   ];
+  
+  // Preparing transactions options
+  const [contractAddress, contractName] =
+  constants.DAO_FT_CONTRACT.split(".");
 
   const txOptions = {
     contractAddress,
@@ -159,18 +161,17 @@ export async function createProposal(req) {
 }
 
 export async function voteProposal(req) {
-  const proposalId = uintCV(req.query.id);
-  const proposalVote = uintCV(req.query.vote) ? trueCV() : falseCV();
+  const proposalId = uintCV(req.body.id);
+  const proposalVote = uintCV(req.body.vote) ? trueCV() : falseCV();
 
+  // generating privatkey from mnemonic
   const seed = mnemonicToSeedSync(mnemonic);
   const master = fromSeed(seed);
   const child = master.derivePath("m/44'/5757'/0'/0/0");
   const ecPair = bitcoin.ECPair.fromPrivateKey(child.privateKey);
   const privkey = blockstack.ecPairToHexString(ecPair);
-
-  const [contractAddress, contractName] =
-  constants.DAO_FT_CONTRACT.split(".");
-
+  
+  // generating transactions post Conditions
   const senderAddress = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM";
   const postConditionAddress = senderAddress;
   const postConditionCode = FungibleConditionCode.GreaterEqual;
@@ -178,7 +179,11 @@ export async function voteProposal(req) {
   const postConditions = [
     makeStandardSTXPostCondition(postConditionAddress, postConditionCode, postConditionAmount),
   ];
-
+  
+  // Preparing transactions options
+  const [contractAddress, contractName] =
+  constants.DAO_FT_CONTRACT.split(".");
+  
   const txOptions = {
     contractAddress,
     contractName,
