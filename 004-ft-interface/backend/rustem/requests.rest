@@ -27,10 +27,18 @@ get http://localhost:3000/getProposal
     ?id=1
 
 ###
-get http://localhost:3000/mintFT
-    ?amount=100
+POST http://localhost:3000/mintFT  HTTP/1.1
+Content-Type: application/json
+
+{
+    "amount": 100
+}
 
 ###
-get http://localhost:3000/createProposal
-    ?name=Proposal1
-    &expireAt=3
+POST http://localhost:3000/createProposal  HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "Proposal 1",
+    "expireAt": 3
+}

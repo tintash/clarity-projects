@@ -21,50 +21,19 @@ app.get("/", (req, rsp) => {
   rsp.send("Fungible Tokens for DAO!");
 });
 
-app.get("/contractAPI/tokenName", async (req, rsp) => {
+const pathFunctionMap = {
+  "tokenName": getTokenName,
+  "tokenSymbol": getTokenSymbol,
+  "tokenDecimals": getTokenDecimals,
+  "tokenSupply": getTokenSupply,
+  "tokenURI": getTokenURI,
+
+};
+
+app.get("/contractAPI/:path", async (req, rsp) => {
   try {
-    const name = await getTokenName();
+    const name = await pathFunctionMap[req.params.path]();
     rsp.send(name);
-  } catch (error) {
-    rsp.status(404);
-    rsp.send("Not Found - " + error);
-  }
-});
-
-app.get("/contractAPI/tokenSymbol", async (req, rsp) => {
-  try {
-    const symbol = await getTokenSymbol();
-    rsp.send(symbol);
-  } catch (error) {
-    rsp.status(404);
-    rsp.send("Not Found - " + error);
-  }
-});
-
-app.get("/contractAPI/tokenDecimals", async (req, rsp) => {
-  try {
-    const decimals = await getTokenDecimals();
-    rsp.send(decimals);
-  } catch (error) {
-    rsp.status(404);
-    rsp.send("Not Found - " + error);
-  }
-});
-
-app.get("/contractAPI/tokenSupply", async (req, rsp) => {
-  try {
-    const tokenSupply = await getTokenSupply();
-    rsp.send(tokenSupply);
-  } catch (error) {
-    rsp.status(404);
-    rsp.send("Not Found - " + error);
-  }
-});
-
-app.get("/contractAPI/tokenURI", async (req, rsp) => {
-  try {
-    const uri = await getTokenURI();
-    rsp.send(uri);
   } catch (error) {
     rsp.status(404);
     rsp.send("Not Found - " + error);
@@ -86,17 +55,17 @@ app.get("/isProposalSucceeded", async (req, rsp) => {
   rsp.send(val);
 });
 
-app.get("/mintFT", async (req, rsp) => {
+app.post("/mintFT", async (req, rsp) => {
   const val = await mintFT(req);
   rsp.send(val);
 });
 
-app.get("/createProposal", async (req, rsp) => {
+app.post("/createProposal", async (req, rsp) => {
   const val = await createProposal(req);
   rsp.send(val);
 });
 
-app.get("/voteProposal", async (req, rsp) => {
+app.post("/voteProposal", async (req, rsp) => {
   const val = await voteProposal(req);
   rsp.send(val);
 });
